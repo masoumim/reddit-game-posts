@@ -3,6 +3,7 @@
 
 import './globals.css'
 import { Inter } from 'next/font/google'
+import AppProvider from './appProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -15,7 +16,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>{children}
-      {/* TODO: If user logged in, display u/username. Otherwise, display button with text: "Connect your Reddit Account" */}
+        {/* TODO: If user logged in, display u/username. Otherwise, display button with text: "Connect your Reddit Account" */}
+        <AppProvider>
+          {children}
+        </AppProvider>
       </body>
     </html>
   )
