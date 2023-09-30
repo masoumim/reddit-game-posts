@@ -2,7 +2,10 @@
 // - Getting Access Token
 // - Fetching Post data
 
-
+// TODO: Authorize App / Grant App Permission
+export function authorizeApp(){
+    console.log("authorizeApp() triggered!");
+}
 
 // TODO: Get Access Token
 

@@ -2,7 +2,7 @@
 // It then iterates over them, creating a post 'tile' for each one
 
 import React from "react";
-import { selectPosts } from "./postsSlice";
+import { selectPosts } from "./postsSlice";    
 import Tile from "@/app/components/tile";
 
 export default function Posts() {
