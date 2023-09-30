@@ -14,7 +14,7 @@ it("Confirms empty username when user Clicks the 'Continue without connecting Re
     const continueWithoutConnectingLink = screen.getByRole("link");
     
     // Act
-    userEvent.click(continueWithoutConnectingLink);
+    userEvent.click(continueWithoutConnectingLink);    
     const userName = getUsername();
 
     // Assert
