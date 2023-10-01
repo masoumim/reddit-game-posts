@@ -2,8 +2,8 @@
 // It then iterates over them, creating a post 'tile' for each one
 
 import React from "react";
-import { selectPosts } from "./postsSlice";    
-import Tile from "@/app/components/tile";
+import { selectPosts } from "./postsSlice.js";    
+import Tile from "@/app/components/Tile.js";
 
 export default function Posts() {
 
@@ -12,7 +12,6 @@ export default function Posts() {
 
     // Get an array of each individual post Object
     const postsList = Object.values(posts.posts);
-
 
     // Iterate though posts and render a tile component for each one
     return (
