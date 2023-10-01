@@ -6,17 +6,13 @@
 // To search for POSTS use https://www.reddit.com/dev/api/#GET_search and set restrict_sr to FALSE
 
 import axios from "axios";
-import { v4 as uuidv4 } from 'uuid';
 
 // Authorize App + User
 // *User grants this client app permission to access their Reddit profile data
-export function userAuthorizeApp() {
-    // Use UUID to generate key for "state" parameter
-    const stateString = uuidv4();
-
+export function userAuthorizeApp(stateString) { 
     // Use NODE_ENV to set "redirect_uri" depending on environment
     // TODO: Set the production URI after deploying to VERCEL 
-    const redirectURI = process.env.NODE_ENV === "development" ? "http://localhost:3000/app" : "[productionURL]/app"
+    const redirectURI = process.env.NODE_ENV === "development" ? "http://localhost:3000/app" : "[productionURL]/app";
 
     // Set url parameters
     const params = new URLSearchParams();
@@ -31,9 +27,14 @@ export function userAuthorizeApp() {
     document.location = `https://www.reddit.com/api/v1/authorize?${params.toString()}`;
 }
 
+// Returns the Access Token using URL params 'state' and 'code'
+export async function getUserAuthAccessToken(returnedStateString, code){
+    console.log('inside getUserAuthAccessToken()');
+}
+
 // Authorize App Only
 // *Authorizes this client app without a user context.
-export async function authorizeAppOnly() {    
+export async function authorizeAppOnly() {
     // As per Reddit API spec, Application Only OAuth uses HTTP Basic Auth to authorize this app.
     // Basic Auth uses an "Authorization" header to set the username / password.
     // This implementation uses Axios's 'auth' property instead of the Authorization Header
@@ -43,17 +44,16 @@ export async function authorizeAppOnly() {
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
         auth: { username: process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID, password: process.env.NEXT_PUBLIC_REDDIT_SECRET },
         data: new URLSearchParams({
-            grant_type: 'client_credentials'
+            grant_type: 'client_credentials',
+            scope: 'read'
         })
     };
 
-    // TODO: Save the Access Token from the response.
-    axios.request(options)
-    .then(function (response) {
-        console.log(response.data);        
-    }).catch(function (error) {
-        console.error(error);
-    });
+    // Send the POST request containing Access Token
+    const accessTokenObject = await axios.request(options);
+    
+    // Return the response object
+    return accessTokenObject;
 }
 
 // TODO: Get Access Token

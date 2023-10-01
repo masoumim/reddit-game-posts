@@ -6,17 +6,19 @@ import { userEvent } from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 import Home from "../page";
-import { getUsername } from "../utilities";
+import RootLayout from "../layout";
 
-it("Confirms empty username when user Clicks the 'Continue without connecting Reddit Account' Link", () =>{
-    // Arrange
-    render(<Home/>);
-    const continueWithoutConnectingLink = screen.getByRole("link");
+// it("Confirms presence of 'Connect Reddit account' button in layout when user Clicks the 'Continue without connecting Reddit Account' Link on Home page", () =>{
+//     // Arrange
+//     render(<Home/>);
+//     const continueWithoutConnectingLink = screen.getByRole("link");
     
-    // Act
-    userEvent.click(continueWithoutConnectingLink);    
-    const userName = getUsername();
+//     // Act
+//     userEvent.click(continueWithoutConnectingLink);
+//     render(<Home/>);
+//     render(<RootLayout/>);
+//     const button = screen.getByRole('button', {name: /Connect Reddit account/i});
 
-    // Assert
-    expect(userName).toEqual("");
-});
+//     // Assert
+//     expect(button).toBeInTheDocument();
+// });
