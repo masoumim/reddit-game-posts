@@ -6,12 +6,8 @@ import { createSlice } from "@reduxjs/toolkit";
 // Create Slice
 export const redditSlice = createSlice({
     name: 'reddit',
-    initialState: { generatedStateString: "", accessToken: "", redditCode: ""},
+    initialState: { accessToken: "", redditCode: ""},
     reducers: {
-        setGeneratedStateString: (state, action) => {
-            console.log(`inside redditSlice - setGeneratedStateString - action.payload = ${action.payload.generatedStateString}`);
-            state.generatedStateString = action.payload.generatedStateString;
-        },
         setAccessToken: (state, action) => {
             state.accessToken = action.payload;
         },
@@ -22,12 +18,11 @@ export const redditSlice = createSlice({
 })
 
 // Export action creator(s)
-export const { setGeneratedStateString, setAccessToken, setRedditCode } = redditSlice.actions;
+export const { setAccessToken, setRedditCode } = redditSlice.actions;
 
 // Export the selectors
-export const selectGeneratedString = (state) => state.generatedStateString;
-export const selectAccessToken = (state) => state.accessToken;
-export const selectRedditCode = (state) => state.redditCode;
+export const selectAccessToken = (state) => state.reddit.accessToken;
+export const selectRedditCode = (state) => state.reddit.redditCode;
 
 // Export the reducer
 export default redditSlice.reducer;

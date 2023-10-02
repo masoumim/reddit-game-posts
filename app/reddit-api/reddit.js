@@ -6,13 +6,21 @@
 // To search for POSTS use https://www.reddit.com/dev/api/#GET_search and set restrict_sr to FALSE
 
 import axios from "axios";
+import { v4 as uuidv4 } from 'uuid';
 
 // Authorize App + User
-// *User grants this client app permission to access their Reddit profile data
-export function userAuthorizeApp(stateString) { 
+// *User grants this client app permission to access their Reddit account.
+export function userAuthorizeApp() {
     // Use NODE_ENV to set "redirect_uri" depending on environment
     // TODO: Set the production URI after deploying to VERCEL 
     const redirectURI = process.env.NODE_ENV === "development" ? "http://localhost:3000/app" : "[productionURL]/app";
+
+    // Use UUID to generate key for the "state" URL parameter required by Reddit API
+    const stateString = uuidv4();
+
+    // Save the state string to session storage so it can persist
+    // when the user is redirected back to the /app route after authorization on Reddit.
+    window.sessionStorage.setItem("stateString", stateString);
 
     // Set url parameters
     const params = new URLSearchParams();
@@ -28,16 +36,18 @@ export function userAuthorizeApp(stateString) {
 }
 
 // Returns the Access Token using URL params 'state' and 'code'
-export async function getUserAuthAccessToken(returnedStateString, code){
+export async function getUserAuthAccessToken(state, code) {
     console.log('inside getUserAuthAccessToken()');
+
+    // TODO: After getting the Access Token, clear / delete the sessionStore's state string.
 }
 
 // Authorize App Only
 // *Authorizes this client app without a user context.
 export async function authorizeAppOnly() {
-    // As per Reddit API spec, Application Only OAuth uses HTTP Basic Auth to authorize this app.
-    // Basic Auth uses an "Authorization" header to set the username / password.
-    // This implementation uses Axios's 'auth' property instead of the Authorization Header
+    // As per Reddit API spec, 'Application Only OAuth' uses 'HTTP Basic Auth' to authorize this app.
+    // Basic Auth uses an "Authorization" header to set a username / password.
+    // This implementation uses Axios's 'auth' property to set the Authorization Header.
     const options = {
         method: 'POST',
         url: 'https://www.reddit.com/api/v1/access_token',
@@ -45,15 +55,16 @@ export async function authorizeAppOnly() {
         auth: { username: process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID, password: process.env.NEXT_PUBLIC_REDDIT_SECRET },
         data: new URLSearchParams({
             grant_type: 'client_credentials',
-            scope: 'read'
+            scope: 'read',
+            duration: 'permanent'
         })
     };
 
-    // Send the POST request containing Access Token
-    const accessTokenObject = await axios.request(options);
-    
-    // Return the response object
-    return accessTokenObject;
+    // Send the POST request
+    const responseObject = await axios.request(options);
+
+    // Return access token from the responseObject
+    return responseObject.data.access_token;
 }
 
 // TODO: Get Access Token

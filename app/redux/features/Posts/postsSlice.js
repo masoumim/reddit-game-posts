@@ -8,10 +8,10 @@ export const postsSlice = createSlice({
     initialState: { posts: {} },
     reducers: {
         addPost: (state, action) => {
-            state.posts[action.payload.postId] = action.payload;
+            
         },
         removePost: (state, action) => {
-            delete state.posts[action.payload.postId];
+            
         }
     }
 })
