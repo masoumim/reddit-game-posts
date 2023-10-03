@@ -29,7 +29,7 @@ export function userAuthorizeApp() {
     params.append("state", stateString);
     params.append("redirect_uri", redirectURI);
     params.append("duration", 'permanent');
-    params.append("scope", "identity");
+    params.append("scope", "identity read");
 
     // Redirect user to Reddit 'authorization' URL where user can grant this app access to their profile data.
     document.location = `https://www.reddit.com/api/v1/authorize?${params.toString()}`;
@@ -47,7 +47,7 @@ export async function getUserAuthAccessToken(code) {
             grant_type: 'authorization_code',
             code: code,
             redirect_uri: redirectURI,
-            scope: "identity",
+            scope: "identity read",
             duration: 'permanent'
         }
     };
@@ -55,6 +55,8 @@ export async function getUserAuthAccessToken(code) {
     // Send the POST request
     const responseObject = await axios.request(options);
 
+    console.log(responseObject);
+    
     // Delete the state string in sessionStore
     window.sessionStorage.clear();
 
