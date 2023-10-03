@@ -3,18 +3,18 @@
 // - Getting Access Token
 // - Fetching Post data
 // Reddit OAuth2 Documentation: https://github.com/reddit-archive/reddit/wiki/OAuth2
-// To search for POSTS use https://www.reddit.com/dev/api/#GET_search and set restrict_sr to FALSE
+// To search for POSTS use https://www.reddit.com/dev/api/#GET_search and set restrict_sr to FALSE. restrict_sr = restrict subreddit
 
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
 
+// Use NODE_ENV to set "redirect_uri" depending on environment
+// TODO: Set the production URI after deploying to VERCEL 
+const redirectURI = process.env.NODE_ENV === "development" ? "http://localhost:3000/app" : "[productionURL]/app";
+
 // Authorize App + User
 // *User grants this client app permission to access their Reddit account.
 export function userAuthorizeApp() {
-    // Use NODE_ENV to set "redirect_uri" depending on environment
-    // TODO: Set the production URI after deploying to VERCEL 
-    const redirectURI = process.env.NODE_ENV === "development" ? "http://localhost:3000/app" : "[productionURL]/app";
-
     // Use UUID to generate key for the "state" URL parameter required by Reddit API
     const stateString = uuidv4();
 
@@ -35,29 +35,47 @@ export function userAuthorizeApp() {
     document.location = `https://www.reddit.com/api/v1/authorize?${params.toString()}`;
 }
 
-// Returns the Access Token using URL params 'state' and 'code'
-export async function getUserAuthAccessToken(state, code) {
-    console.log('inside getUserAuthAccessToken()');
-
-    // TODO: After getting the Access Token, clear / delete the sessionStore's state string.
-}
-
-// Authorize App Only
-// *Authorizes this client app without a user context.
-export async function authorizeAppOnly() {
-    // As per Reddit API spec, 'Application Only OAuth' uses 'HTTP Basic Auth' to authorize this app.
-    // Basic Auth uses an "Authorization" header to set a username / password.
-    // This implementation uses Axios's 'auth' property to set the Authorization Header.
+// Returns the Access Token using URL param 'code'
+export async function getUserAuthAccessToken(code) {    
+    // Set the object to use in the POST request
     const options = {
         method: 'POST',
         url: 'https://www.reddit.com/api/v1/access_token',
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
         auth: { username: process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID, password: process.env.NEXT_PUBLIC_REDDIT_SECRET },
-        data: new URLSearchParams({
+        data: {
+            grant_type: 'authorization_code',
+            code: code,
+            redirect_uri: redirectURI,
+            scope: 'read',
+            duration: 'permanent'
+        }
+    };
+
+    // Send the POST request
+    const responseObject = await axios.request(options);
+
+    // Delete the state string in sessionStore
+    window.sessionStorage.clear();
+
+    // Return access token from the responseObject
+    return responseObject.data.access_token;    
+}
+
+// Authorize App Only
+// *Authorizes this client app without a user context.
+export async function authorizeAppOnly() {
+    // Set the object to use in the POST request
+    const options = {
+        method: 'POST',
+        url: 'https://www.reddit.com/api/v1/access_token',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        auth: { username: process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID, password: process.env.NEXT_PUBLIC_REDDIT_SECRET },
+        data: {
             grant_type: 'client_credentials',
             scope: 'read',
             duration: 'permanent'
-        })
+        }
     };
 
     // Send the POST request
@@ -66,8 +84,6 @@ export async function authorizeAppOnly() {
     // Return access token from the responseObject
     return responseObject.data.access_token;
 }
-
-// TODO: Get Access Token
 
 // TODO: Search Reddit POSTS for game in POST TITLE
 
