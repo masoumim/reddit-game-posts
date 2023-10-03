@@ -3,7 +3,6 @@
 // - Getting Access Token
 // - Fetching Post data
 // Reddit OAuth2 Documentation: https://github.com/reddit-archive/reddit/wiki/OAuth2
-// To search for POSTS use https://www.reddit.com/dev/api/#GET_search and set restrict_sr to FALSE. restrict_sr = restrict subreddit
 
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
