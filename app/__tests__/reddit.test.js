@@ -58,7 +58,7 @@ it('tests the getUserAuthAccessToken() method which returns an access token', as
     axios.request.mockResolvedValueOnce(mockResponse);
 
     // act
-    const actualResponse = await getUserAuthAccessToken('state', 'code');
+    const actualResponse = await getUserAuthAccessToken('code');
 
     // assert
     expect(actualResponse).toEqual(expectedValue);

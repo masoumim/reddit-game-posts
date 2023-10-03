@@ -6,6 +6,7 @@
 
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
+import { selectAccessToken } from "../redux/features/Reddit/redditSlice";
 
 // Use NODE_ENV to set "redirect_uri" depending on environment
 // TODO: Set the production URI after deploying to VERCEL 
@@ -27,15 +28,15 @@ export function userAuthorizeApp() {
     params.append("response_type", "code");
     params.append("state", stateString);
     params.append("redirect_uri", redirectURI);
-    params.append("duration", 'temporary');
-    params.append("scope", "read");
+    params.append("duration", 'permanent');
+    params.append("scope", "identity");
 
     // Redirect user to Reddit 'authorization' URL where user can grant this app access to their profile data.
     document.location = `https://www.reddit.com/api/v1/authorize?${params.toString()}`;
 }
 
 // Returns the Access Token using URL param 'code'
-export async function getUserAuthAccessToken(code) {    
+export async function getUserAuthAccessToken(code) {        
     // Set the object to use in the POST request
     const options = {
         method: 'POST',
@@ -46,7 +47,7 @@ export async function getUserAuthAccessToken(code) {
             grant_type: 'authorization_code',
             code: code,
             redirect_uri: redirectURI,
-            scope: 'read',
+            scope: "identity",
             duration: 'permanent'
         }
     };
@@ -58,7 +59,7 @@ export async function getUserAuthAccessToken(code) {
     window.sessionStorage.clear();
 
     // Return access token from the responseObject
-    return responseObject.data.access_token;    
+    return responseObject.data.access_token;
 }
 
 // Authorize App Only
@@ -83,6 +84,28 @@ export async function authorizeAppOnly() {
     // Return access token from the responseObject
     return responseObject.data.access_token;
 }
+
+// Reddit API base URL: https://oauth.reddit.com
+export async function getUserInfo(accessToken) {    
+    const base_url = 'https://oauth.reddit.com';
+
+    // Set the object to use in the GET request
+    const options = {
+        method: 'GET',
+        url: `${base_url}/api/v1/me/`,
+        headers: { 'Authorization': `bearer ${accessToken}` }
+    };
+
+    try {
+        const response = await axios.request(options);        
+        return response;
+    }
+    catch (err) {
+        console.log(`getUserInfo() error: ${err}`);
+    }
+}
+
+// https://alpscode.com/blog/how-to-use-reddit-api/
 
 // TODO: Search Reddit POSTS for game in POST TITLE
 

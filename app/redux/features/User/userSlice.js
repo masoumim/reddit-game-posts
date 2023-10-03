@@ -8,10 +8,10 @@ export const userSlice = createSlice({
     initialState: { loggedIn: false, name: "" },
     reducers: {
         setLoggedIn: (state, action) => {
-            
+            state.loggedIn = action.payload;
         },
         setName: (state, action) => {
-            
+            state.name = action.payload;   
         }
     }
 })

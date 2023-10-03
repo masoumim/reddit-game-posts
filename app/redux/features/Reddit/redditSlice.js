@@ -8,7 +8,7 @@ export const redditSlice = createSlice({
     name: 'reddit',
     initialState: { accessToken: "", redditCode: ""},
     reducers: {
-        setAccessToken: (state, action) => {
+        setAccessToken: (state, action) => {            
             state.accessToken = action.payload;
         },
         setRedditCode: (state, action) => {

@@ -3,16 +3,21 @@
 // This page will render all of the content for the app.
 
 import { useState, useEffect, useRef } from "react";
-import { useDispatch } from "react-redux";
-import { authorizeAppOnly, getUserAuthAccessToken } from "@/app/reddit-api/reddit.js";
+import { useDispatch, useSelector } from "react-redux";
+import { authorizeAppOnly, getUserAuthAccessToken, getUserInfo } from "@/app/reddit-api/reddit.js";
 import { checkGameTitle } from "@/app/videogame-db-api/vgdb";
 import { setAccessToken } from "@/app/redux/features/Reddit/redditSlice";
+import { setLoggedIn, selectLoggedInStatus } from "@/app/redux/features/User/userSlice";
 import SearchForm from "@/app/components/SearchForm";
 
 export default function App() {
     // store hook in variable so it can be used in the body of
     // functions other than Component Functions
     const dispatch = useDispatch();
+
+    const [accessToken, setAccessToken] = useState("");
+    const [loggedIn, setLoggedIn] = useState(false);
+    const [redditUsername, setRedditUsername] = useState("");
 
     /*
      The useRef Hook allows you to persist values between renders.
@@ -23,9 +28,13 @@ export default function App() {
     */
     const accessTokenRef = useRef(false);
 
+    // Get Access Token
     useEffect(() => {
         // If we have already fetched the access token, return.
         if (accessTokenRef.current) return;
+
+        // Otherwise, set accessTokenRef to true and get access token
+        accessTokenRef.current = true;
 
         // We check to see if the URL has params named "state" and "code". 
         // If it does, it signifies the User has authorized the app and has been redirected successfully.
@@ -40,14 +49,14 @@ export default function App() {
 
             // Check if the state string in the URL matches the initially generated string
             if (stateString === state) {
-                // Get the Access Token using code
+                // Get the Access Token using code                
                 getUserAuthAccessToken(code)
                     .then(token => {
-                        // Save the access token to the Reddit Slice
-                        dispatch(setAccessToken(token));
+                        // Set the access token state variable
+                        setAccessToken(token);
 
-                        // Set accessTokenRef to true as we have fetched the access token
-                        accessTokenRef.current = true;
+                        // Set bool to indicate User is logged in to their Reddit account
+                        setLoggedIn(true);
                     })
                     .catch((err) => {
                         console.log(err);
@@ -60,17 +69,29 @@ export default function App() {
         else {
             authorizeAppOnly()
                 .then(token => {
-                    // Save the access token to the Reddit Slice
-                    dispatch(setAccessToken(token));
 
-                    // Set accessTokenRef to true as we have fetched the access token
-                    accessTokenRef.current = true;
+                    // Set the access token state variable
+                    setAccessToken(token);
                 })
                 .catch((err) => {
                     console.log(err);
                 });
         }
     }, []);
+
+    
+    // Get user's Reddit profile name
+    useEffect(() => {
+        if (loggedIn) {
+            getUserInfo(accessToken)
+                .then(res => {
+                    setRedditUsername(res.data.name);
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+        }
+    }, [loggedIn]);
 
     // State variable for the Search Bar input
     const [searchBarInput, setSearchBarInput] = useState("");
@@ -91,18 +112,20 @@ export default function App() {
         // Confirm user input is a valid game title by calling RAWG API
         const result = await checkGameTitle(searchBarInput);
 
-        if(result){
+        if (result) {
             setGameTitleSearchResult(`Searching for: ${result}`);
-            // Search Reddit for this game...            
-        }else{
+
+            // TODO: Search Reddit for this game...
+
+        } else {
             setGameTitleSearchResult(`Sorry, no game found`);
         }
-        
+
         // Get the access token from the Reddit Slice
         const accessToken = "";
 
         // Call the Reddit API
-        // let searchResults = await someAPICall(searchBarInput, accessToken);
+        // let searchResults = await someFunc(searchBarInput);
 
         // Process response
         // const postsArray = getPosts(searchResults);
@@ -110,10 +133,12 @@ export default function App() {
         // Add posts to the posts slice        
     }
 
+
     return (
         <>
+            <p>{redditUsername}</p>
             <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} handleSearchBarInput={handleSearchBarInput} />
-            <br/>
+            <br />
             <p>{gameTitleSearchResult}</p>
         </>
     )
