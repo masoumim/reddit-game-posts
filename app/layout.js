@@ -3,7 +3,6 @@
 
 import './globals.css'
 import { Inter } from 'next/font/google'
-import AppProvider from './appProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,9 +18,7 @@ export default function RootLayout({ children }) {
         <nav>
           <p>Reddit Game Posts</p>
         </nav>
-        <AppProvider>
           {children}
-        </AppProvider>
       </body>
     </html>
   )

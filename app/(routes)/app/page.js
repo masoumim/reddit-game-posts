@@ -3,21 +3,18 @@
 // This page will render all of the content for the app.
 
 import { useState, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { authorizeAppOnly, getUserAuthAccessToken, getUserInfo } from "@/app/reddit-api/reddit.js";
 import { checkGameTitle } from "@/app/videogame-db-api/vgdb";
-import { setAccessToken } from "@/app/redux/features/Reddit/redditSlice";
-import { setLoggedIn, selectLoggedInStatus } from "@/app/redux/features/User/userSlice";
 import SearchForm from "@/app/components/SearchForm";
 
 export default function App() {
-    // store hook in variable so it can be used in the body of
-    // functions other than Component Functions
-    const dispatch = useDispatch();
 
-    const [accessToken, setAccessToken] = useState("");
-    const [loggedIn, setLoggedIn] = useState(false);
-    const [redditUsername, setRedditUsername] = useState("");
+    const [isLoading, setIsLoading] = useState(false);                          // Used to conditionally render data while fetching
+    const [accessToken, setAccessToken] = useState("");                         // Reddit access token
+    const [loggedIn, setLoggedIn] = useState(false);                            // Status representing if user is logged in to Reddit or not    
+    const [redditUsername, setRedditUsername] = useState("");                   // The user's Reddit username
+    const [searchBarInput, setSearchBarInput] = useState("");                   // The text entered into the search bar
+    const [gameTitleSearchResult, setGameTitleSearchResult] = useState("");     // Set to a valid title if returned by RAWG API call
 
     /*
      The useRef Hook allows you to persist values between renders.
@@ -79,25 +76,21 @@ export default function App() {
         }
     }, []);
 
-    
+
     // Get user's Reddit profile name
-    useEffect(() => {
+    useEffect(() => {        
         if (loggedIn) {
+            setIsLoading(true);
             getUserInfo(accessToken)
                 .then(res => {
                     setRedditUsername(res.data.name);
+                    setIsLoading(false);
                 })
                 .catch((err) => {
                     console.log(err);
                 })
         }
     }, [loggedIn]);
-
-    // State variable for the Search Bar input
-    const [searchBarInput, setSearchBarInput] = useState("");
-
-    // State variable for the game title search result
-    const [gameTitleSearchResult, setGameTitleSearchResult] = useState("");
 
     // Updates the searchBarInput state on every change to the input field
     function handleSearchBarInput(event) {
@@ -136,7 +129,7 @@ export default function App() {
 
     return (
         <>
-            <p>{redditUsername}</p>
+            {isLoading ? <p>Loading...</p> : redditUsername}
             <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} handleSearchBarInput={handleSearchBarInput} />
             <br />
             <p>{gameTitleSearchResult}</p>

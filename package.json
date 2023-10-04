@@ -10,12 +10,10 @@
     "test": "jest --watch"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "^1.9.6",
     "axios": "^1.5.1",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "react-redux": "^8.1.2",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

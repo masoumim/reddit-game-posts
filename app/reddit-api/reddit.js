@@ -6,7 +6,6 @@
 
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
-import { selectAccessToken } from "../redux/features/Reddit/redditSlice";
 
 // Use NODE_ENV to set "redirect_uri" depending on environment
 // TODO: Set the production URI after deploying to VERCEL 
