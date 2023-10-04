@@ -3,9 +3,10 @@
 // This page will render all of the content for the app.
 
 import { useState, useEffect, useRef } from "react";
-import { authorizeAppOnly, getUserAuthAccessToken, getUserInfo } from "@/app/reddit-api/reddit.js";
+import { authorizeAppOnly, getUserAuthAccessToken, getUserInfo, getRedditPosts } from "@/app/reddit-api/reddit.js";
 import { checkGameTitle } from "@/app/videogame-db-api/vgdb";
 import SearchForm from "@/app/components/SearchForm";
+import { processPosts } from "@/app/processPostData";
 
 export default function App() {
 
@@ -14,7 +15,7 @@ export default function App() {
     const [loggedIn, setLoggedIn] = useState(false);                            // Status representing if user is logged in to Reddit or not    
     const [redditUsername, setRedditUsername] = useState("");                   // The user's Reddit username
     const [searchBarInput, setSearchBarInput] = useState("");                   // The text entered into the search bar
-    const [gameTitleSearchResult, setGameTitleSearchResult] = useState("");     // Set to a valid title if returned by RAWG API call
+    const [gameTitle, setGameTitle] = useState("");                             // Set to a valid title if returned by RAWG API call
 
     /*
      The useRef Hook allows you to persist values between renders.
@@ -78,7 +79,7 @@ export default function App() {
 
 
     // Get user's Reddit profile name
-    useEffect(() => {        
+    useEffect(() => {
         if (loggedIn) {
             setIsLoading(true);
             getUserInfo(accessToken)
@@ -103,27 +104,23 @@ export default function App() {
         event.preventDefault(); // Prevents the page from reloading on submit
 
         // Confirm user input is a valid game title by calling RAWG API
-        const result = await checkGameTitle(searchBarInput);
+        const gameTitleSearchResult = await checkGameTitle(searchBarInput);
 
-        if (result) {
-            setGameTitleSearchResult(`Searching for: ${result}`);
+        if (gameTitleSearchResult) {
+            // Display the game title                        
+            setGameTitle(`Searching for: ${gameTitleSearchResult.name}`);
 
-            // TODO: Search Reddit for this game...
+            // Search Reddit for this game            
+            const redditSearchResults = await getRedditPosts(accessToken, gameTitleSearchResult.name);
 
+            // Process response - Returns a formatted array of Post Objects
+            // redditSearchResults.data.data.children = array of returned reddit posts
+            // gameTitleSearchResult.tags = array of tags related to the game title
+            // gameTitleSearchResult.platforms = array of platforms the game released on
+            const postsArray = processPosts(redditSearchResults.data.data.children, gameTitleSearchResult.tags, gameTitleSearchResult.platforms);
         } else {
-            setGameTitleSearchResult(`Sorry, no game found`);
+            setGameTitle(`Sorry, no game found`);
         }
-
-        // Get the access token from the Reddit Slice
-        const accessToken = "";
-
-        // Call the Reddit API
-        // let searchResults = await someFunc(searchBarInput);
-
-        // Process response
-        // const postsArray = getPosts(searchResults);
-
-        // Add posts to the posts slice        
     }
 
 
@@ -132,7 +129,7 @@ export default function App() {
             {isLoading ? <p>Loading...</p> : redditUsername}
             <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} handleSearchBarInput={handleSearchBarInput} />
             <br />
-            <p>{gameTitleSearchResult}</p>
+            <p>{gameTitle}</p>
         </>
     )
 }

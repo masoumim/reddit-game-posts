@@ -11,6 +11,9 @@ import { v4 as uuidv4 } from 'uuid';
 // TODO: Set the production URI after deploying to VERCEL 
 const redirectURI = process.env.NODE_ENV === "development" ? "http://localhost:3000/app" : "[productionURL]/app";
 
+// Base URL for Reddit API
+const base_url = 'https://oauth.reddit.com';
+
 // Authorize App + User
 // *User grants this client app permission to access their Reddit account.
 export function userAuthorizeApp() {
@@ -54,8 +57,6 @@ export async function getUserAuthAccessToken(code) {
     // Send the POST request
     const responseObject = await axios.request(options);
 
-    console.log(responseObject);
-    
     // Delete the state string in sessionStore
     window.sessionStorage.clear();
 
@@ -86,10 +87,8 @@ export async function authorizeAppOnly() {
     return responseObject.data.access_token;
 }
 
-// Reddit API base URL: https://oauth.reddit.com
+// Calls Reddit API to get Reddit username
 export async function getUserInfo(accessToken) {    
-    const base_url = 'https://oauth.reddit.com';
-
     // Set the object to use in the GET request
     const options = {
         method: 'GET',
@@ -106,10 +105,25 @@ export async function getUserInfo(accessToken) {
     }
 }
 
-// https://alpscode.com/blog/how-to-use-reddit-api/
+// Calls Reddit API to search for posts about game title
+export async function getRedditPosts(accessToken, gameTitle){
+    // Set the object to use in the GET request
+    const options = {
+        method: 'GET',
+        url: `${base_url}/search`,
+        headers: { 'Authorization': `bearer ${accessToken}` },
+        params: {
+            q: gameTitle,
+            limit: 100,
+            restrict_sr: false
+        }
+    };
 
-// TODO: Search Reddit POSTS for game in POST TITLE
-
-// TODO: Search Reddit POSTS for game in POST BODY
-
-// TODO: Search Reddit COMMUNITIES for game in SUBREDDIT NAME
+    try {
+        const response = await axios.request(options);        
+        return response;
+    }
+    catch (err) {
+        console.log(`getUserInfo() error: ${err}`);
+    }
+}
