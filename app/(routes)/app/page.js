@@ -117,7 +117,7 @@ export default function App() {
             // redditSearchResults.data.data.children = array of returned reddit posts
             // gameTitleSearchResult.tags = array of tags related to the game title
             // gameTitleSearchResult.platforms = array of platforms the game released on
-            const postsArray = processPosts(redditSearchResults.data.data.children, gameTitleSearchResult.tags, gameTitleSearchResult.platforms);
+            const postsArray = processPosts(redditSearchResults.data.data.children, gameTitleSearchResult.tags, gameTitleSearchResult.platforms, gameTitleSearchResult.name);
         } else {
             setGameTitle(`Sorry, no game found`);
         }
