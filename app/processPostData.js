@@ -1,7 +1,6 @@
 // processPostData.js - This file handles the validating processing of fetched posts by:
 // - Determining and measuring the likelihood that a post is about the game
 // - Removing / Filtering out posts with low likelihood
-// - Removing duplicate posts
 
 // General game related terms
 const gameTerms = ["game", "gaming", "videogame", "video game", "sega", "nintendo", "xbox", "playstation", "console", "controller", "backlog", "steam", "playtime", "emulation", "emulator"];
@@ -20,12 +19,14 @@ export function processPosts(posts, gameTagsArray, gamePlatformsArray, title) {
 
     // Set the game date if it is in the gameTitle. 
     // *RAWG will append the date in parentheses to some games, mainly retro games.
-    // RegEx: a 4 digit number    
+    // RegEx: a 4 digit number between parentheses.
     let gameDate = "";
-    const extractedDate = title.match(/\d{4}/);
-    if (extractedDate)
-        gameDate = extractedDate[0];
-
+    const extractedDate = title.match(/\(\d{4}\)/);
+    if (extractedDate){
+        const dateWithParentheses = extractedDate[0];
+        gameDate = dateWithParentheses.replace(/\(|\)/g, "");
+    }
+    
     console.log(`gameDate = ${gameDate}`);
 
     // Set the game title (remove the date in parentheses if it exists, then convert to lower case)
@@ -78,10 +79,10 @@ function formatGameTitle(gameTitle) {
     // RegEx: replace numbers (and all that come after), colons (and all that come after), apostrophes and parentheses with nothing(""), globally in the string.
     let formattedGameTitle = gameTitle.replace(/[0-9](.*)|:(.*)|'|\(|\)|/g, "");
 
-    // Get the index of the last whitespace character in the string
+    // Remove roman numerals: Get the index of the last whitespace character in the string.
     const indexOfLastWhitespace = formattedGameTitle.lastIndexOf(" ");
 
-    // Get the string of characters that follow the last whitespace character in the string
+    // Remove roman numerals: Get the string of characters that follow the last whitespace character in the string.
     const charsAfterLastWhitespace = formattedGameTitle.substring(indexOfLastWhitespace + 1, formattedGameTitle.length);
     console.log(`charsAfterLastWhitespace = ${charsAfterLastWhitespace}`);
 
@@ -118,13 +119,11 @@ function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTit
             validityScore++;
         }
 
-
         // Check post subreddit name
         if (postSubreddit.toLowerCase().includes(term)) {
             console.log(`postSubreddit contains: ${term}`);
             validityScore++;
         }
-
 
         // Check post body
         if (postText.toLowerCase().includes(term)) {
@@ -156,25 +155,26 @@ function determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms, has
     if (gameTitle !== formattedGameTitle && combinedTerms.includes(formattedGameTitle)) {
         weighFormattedGameTitle = true;
     }
-
-    // Common words = 1, Uncommon words = 2. The more words in the title, the more specific Reddit's search results will be,
-    // and the higher the overall weight of the gameTitle will be as well.
-    
+   
     // Put each word in the gameTitle into an array
-    console.log(`gameTitle before split into array: ${gameTitle}`);
-
-    const array = gameTitle.replace(/[0-9]$|\s[0-9]:|:|-/, "").trim().split(" ");
-
-    console.log(`gameTitle after replace + split operations: ${gameTitle}`);
-    console.log(`gameTitle after split into array: ${array}`);
+    // RegEx: 4 digit numbers, space followed by single number at end of string, space followed by number followed by space,
+    // space followed by number followed by colon, colon, hyphen.
+    const titleWordsArray = gameTitle.replace(/\d{4}|\s[0-9]$|\s[0-9]\s|\s[0-9]:|:|-/, "").trim().split(" ");    
     
-    // TODO: remove the array element that contains a roman numeral
+    // Remove roman numerals from title words array
+    titleWordsArray.forEach(element => {
+        if(romanNumerals.includes(element)){
+            const index = array.indexOf(element);
+            array.splice(index, 1);
+        }
+    });
     
     // 1. For each element in array, search library to see if it returns a definition. If so, add 1 to weight, if not, add 2 to weight.
+    // TODO: Query a Dictionary API
 
     // 2. If weighFormattedGameTitle = true, set the weight
 
-    // 3. Check for number(s) or roman numerals in gameTitle
+    // 3. If the gameTitle contains any kind of number (integer or roman numeral), add 1 to gameTitle weight.
     const hasNumber = gameTitle.match(/[0-9]/);
     if (hasNumber || hasRomanNumerals)
         gameTitleWeight++;
