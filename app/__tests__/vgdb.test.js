@@ -1,6 +1,6 @@
 // vgdb.test.js - This file tests the function in the vgdb.js file
 
-import { checkGameTitle } from "../videogame-db-api/vgdb";
+import { checkGameTitle } from "../api/vgdb";
 import axios from "axios";
 
 // Tell Jest to mock the axios module

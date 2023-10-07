@@ -1,7 +1,7 @@
 "use client";
 // page.js - This file is the main / root 'home page' for the app.
 
-import { userAuthorizeApp } from "./reddit-api/reddit.js";
+import { userAuthorizeApp } from "./api/reddit.js";
 import Link from "next/link.js";
 
 export default function Home() {

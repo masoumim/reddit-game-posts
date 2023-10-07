@@ -11,10 +11,6 @@ const gameTerms = ["game", "gaming", "videogame", "video game", "sega", "nintend
 // Array of valid posts to return
 let validatedPosts = [];
 
-// Game title variables
-let gameTitle = "";
-let formattedGameTitle = "";
-
 // Game title weight values used for determining relevancy of Reddit search results
 let gameTitleWeight = 0;
 let formattedGameTitleWeight = 0;
@@ -25,7 +21,12 @@ export function processPosts(posts, gameTagsArray, gamePlatformsArray, title) {
     let gameTags = [];          // Array of tags relating to the game title
     let gamePlatforms = [];     // Array of platforms the game released on
 
-    // Set the game date if it is in the gameTitle. RAWG will append the date in parentheses to some games, mainly retro games.
+    // Game title variables
+    let gameTitle = "";
+    let formattedGameTitle = "";
+
+    // Set the game date if it is in the gameTitle. 
+    // *RAWG will append the date in parentheses to some games, mainly retro games.
     // RegEx: a 4 digit number    
     let gameDate = "";
     const extractedDate = title.match(/\d{4}/);
@@ -38,12 +39,9 @@ export function processPosts(posts, gameTagsArray, gamePlatformsArray, title) {
     // RegEx: a 4 digit number in parentheses
     gameTitle = title.replace(/\(\d{4}\)/, "").toLocaleLowerCase().trim();
 
-    // Set the formatted game title
-    // Remove spaces and special characters from game title to see if result matches a subreddit name (ie: Street Fighter 6 --> streetfighter)
-    // RegEx: replace spaces, numbers with spaces to the left and right, colons, apostrophes and parentheses with nothing, globally in the string.
-    // TODO: replace() and remove any trailing roman numerals first(!!)...
-    formattedGameTitle = gameTitle.replace(/ | [0-9] |:|'|\(|\)|/g, "").toLocaleLowerCase();
-
+    // Get the formatted game title
+    formattedGameTitle = formatGameTitle(gameTitle);
+        
     // Extract the game tags
     if (gameTagsArray.length > 0)
         gameTags = gameTagsArray.map(e => e.name.toLowerCase());
@@ -64,7 +62,7 @@ export function processPosts(posts, gameTagsArray, gamePlatformsArray, title) {
     // For each post, determine if it is related to the game title
     // If so, continue to process the data. Otherwise, skip it
     posts.forEach(post => {
-        const isValid = validatePost(post.data.title, post.data.subreddit, post.data.selftext, combinedTerms)
+        const isValid = validatePost(post.data.title, post.data.subreddit, post.data.selftext, combinedTerms, gameTitle, formattedGameTitle)
 
         if (isValid) {
             // Format data by creating Post Object with only relevant properties:
@@ -77,8 +75,37 @@ export function processPosts(posts, gameTagsArray, gamePlatformsArray, title) {
     });
 }
 
+// Formats the game title to resemble Subreddit format
+// Example: "street fighter ii: the world warrior" converts to "streetfighter" which would match the subreddit r/streetfighter
+function formatGameTitle(gameTitle) {
+
+    // Roman numerals (from 1 to 20)
+    const romanNumerals = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii", "xiii", "xiv", "xv", "xvi", "xvii", "xviii", "xix", "xx"];
+
+    // RegEx: replace numbers (and all that come after), colons (and all that come after), apostrophes and parentheses with nothing(""), globally in the string.
+    let formattedGameTitle = gameTitle.replace(/[0-9](.*)|:(.*)|'|\(|\)|/g, "");
+
+    // Get the index of the last whitespace character in the string
+    const indexOfLastWhitespace = formattedGameTitle.lastIndexOf(" ");
+    
+    // Get the string of characters that follow the last whitespace character in the string
+    const charsAfterLastWhitespace = formattedGameTitle.substring(indexOfLastWhitespace + 1, formattedGameTitle.length);
+    console.log(`charsAfterLastWhitespace = ${charsAfterLastWhitespace}`);
+
+    // Remove roman numerals
+    if (romanNumerals.includes(charsAfterLastWhitespace)) {        
+        formattedGameTitle = formattedGameTitle.replace(charsAfterLastWhitespace, "");
+    }
+
+    // Finally, remove all whitespace characters in the string
+    formattedGameTitle = formattedGameTitle.replace(/ /g, "");
+
+    return formattedGameTitle;
+}
+
+
 // Determines if a given post is about the game title. If it is, return TRUE, otherwise return FALSE
-function validatePost(postTitle, postSubreddit, postText, combinedTerms) {
+function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTitle, formattedGameTitle) {
 
     // Represents the likelihood of a valid post - 5+ is considered valid
     let validityScore = 0;

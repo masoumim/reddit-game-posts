@@ -1,6 +1,6 @@
 // reddit.test.js - This file tests the functions in the reddit.js file
 
-import { authorizeAppOnly, getUserAuthAccessToken } from "../reddit-api/reddit";
+import { authorizeAppOnly, getUserAuthAccessToken } from "../api/reddit";
 import axios from "axios";
 
 // Tell Jest to mock the axios module
