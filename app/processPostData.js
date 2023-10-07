@@ -3,27 +3,20 @@
 // - Removing / Filtering out posts with low likelihood
 // - Removing duplicate posts
 
-// Dictionary of general game related terms
+// General game related terms
 const gameTerms = ["game", "gaming", "videogame", "video game", "sega", "nintendo", "xbox", "playstation", "console", "controller", "backlog", "steam", "playtime", "emulation", "emulator"];
 
-// TODO: Refactor so that there are no global vars
-
-// Array of valid posts to return
-let validatedPosts = [];
-
-// Game title weight values used for determining relevancy of Reddit search results
-let gameTitleWeight = 0;
-let formattedGameTitleWeight = 0;
+// Roman numerals (from 1 to 20)
+const romanNumerals = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii", "xiii", "xiv", "xv", "xvi", "xvii", "xviii", "xix", "xx"];
 
 // Process Reddit posts
 export function processPosts(posts, gameTagsArray, gamePlatformsArray, title) {
 
+    // Array of valid posts to return
+    let validatedPosts = [];
+
     let gameTags = [];          // Array of tags relating to the game title
     let gamePlatforms = [];     // Array of platforms the game released on
-
-    // Game title variables
-    let gameTitle = "";
-    let formattedGameTitle = "";
 
     // Set the game date if it is in the gameTitle. 
     // *RAWG will append the date in parentheses to some games, mainly retro games.
@@ -37,11 +30,11 @@ export function processPosts(posts, gameTagsArray, gamePlatformsArray, title) {
 
     // Set the game title (remove the date in parentheses if it exists, then convert to lower case)
     // RegEx: a 4 digit number in parentheses
-    gameTitle = title.replace(/\(\d{4}\)/, "").toLocaleLowerCase().trim();
+    const gameTitle = title.replace(/\(\d{4}\)/, "").toLowerCase().trim();
 
-    // Get the formatted game title
-    formattedGameTitle = formatGameTitle(gameTitle);
-        
+    // Get the formattedGameTitle and hasRomanNumerals boolean by destructuring
+    const { formattedGameTitle, hasRomanNumerals } = formatGameTitle(gameTitle);
+
     // Extract the game tags
     if (gameTagsArray.length > 0)
         gameTags = gameTagsArray.map(e => e.name.toLowerCase());
@@ -62,7 +55,7 @@ export function processPosts(posts, gameTagsArray, gamePlatformsArray, title) {
     // For each post, determine if it is related to the game title
     // If so, continue to process the data. Otherwise, skip it
     posts.forEach(post => {
-        const isValid = validatePost(post.data.title, post.data.subreddit, post.data.selftext, combinedTerms, gameTitle, formattedGameTitle)
+        const isValid = validatePost(post.data.title, post.data.subreddit, post.data.selftext, combinedTerms, gameTitle, formattedGameTitle, hasRomanNumerals)
 
         if (isValid) {
             // Format data by creating Post Object with only relevant properties:
@@ -79,33 +72,34 @@ export function processPosts(posts, gameTagsArray, gamePlatformsArray, title) {
 // Example: "street fighter ii: the world warrior" converts to "streetfighter" which would match the subreddit r/streetfighter
 function formatGameTitle(gameTitle) {
 
-    // Roman numerals (from 1 to 20)
-    const romanNumerals = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii", "xiii", "xiv", "xv", "xvi", "xvii", "xviii", "xix", "xx"];
+    // Toggle boolean if game title has roman numerals or not
+    let hasRomanNumerals = false;
 
     // RegEx: replace numbers (and all that come after), colons (and all that come after), apostrophes and parentheses with nothing(""), globally in the string.
     let formattedGameTitle = gameTitle.replace(/[0-9](.*)|:(.*)|'|\(|\)|/g, "");
 
     // Get the index of the last whitespace character in the string
     const indexOfLastWhitespace = formattedGameTitle.lastIndexOf(" ");
-    
+
     // Get the string of characters that follow the last whitespace character in the string
     const charsAfterLastWhitespace = formattedGameTitle.substring(indexOfLastWhitespace + 1, formattedGameTitle.length);
     console.log(`charsAfterLastWhitespace = ${charsAfterLastWhitespace}`);
 
     // Remove roman numerals
-    if (romanNumerals.includes(charsAfterLastWhitespace)) {        
+    if (romanNumerals.includes(charsAfterLastWhitespace)) {
+        hasRomanNumerals = true;
         formattedGameTitle = formattedGameTitle.replace(charsAfterLastWhitespace, "");
     }
 
     // Finally, remove all whitespace characters in the string
     formattedGameTitle = formattedGameTitle.replace(/ /g, "");
 
-    return formattedGameTitle;
+    return { formattedGameTitle, hasRomanNumerals };
 }
 
 
 // Determines if a given post is about the game title. If it is, return TRUE, otherwise return FALSE
-function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTitle, formattedGameTitle) {
+function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTitle, formattedGameTitle, hasRomanNumerals) {
 
     // Represents the likelihood of a valid post - 5+ is considered valid
     let validityScore = 0;
@@ -114,26 +108,26 @@ function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTit
     let isValid = false;
 
     // Determine weight of titles
-    determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms);
+    determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms, hasRomanNumerals);
 
     // Check if post includes terms
     combinedTerms.forEach(term => {
         // Check post title
-        if (postTitle.toLocaleLowerCase().includes(term)) {
+        if (postTitle.toLowerCase().includes(term)) {
             console.log(`postTitle contains: ${term}`);
             validityScore++;
         }
 
 
         // Check post subreddit name
-        if (postSubreddit.toLocaleLowerCase().includes(term)) {
+        if (postSubreddit.toLowerCase().includes(term)) {
             console.log(`postSubreddit contains: ${term}`);
             validityScore++;
         }
 
 
         // Check post body
-        if (postText.toLocaleLowerCase().includes(term)) {
+        if (postText.toLowerCase().includes(term)) {
             console.log(`postText contains: ${term}`);
             validityScore++;
         }
@@ -148,7 +142,12 @@ function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTit
 }
 
 // Determines and sets the value of the title weights
-function determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms) {
+function determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms, hasRomanNumerals) {
+
+    // Variables to store the gameTitle weight and the formattedGameTitle weight
+    let gameTitleWeight = 0;
+    let formattedGameTitleWeight = 0;
+
     // The combinedTerms array does not contain duplicates.
     // If game title is a single word and no numbers (ie: Destiny),
     // it will appear in the combinedTerms array only once
@@ -158,28 +157,30 @@ function determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms) {
         weighFormattedGameTitle = true;
     }
 
-    
     // Common words = 1, Uncommon words = 2. The more words in the title, the more specific Reddit's search results will be,
     // and the higher the overall weight of the gameTitle will be as well.
-
-    // 1. If the gameTitle has a number (sequel to another game), it gets +1 to weight.
-    // Check for roman numerals as well
-
-    // 2. If gameTitle has a single word, check the commonality of the word, set the weight and return
-
-    // 3. If gameTitle has multiple words, check commonality of each word, set the weight and return
     
+    // Put each word in the gameTitle into an array
+    console.log(`gameTitle before split into array: ${gameTitle}`);
 
-    // Note: I can return an object {gameTitleWeight, formattedGameTitleWeight} instead of setting global vars...
+    const array = gameTitle.replace(/[0-9]$|\s[0-9]:|:|-/, "").trim().split(" ");
+
+    console.log(`gameTitle after replace + split operations: ${gameTitle}`);
+    console.log(`gameTitle after split into array: ${array}`);
+    
+    // TODO: remove the array element that contains a roman numeral
+    
+    // 1. For each element in array, search library to see if it returns a definition. If so, add 1 to weight, if not, add 2 to weight.
+
+    // 2. If weighFormattedGameTitle = true, set the weight
+
+    // 3. Check for number(s) or roman numerals in gameTitle
+    const hasNumber = gameTitle.match(/[0-9]/);
+    if (hasNumber || hasRomanNumerals)
+        gameTitleWeight++;
+
+    // return an object {gameTitleWeight, formattedGameTitleWeight} instead of setting global vars...
     // In the call from validatePost(), I can destructure the results...
-
-    // TODO: If weighFormattedGameTitle = true, set the weight
-
-    console.log(`gameTitle = ${gameTitle}`);
-    console.log(`formattedGameTitle = ${formattedGameTitle}`);
-    console.log(`weigh formattedGameTitle?: ${weighFormattedGameTitle}`);
-
-
 }
 
 // Formats post data and returns a Post Object
