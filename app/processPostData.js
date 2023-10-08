@@ -2,6 +2,8 @@
 // - Determining and measuring the likelihood that a post is about the game
 // - Removing / Filtering out posts with low likelihood
 
+import { hasDefinition } from "./api/dictionary";
+
 // General game related terms
 const gameTerms = ["game", "gaming", "videogame", "video game", "sega", "nintendo", "xbox", "playstation", "console", "controller", "backlog", "steam", "playtime", "emulation", "emulator"];
 
@@ -9,7 +11,7 @@ const gameTerms = ["game", "gaming", "videogame", "video game", "sega", "nintend
 const romanNumerals = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii", "xiii", "xiv", "xv", "xvi", "xvii", "xviii", "xix", "xx"];
 
 // Process Reddit posts
-export function processPosts(posts, gameTagsArray, gamePlatformsArray, title) {
+export async function processPosts(posts, gameTagsArray, gamePlatformsArray, title) {
 
     // Array of valid posts to return
     let validatedPosts = [];
@@ -53,10 +55,13 @@ export function processPosts(posts, gameTagsArray, gamePlatformsArray, title) {
 
     console.log(combinedTerms);
 
+    // Get the title weights (gameTitle and formattedGameTitle)
+    const { gameTitleWeight, formattedGameTitleWeight } = await determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms, hasRomanNumerals);
+
     // For each post, determine if it is related to the game title
     // If so, continue to process the data. Otherwise, skip it
     posts.forEach(post => {
-        const isValid = validatePost(post.data.title, post.data.subreddit, post.data.selftext, combinedTerms, gameTitle, formattedGameTitle, hasRomanNumerals)
+        const isValid = validatePost(post.data.title, post.data.subreddit, post.data.selftext, combinedTerms, gameTitleWeight, formattedGameTitleWeight)
 
         if (isValid) {
             // Format data by creating Post Object with only relevant properties:
@@ -98,9 +103,8 @@ function formatGameTitle(gameTitle) {
     return { formattedGameTitle, hasRomanNumerals };
 }
 
-
 // Determines if a given post is about the game title. If it is, return TRUE, otherwise return FALSE
-function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTitle, formattedGameTitle, hasRomanNumerals) {
+function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTitleWeight, formattedGameTitleWeight) {
 
     // Represents the likelihood of a valid post - 5+ is considered valid
     let validityScore = 0;
@@ -108,9 +112,7 @@ function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTit
     // Bool to indicate whether post is valid or not
     let isValid = false;
 
-    // Determine weight of titles
-    determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms, hasRomanNumerals);
-
+    // TODO: Add weight values.....
     // Check if post includes terms
     combinedTerms.forEach(term => {
         // Check post title
@@ -141,7 +143,7 @@ function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTit
 }
 
 // Determines and sets the value of the title weights
-function determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms, hasRomanNumerals) {
+async function determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms, hasRomanNumerals) {
 
     // Variables to store the gameTitle weight and the formattedGameTitle weight
     let gameTitleWeight = 0;
@@ -162,25 +164,37 @@ function determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms, has
     const titleWordsArray = gameTitle.replace(/\d{4}|\s[0-9]$|\s[0-9]\s|\s[0-9]:|:|-/, "").trim().split(" ");    
     
     // Remove roman numerals from title words array
-    titleWordsArray.forEach(element => {
-        if(romanNumerals.includes(element)){
-            const index = array.indexOf(element);
-            array.splice(index, 1);
+    titleWordsArray.forEach(word => {
+        if(romanNumerals.includes(word)){
+            const index = titleWordsArray.indexOf(word);
+            titleWordsArray.splice(index, 1);
         }
     });
+
+    console.log(`titleWordsArray: ${titleWordsArray}`);
     
     // 1. For each element in array, search library to see if it returns a definition. If so, add 1 to weight, if not, add 2 to weight.
-    // TODO: Query a Dictionary API
+    for (const word in titleWordsArray) {
+        const definitionFound = await hasDefinition(titleWordsArray[word]);
+        if (definitionFound) {
+            gameTitleWeight++;
+        }
+        else {
+            gameTitleWeight += 2;
+        }
+    }
 
     // 2. If weighFormattedGameTitle = true, set the weight
+    if(weighFormattedGameTitle)
+        formattedGameTitleWeight = gameTitleWeight;
 
     // 3. If the gameTitle contains any kind of number (integer or roman numeral), add 1 to gameTitle weight.
     const hasNumber = gameTitle.match(/[0-9]/);
     if (hasNumber || hasRomanNumerals)
         gameTitleWeight++;
 
-    // return an object {gameTitleWeight, formattedGameTitleWeight} instead of setting global vars...
-    // In the call from validatePost(), I can destructure the results...
+    // Return the weight values
+    return {gameTitleWeight, formattedGameTitleWeight};
 }
 
 // Formats post data and returns a Post Object
