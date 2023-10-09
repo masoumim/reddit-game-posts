@@ -15,7 +15,7 @@ export default function App() {
     const [loggedIn, setLoggedIn] = useState(false);                            // Status representing if user is logged in to Reddit or not    
     const [redditUsername, setRedditUsername] = useState("");                   // The user's Reddit username
     const [searchBarInput, setSearchBarInput] = useState("");                   // The text entered into the search bar
-    const [gameTitle, setGameTitle] = useState("");                             // Set to a valid title if returned by RAWG API call
+    const [gameTitles, setGameTitles] = useState([]);                           // Array of results returned by RAWG API
 
     /*
      The useRef Hook allows you to persist values between renders.
@@ -77,7 +77,6 @@ export default function App() {
         }
     }, []);
 
-
     // Get user's Reddit profile name
     useEffect(() => {
         if (loggedIn) {
@@ -94,42 +93,50 @@ export default function App() {
     }, [loggedIn]);
 
     // Updates the searchBarInput state on every change to the input field
-    function handleSearchBarInput(event) {
+    async function handleSearchBarInput(event) {
+        
         // Set the state variable
         setSearchBarInput(event.target.value);
+        
+        // Create empty array to hold matching game titles
+        const matchingGameTitles = [];
+
+        // Do a search for games matching user input
+        const gameTitleSearchResults = await checkGameTitle(event.target.value);
+
+        // Populate the matchingGameTitles array for each result returned by the API
+        if (gameTitleSearchResults) {
+            gameTitleSearchResults.forEach(result => {
+                matchingGameTitles.push(result.name);
+            });
+        }
+
+        // Set the state variable
+        setGameTitles(matchingGameTitles);
     }
 
     // Handle search form submit
     async function handleSearchSubmit(event) {
         event.preventDefault(); // Prevents the page from reloading on submit
 
-        // Confirm user input is a valid game title by calling RAWG API
+        // We want the first result (index 0) in the returned array
         const gameTitleSearchResult = await checkGameTitle(searchBarInput);
-
-        if (gameTitleSearchResult) {
-            // Display the game title                        
-            setGameTitle(`Searching for: ${gameTitleSearchResult.name}`);
-
-            // Search Reddit for this game            
-            const redditSearchResults = await getRedditPosts(accessToken, gameTitleSearchResult.name);
-
-            // Process response - Returns a formatted array of Post Objects
-            // redditSearchResults.data.data.children = array of returned reddit posts
-            // gameTitleSearchResult.tags = array of tags related to the game title
-            // gameTitleSearchResult.platforms = array of platforms the game released on
-            const postsArray = processPosts(redditSearchResults.data.data.children, gameTitleSearchResult.tags, gameTitleSearchResult.platforms, gameTitleSearchResult.name);
-        } else {
-            setGameTitle(`Sorry, no game found`);
-        }
+        
+        // Search Reddit for this game            
+        const redditSearchResults = await getRedditPosts(accessToken, gameTitleSearchResult[0].name);
+        
+        // Process response - Returns a formatted array of Post Objects
+        // redditSearchResults.data.data.children = array of returned reddit posts
+        // gameTitleSearchResult[0].tags = array of tags related to the game title
+        // gameTitleSearchResult[0].platforms = array of platforms the game released on
+        const postsArray = processPosts(redditSearchResults.data.data.children, gameTitleSearchResult[0].tags, gameTitleSearchResult[0].platforms, gameTitleSearchResult[0].name);
     }
-
 
     return (
         <>
             {isLoading ? <p>Loading...</p> : redditUsername}
-            <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} handleSearchBarInput={handleSearchBarInput} />
-            <br />
-            <p>{gameTitle}</p>
+            <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles}/>
+            <br />            
         </>
     )
 }

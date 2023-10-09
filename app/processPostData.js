@@ -5,7 +5,7 @@
 import { hasDefinition } from "./api/dictionary";
 
 // General game related terms
-const gameTerms = ["game", "gaming", "videogame", "video game", "sega", "nintendo", "xbox", "playstation", "console", "controller", "backlog", "steam", "playtime", "emulation", "emulator"];
+const gameTerms = ["game", "gaming", "videogame", "video game", "sega", "nintendo", "xbox", "playstation", "console", "controller", "backlog", "steam", "playtime", "nostalgia"];
 
 // Roman numerals (from 1 to 20)
 const romanNumerals = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii", "xiii", "xiv", "xv", "xvi", "xvii", "xviii", "xix", "xx"];
@@ -29,7 +29,7 @@ export async function processPosts(posts, gameTagsArray, gamePlatformsArray, tit
         gameDate = dateWithParentheses.replace(/\(|\)/g, "");
     }
     
-    console.log(`gameDate = ${gameDate}`);
+    // console.log(`gameDate = ${gameDate}`);
 
     // Set the game title (remove the date in parentheses if it exists, then convert to lower case)
     // RegEx: a 4 digit number in parentheses
@@ -58,10 +58,14 @@ export async function processPosts(posts, gameTagsArray, gamePlatformsArray, tit
     // Get the title weights (gameTitle and formattedGameTitle)
     const { gameTitleWeight, formattedGameTitleWeight } = await determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms, hasRomanNumerals);
 
+    // Filter / remove posts with Subredit names in a removePosts array
+    const removePosts = ["gamecollecting", "gameswap", "gamesale", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals"];
+    const filteredPosts = posts.filter(post => !removePosts.includes(post.data.subreddit.toLowerCase()));
+
     // For each post, determine if it is related to the game title
     // If so, continue to process the data. Otherwise, skip it
-    posts.forEach(post => {
-        const isValid = validatePost(post.data.title, post.data.subreddit, post.data.selftext, combinedTerms, gameTitleWeight, formattedGameTitleWeight)
+    filteredPosts.forEach(post => {
+        const isValid = validatePost(post.data.title, post.data.subreddit, post.data.selftext, combinedTerms, gameTitleWeight, formattedGameTitleWeight, gameTitle, formattedGameTitle)
 
         if (isValid) {
             // Format data by creating Post Object with only relevant properties:
@@ -89,7 +93,7 @@ function formatGameTitle(gameTitle) {
 
     // Remove roman numerals: Get the string of characters that follow the last whitespace character in the string.
     const charsAfterLastWhitespace = formattedGameTitle.substring(indexOfLastWhitespace + 1, formattedGameTitle.length);
-    console.log(`charsAfterLastWhitespace = ${charsAfterLastWhitespace}`);
+    // console.log(`charsAfterLastWhitespace = ${charsAfterLastWhitespace}`);
 
     // Remove roman numerals
     if (romanNumerals.includes(charsAfterLastWhitespace)) {
@@ -104,8 +108,11 @@ function formatGameTitle(gameTitle) {
 }
 
 // Determines if a given post is about the game title. If it is, return TRUE, otherwise return FALSE
-function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTitleWeight, formattedGameTitleWeight) {
+function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTitleWeight, formattedGameTitleWeight, gameTitle, formattedGameTitle) {
 
+    // console.log(`validatePost() - gameTitleWeight: ${gameTitleWeight}`);
+    // console.log(`validatePost() - formattedGameTitleWeight: ${formattedGameTitleWeight}`);
+    
     // Represents the likelihood of a valid post - 5+ is considered valid
     let validityScore = 0;
 
@@ -117,27 +124,55 @@ function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTit
     combinedTerms.forEach(term => {
         // Check post title
         if (postTitle.toLowerCase().includes(term)) {
-            console.log(`postTitle contains: ${term}`);
-            validityScore++;
+            if (term === gameTitle) {
+                // console.log(`postTitle contains: ${term}`);
+                validityScore += gameTitleWeight;
+            } else {
+                // console.log(`postTitle contains: ${term}`);
+                validityScore++;
+                
+            }
         }
 
         // Check post subreddit name
         if (postSubreddit.toLowerCase().includes(term)) {
-            console.log(`postSubreddit contains: ${term}`);
-            validityScore++;
+            if (term === formattedGameTitle) {
+                // console.log(`postSubreddit contains: ${term}`);
+                validityScore += formattedGameTitleWeight;
+            } else {
+                // console.log(`postSubreddit contains: ${term}`);
+                validityScore++;
+                
+            }
         }
 
         // Check post body
         if (postText.toLowerCase().includes(term)) {
-            console.log(`postText contains: ${term}`);
-            validityScore++;
+            if (term === gameTitle) {
+                // console.log(`postText contains: ${term}`);
+                validityScore += gameTitleWeight;
+            } else {
+                // console.log(`postText contains: ${term}`);
+                validityScore++;
+                
+            }
         }
     });
 
-    console.log(`Post validity score: ${validityScore}`);
-    console.log(postTitle);
-    console.log(postSubreddit);
-    console.log(postText);
+    if (validityScore >= 3) {
+        console.log(`Post validity score: ${validityScore}`);
+        console.log(postTitle);
+        console.log(postSubreddit);
+        console.log(postText);
+    }
+
+    // if (validityScore <= 5) {
+    //     console.log(`Post validity score: ${validityScore}`);
+    //     console.log(postTitle);
+    //     console.log(postSubreddit);
+    //     console.log(postText);
+    // }
+
 
     // return true / false
 }
@@ -171,7 +206,7 @@ async function determineTitleWeights(gameTitle, formattedGameTitle, combinedTerm
         }
     });
 
-    console.log(`titleWordsArray: ${titleWordsArray}`);
+    // console.log(`titleWordsArray: ${titleWordsArray}`);
     
     // 1. For each element in array, search library to see if it returns a definition. If so, add 1 to weight, if not, add 2 to weight.
     for (const word in titleWordsArray) {

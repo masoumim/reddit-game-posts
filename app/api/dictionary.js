@@ -12,11 +12,11 @@ export async function hasDefinition(word) {
     
         // Check response for definition
         if(response.data[0].shortdef){
-            console.log(`Definition found for: ${word}`);
+            // console.log(`Definition found for: ${word}`);
             return true;
         }
         else{
-            console.log(`No definition found for: ${word}`);
+            // console.log(`No definition found for: ${word}`);
             return false;
         }
     } catch (error) {
