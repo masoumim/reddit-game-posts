@@ -17,6 +17,10 @@ export default function App() {
     const [searchBarInput, setSearchBarInput] = useState("");                   // The text entered into the search bar
     const [gameTitles, setGameTitles] = useState([]);                           // Array of results returned by RAWG API
     const [matchTitleExactly, setMatchTitleExactly] = useState(false);          // Toggled by the 'match title exactly' checkbox
+    const [gameTitle, setGameTitle] = useState("");                             // Title of game being searched for
+    const [gameYear, setGameYear] = useState("");                               // Release year of game being searched for
+    const [gamePlatforms, setGamePlatforms] = useState([]);                     // Platforms of the game being searched for
+    const [gameMetacritic, setGameMetacritic] = useState("");                   // The Metacritic score of the game being searched for
 
     /*
      The useRef Hook allows you to persist values between renders.
@@ -95,10 +99,10 @@ export default function App() {
 
     // Updates the searchBarInput state on every change to the input field
     async function handleSearchBarInput(event) {
-        
+
         // Set the state variable
         setSearchBarInput(event.target.value);
-        
+
         // Create empty array to hold matching game titles
         const matchingGameTitles = [];
 
@@ -117,9 +121,21 @@ export default function App() {
     }
 
     // Handle 'match title exactly' checkbox
-    function handleMatchExactlyCheckbox(){
+    function handleMatchExactlyCheckbox() {
         // Toggle match exactly true/false
         setMatchTitleExactly(!matchTitleExactly);
+    }
+
+    // Displays game info
+    function displayGameInfo(game) {
+        // Get the name each platform the game released on
+        const platforms = game.platforms.map(e => {return e.platform.name});
+        
+        // Set the values for the game
+        setGameTitle(game.name);
+        setGameYear(game.released.match(/\d{4}/));        
+        setGamePlatforms(platforms);
+        setGameMetacritic(game.metacritic);
     }
 
     // Handle search form submit
@@ -128,10 +144,13 @@ export default function App() {
 
         // We want the first result (index 0) in the returned array
         const gameTitleSearchResult = await checkGameTitle(searchBarInput);
-        
+
+        // Display game info (title, year, platforms etc)
+        displayGameInfo(gameTitleSearchResult[0]);
+
         // Search Reddit for this game            
         const redditSearchResults = await getRedditPosts(accessToken, gameTitleSearchResult[0].name, matchTitleExactly);
-        
+
         // Process response - Returns a formatted array of Post Objects
         // redditSearchResults.data.data.children = array of returned reddit posts
         // gameTitleSearchResult[0].tags = array of tags related to the game title
@@ -142,8 +161,15 @@ export default function App() {
     return (
         <>
             {isLoading ? <p>Loading...</p> : redditUsername}
-            <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox}/>
-            <br />            
+            <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} />
+            <br />
+            <b>Title: </b>{gameTitle}
+            <br/>
+            <b>Release Year: </b>{gameYear}
+            <br/>
+            <b>Platforms: </b>{gamePlatforms.join(", ")}
+            <br/>
+            <b>Metacritic: </b>{gameMetacritic ? gameMetacritic : "N/A"}
         </>
     )
 }

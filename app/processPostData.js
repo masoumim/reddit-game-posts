@@ -53,7 +53,7 @@ export async function processPosts(posts, gameTagsArray, gamePlatformsArray, tit
     if (gameDate)
         combinedTerms.push(gameDate);
 
-    console.log(combinedTerms);
+    // console.log(combinedTerms);
 
     // Get the title weights (gameTitle and formattedGameTitle)
     const { gameTitleWeight, formattedGameTitleWeight } = await determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms, hasRomanNumerals);
@@ -118,8 +118,7 @@ function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTit
 
     // Bool to indicate whether post is valid or not
     let isValid = false;
-
-    // TODO: Add weight values.....
+    
     // Check if post includes terms
     combinedTerms.forEach(term => {
         // Check post title
@@ -159,21 +158,8 @@ function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTit
         }
     });
 
-    if (validityScore >= 3) {
-        console.log(`Post validity score: ${validityScore}`);
-        console.log(postTitle);
-        console.log(postSubreddit);
-        console.log(postText);
-    }
-
-    // if (validityScore <= 5) {
-    //     console.log(`Post validity score: ${validityScore}`);
-    //     console.log(postTitle);
-    //     console.log(postSubreddit);
-    //     console.log(postText);
-    // }
-
-    // return true / false
+    // Return TRUE if validityScore is 5 or greater
+    return validityScore >= 5 ? true : false;
 }
 
 // Determines and sets the value of the title weights
