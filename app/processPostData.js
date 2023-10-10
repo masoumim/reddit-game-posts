@@ -173,7 +173,6 @@ function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTit
     //     console.log(postText);
     // }
 
-
     // return true / false
 }
 
@@ -196,7 +195,7 @@ async function determineTitleWeights(gameTitle, formattedGameTitle, combinedTerm
     // Put each word in the gameTitle into an array
     // RegEx: 4 digit numbers, space followed by single number at end of string, space followed by number followed by space,
     // space followed by number followed by colon, colon, hyphen.
-    const titleWordsArray = gameTitle.replace(/\d{4}|\s[0-9]$|\s[0-9]\s|\s[0-9]:|:|-/, "").trim().split(" ");    
+    const titleWordsArray = gameTitle.replace(/\d{4}|\s[0-9]$|\s[0-9]\s|\s[0-9]:|:|-/, "").trim().split(" ");
     
     // Remove roman numerals from title words array
     titleWordsArray.forEach(word => {

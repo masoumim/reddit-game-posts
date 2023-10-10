@@ -16,6 +16,7 @@ export default function App() {
     const [redditUsername, setRedditUsername] = useState("");                   // The user's Reddit username
     const [searchBarInput, setSearchBarInput] = useState("");                   // The text entered into the search bar
     const [gameTitles, setGameTitles] = useState([]);                           // Array of results returned by RAWG API
+    const [matchTitleExactly, setMatchTitleExactly] = useState(false);          // Toggled by the 'match title exactly' checkbox
 
     /*
      The useRef Hook allows you to persist values between renders.
@@ -115,6 +116,12 @@ export default function App() {
         setGameTitles(matchingGameTitles);
     }
 
+    // Handle 'match title exactly' checkbox
+    function handleMatchExactlyCheckbox(){
+        // Toggle match exactly true/false
+        setMatchTitleExactly(!matchTitleExactly);
+    }
+
     // Handle search form submit
     async function handleSearchSubmit(event) {
         event.preventDefault(); // Prevents the page from reloading on submit
@@ -123,7 +130,7 @@ export default function App() {
         const gameTitleSearchResult = await checkGameTitle(searchBarInput);
         
         // Search Reddit for this game            
-        const redditSearchResults = await getRedditPosts(accessToken, gameTitleSearchResult[0].name);
+        const redditSearchResults = await getRedditPosts(accessToken, gameTitleSearchResult[0].name, matchTitleExactly);
         
         // Process response - Returns a formatted array of Post Objects
         // redditSearchResults.data.data.children = array of returned reddit posts
@@ -135,7 +142,7 @@ export default function App() {
     return (
         <>
             {isLoading ? <p>Loading...</p> : redditUsername}
-            <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles}/>
+            <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox}/>
             <br />            
         </>
     )

@@ -106,14 +106,18 @@ export async function getUserInfo(accessToken) {
 }
 
 // Calls Reddit API to search for posts about game title
-export async function getRedditPosts(accessToken, gameTitle){
+export async function getRedditPosts(accessToken, gameTitle, matchTitleExactly){
+        
+    // If matching title exactly, wrap title in quotes
+    const title = matchTitleExactly ? `"${gameTitle}"` : gameTitle;
+    
     // Set the object to use in the GET request
     const options = {
         method: 'GET',
         url: `${base_url}/search`,
         headers: { 'Authorization': `bearer ${accessToken}` },
         params: {
-            q: gameTitle,
+            q: title,
             limit: 100,
             restrict_sr: false
         }
