@@ -17,3 +17,4 @@ it("Confirms presence of 'Connect your Reddit account' button' and 'Continue wit
     expect(button).toBeInTheDocument();
     expect(link).toBeInTheDocument();
 });
+

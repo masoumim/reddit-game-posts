@@ -158,6 +158,12 @@ function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTit
         }
     });
 
+    if(validityScore >= 5){
+        console.log(postTitle);
+        console.log(postSubreddit);
+        console.log(postText);
+    }
+
     // Return TRUE if validityScore is 5 or greater
     return validityScore >= 5 ? true : false;
 }

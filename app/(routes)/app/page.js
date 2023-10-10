@@ -17,6 +17,7 @@ export default function App() {
     const [searchBarInput, setSearchBarInput] = useState("");                   // The text entered into the search bar
     const [gameTitles, setGameTitles] = useState([]);                           // Array of results returned by RAWG API
     const [matchTitleExactly, setMatchTitleExactly] = useState(false);          // Toggled by the 'match title exactly' checkbox
+    const [displayGameInfo, setDisplayGameInfo] = useState(false);              // Toggled when search for title is performed and result is received
     const [gameTitle, setGameTitle] = useState("");                             // Title of game being searched for
     const [gameYear, setGameYear] = useState("");                               // Release year of game being searched for
     const [gamePlatforms, setGamePlatforms] = useState([]);                     // Platforms of the game being searched for
@@ -126,8 +127,11 @@ export default function App() {
         setMatchTitleExactly(!matchTitleExactly);
     }
 
-    // Displays game info
-    function displayGameInfo(game) {
+    // Sets the game info
+    function setGameInfo(game) {
+        // Toggle state boolean
+        setDisplayGameInfo(true);
+        
         // Get the name each platform the game released on
         const platforms = game.platforms.map(e => {return e.platform.name});
         
@@ -145,8 +149,8 @@ export default function App() {
         // We want the first result (index 0) in the returned array
         const gameTitleSearchResult = await checkGameTitle(searchBarInput);
 
-        // Display game info (title, year, platforms etc)
-        displayGameInfo(gameTitleSearchResult[0]);
+        // Set the game info (title, year, platforms etc)
+        setGameInfo(gameTitleSearchResult[0]);
 
         // Search Reddit for this game            
         const redditSearchResults = await getRedditPosts(accessToken, gameTitleSearchResult[0].name, matchTitleExactly);
@@ -161,15 +165,17 @@ export default function App() {
     return (
         <>
             {isLoading ? <p>Loading...</p> : redditUsername}
-            <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} />
+            <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} matchTitleExactly={matchTitleExactly} />
             <br />
-            <b>Title: </b>{gameTitle}
-            <br/>
-            <b>Release Year: </b>{gameYear}
-            <br/>
-            <b>Platforms: </b>{gamePlatforms.join(", ")}
-            <br/>
-            <b>Metacritic: </b>{gameMetacritic ? gameMetacritic : "N/A"}
+            {displayGameInfo ?
+                <>
+                    <p><b>Title: </b>{gameTitle}</p>
+                    <p><b>Release Year: </b>{gameYear}</p>
+                    <p><b>Platform(s): </b>{gamePlatforms.join(", ")}</p>
+                    <p><b>Metacritic score: </b>{gameMetacritic ? gameMetacritic : "N/A"}</p>
+                </>
+                : ""}
+
         </>
     )
 }
