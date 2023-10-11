@@ -24,11 +24,11 @@ export async function processPosts(posts, gameTagsArray, gamePlatformsArray, tit
     // RegEx: a 4 digit number between parentheses.
     let gameDate = "";
     const extractedDate = title.match(/\(\d{4}\)/);
-    if (extractedDate){
+    if (extractedDate) {
         const dateWithParentheses = extractedDate[0];
         gameDate = dateWithParentheses.replace(/\(|\)/g, "");
     }
-    
+
     // console.log(`gameDate = ${gameDate}`);
 
     // Set the game title (remove the date in parentheses if it exists, then convert to lower case)
@@ -53,7 +53,7 @@ export async function processPosts(posts, gameTagsArray, gamePlatformsArray, tit
     if (gameDate)
         combinedTerms.push(gameDate);
 
-    // console.log(combinedTerms);
+    console.log(combinedTerms);
 
     // Get the title weights (gameTitle and formattedGameTitle)
     const { gameTitleWeight, formattedGameTitleWeight } = await determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms, hasRomanNumerals);
@@ -112,24 +112,31 @@ function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTit
 
     // console.log(`validatePost() - gameTitleWeight: ${gameTitleWeight}`);
     // console.log(`validatePost() - formattedGameTitleWeight: ${formattedGameTitleWeight}`);
-    
+
     // Represents the likelihood of a valid post - 5+ is considered valid
     let validityScore = 0;
 
     // Bool to indicate whether post is valid or not
     let isValid = false;
-    
+
+    // We only want to include the gameTitle weight in the validityScore once.
+    // Either in the Reddit post title OR the Reddit post text body but NOT both.
+    let gameTitleWeightAdded = false;
+
     // Check if post includes terms
     combinedTerms.forEach(term => {
         // Check post title
         if (postTitle.toLowerCase().includes(term)) {
             if (term === gameTitle) {
-                // console.log(`postTitle contains: ${term}`);
-                validityScore += gameTitleWeight;
+                if (!gameTitleWeightAdded) {
+                    // console.log(`postTitle contains: ${term}`);
+                    validityScore += gameTitleWeight;
+                    gameTitleWeightAdded = true;
+                }
             } else {
                 // console.log(`postTitle contains: ${term}`);
                 validityScore++;
-                
+
             }
         }
 
@@ -141,24 +148,28 @@ function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTit
             } else {
                 // console.log(`postSubreddit contains: ${term}`);
                 validityScore++;
-                
+
             }
         }
 
         // Check post body
         if (postText.toLowerCase().includes(term)) {
             if (term === gameTitle) {
-                // console.log(`postText contains: ${term}`);
-                validityScore += gameTitleWeight;
+                if (!gameTitleWeightAdded) {
+                    // console.log(`postText contains: ${term}`);
+                    validityScore += gameTitleWeight;
+                    gameTitleWeightAdded = false;
+                }
             } else {
                 // console.log(`postText contains: ${term}`);
                 validityScore++;
-                
+
             }
         }
     });
 
-    if(validityScore >= 5){
+    if (validityScore >= 4) {
+        console.log(validityScore);
         console.log(postTitle);
         console.log(postSubreddit);
         console.log(postText);
@@ -183,22 +194,22 @@ async function determineTitleWeights(gameTitle, formattedGameTitle, combinedTerm
     if (gameTitle !== formattedGameTitle && combinedTerms.includes(formattedGameTitle)) {
         weighFormattedGameTitle = true;
     }
-   
+
     // Put each word in the gameTitle into an array
     // RegEx: 4 digit numbers, space followed by single number at end of string, space followed by number followed by space,
     // space followed by number followed by colon, colon, hyphen.
     const titleWordsArray = gameTitle.replace(/\d{4}|\s[0-9]$|\s[0-9]\s|\s[0-9]:|:|-/, "").trim().split(" ");
-    
+
     // Remove roman numerals from title words array
     titleWordsArray.forEach(word => {
-        if(romanNumerals.includes(word)){
+        if (romanNumerals.includes(word)) {
             const index = titleWordsArray.indexOf(word);
             titleWordsArray.splice(index, 1);
         }
     });
 
     // console.log(`titleWordsArray: ${titleWordsArray}`);
-    
+
     // 1. For each element in array, search library to see if it returns a definition. If so, add 1 to weight, if not, add 2 to weight.
     for (const word in titleWordsArray) {
         const definitionFound = await hasDefinition(titleWordsArray[word]);
@@ -211,16 +222,16 @@ async function determineTitleWeights(gameTitle, formattedGameTitle, combinedTerm
     }
 
     // 2. If weighFormattedGameTitle = true, set the weight
-    if(weighFormattedGameTitle)
+    if (weighFormattedGameTitle)
         formattedGameTitleWeight = gameTitleWeight;
 
-    // 3. If the gameTitle contains any kind of number (integer or roman numeral), add 1 to gameTitle weight.
+    // 3. If the gameTitle contains any kind of number (integer, data, roman numeral), add 1 to gameTitle weight.
     const hasNumber = gameTitle.match(/[0-9]/);
     if (hasNumber || hasRomanNumerals)
         gameTitleWeight++;
 
     // Return the weight values
-    return {gameTitleWeight, formattedGameTitleWeight};
+    return { gameTitleWeight, formattedGameTitleWeight };
 }
 
 // Formats post data and returns a Post Object
