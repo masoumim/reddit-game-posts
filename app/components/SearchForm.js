@@ -2,7 +2,7 @@
 // The datalist is populated with matching games for each character the user enters
 // The submit button is disabled unless the input matches an <option>
 
-export default function SearchForm({ searchBarInput, handleSearchBarInput, handleSearchSubmit, gameTitles, handleMatchExactlyCheckbox, matchTitleExactly }) {
+export default function SearchForm({ searchBarInput, handleSearchBarInput, handleSearchSubmit, gameTitles, handleMatchExactlyCheckbox }) {
     return (
         <>
             <form onSubmit={handleSearchSubmit}>

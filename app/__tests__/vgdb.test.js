@@ -10,7 +10,7 @@ it('tests the checkGameTitle() method which searches the RAWG API for a game mat
     // arrange
     const expectedValue = "Valid Game Title";
 
-    // Mocked response of a POST request sent to the Reddit API route: https://www.reddit.com/api/v1/access_token
+    // Mocked response of a GET request to RAWG API
     const mockResponse = {
         config: {},
         data: {
@@ -31,14 +31,14 @@ it('tests the checkGameTitle() method which searches the RAWG API for a game mat
     const actualResponse = await checkGameTitle("valid game title");
 
     // assert
-    expect(actualResponse).toEqual(expectedValue);
+    expect(actualResponse[0].name).toEqual(expectedValue);
 });
 
 it('tests checkGameTitle() if a valid game title is NOT found', async () => {
     // arrange
     const expectedValue = "";
 
-    // Mocked response of a POST request sent to the Reddit API route: https://www.reddit.com/api/v1/access_token
+    // Mocked response of a GET request to RAWG API
     const mockResponse = {
         config: {},
         data: {

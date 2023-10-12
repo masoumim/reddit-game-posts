@@ -1,7 +1,7 @@
 // app.test.js - This file tests the App() component
 
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { getByRole, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import App from "../(routes)/app/page";
 import SearchForm from "../components/SearchForm";
@@ -40,9 +40,9 @@ it("Confirms that submit button becomes enabled when a game title is entered tha
 
 it("Confirms the 'match title exactly' checkbox is checked when clicked", async () => {
     // Arrange
-    render(<App/>);
+    render(<App />);
     const matchTitleCheckBox = screen.getByRole('checkbox', { name: /match title exactly/i });
-        
+
     // Act
     await userEvent.click(matchTitleCheckBox);
 

@@ -73,7 +73,6 @@ export default function App() {
         else {
             authorizeAppOnly()
                 .then(token => {
-
                     // Set the access token state variable
                     setAccessToken(token);
                 })
@@ -148,18 +147,20 @@ export default function App() {
 
         // We want the first result (index 0) in the returned array
         const gameTitleSearchResult = await checkGameTitle(searchBarInput);
-
+        
         // Set the game info (title, year, platforms etc)
         setGameInfo(gameTitleSearchResult[0]);
 
         // Search Reddit for this game            
         const redditSearchResults = await getRedditPosts(accessToken, gameTitleSearchResult[0].name, matchTitleExactly);
-
+        
         // Process response - Returns a formatted array of Post Objects
         // redditSearchResults.data.data.children = array of returned reddit posts
         // gameTitleSearchResult[0].tags = array of tags related to the game title
         // gameTitleSearchResult[0].platforms = array of platforms the game released on
-        const postsArray = processPosts(redditSearchResults.data.data.children, gameTitleSearchResult[0].tags, gameTitleSearchResult[0].platforms, gameTitleSearchResult[0].name);
+        if (redditSearchResults) {
+            const postsArray = processPosts(redditSearchResults.data.data.children, gameTitleSearchResult[0].tags, gameTitleSearchResult[0].platforms, gameTitleSearchResult[0].name);
+        }
     }
 
     return (
