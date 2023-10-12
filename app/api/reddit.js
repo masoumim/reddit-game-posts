@@ -126,9 +126,6 @@ export async function getRedditPosts(accessToken, gameTitle, matchTitleExactly){
     try {
         const response = await axios.request(options);        
         
-        console.log(`RESPONSE EXAMPLE:`);
-        console.log(response);
-        
         // return response;
         return response.data.data.children;
     }

@@ -22,6 +22,7 @@ export default function App() {
     const [gameYear, setGameYear] = useState("");                               // Release year of game being searched for
     const [gamePlatforms, setGamePlatforms] = useState([]);                     // Platforms of the game being searched for
     const [gameMetacritic, setGameMetacritic] = useState("");                   // The Metacritic score of the game being searched for
+    const [posts, setPosts] = useState([]);                                     // Array of Reddit posts to be rendered in Tiles
 
     /*
      The useRef Hook allows you to persist values between renders.
@@ -160,6 +161,9 @@ export default function App() {
         // gameTitleSearchResult[0].platforms = array of platforms the game released on
         if (redditSearchResults) {            
             const postsArray = processPosts(redditSearchResults, gameTitleSearchResult[0].tags, gameTitleSearchResult[0].platforms, gameTitleSearchResult[0].name);
+            
+            // Set the state variable
+            setPosts(postsArray);
         }
     }
 
@@ -176,7 +180,7 @@ export default function App() {
                     <p><b>Metacritic score: </b>{gameMetacritic ? gameMetacritic : "N/A"}</p>
                 </>
                 : ""}
-
+            {/* TODO: For each post in the posts state variable, render a <Tile> using the post data */}
         </>
     )
 }

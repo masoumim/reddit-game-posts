@@ -76,11 +76,14 @@ export async function processPosts(posts, gameTagsArray, gamePlatformsArray, tit
             // Add the object to the validatedPosts array
         }
     });
+
+    // Return the validatedPosts array
+    return validatedPosts;
 }
 
 // Formats the game title to resemble Subreddit format
 // Example: "street fighter ii: the world warrior" converts to "streetfighter" which would match the subreddit r/streetfighter
-function formatGameTitle(gameTitle) {
+export function formatGameTitle(gameTitle) {
 
     // Toggle boolean if game title has roman numerals or not
     let hasRomanNumerals = false;
@@ -108,7 +111,7 @@ function formatGameTitle(gameTitle) {
 }
 
 // Determines if a given post is about the game title. If it is, return TRUE, otherwise return FALSE
-function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTitleWeight, formattedGameTitleWeight, gameTitle, formattedGameTitle) {
+export function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTitleWeight, formattedGameTitleWeight, gameTitle, formattedGameTitle) {
 
     // console.log(`validatePost() - gameTitleWeight: ${gameTitleWeight}`);
     // console.log(`validatePost() - formattedGameTitleWeight: ${formattedGameTitleWeight}`);
@@ -125,6 +128,7 @@ function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTit
 
     // Check if post includes terms
     combinedTerms.forEach(term => {
+        
         // Check post title
         if (postTitle.toLowerCase().includes(term)) {
             if (term === gameTitle) {
@@ -180,7 +184,7 @@ function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTit
 }
 
 // Determines and sets the value of the title weights
-async function determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms, hasRomanNumerals) {
+export async function determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms, hasRomanNumerals) {
 
     // Variables to store the gameTitle weight and the formattedGameTitle weight
     let gameTitleWeight = 0;
@@ -210,22 +214,23 @@ async function determineTitleWeights(gameTitle, formattedGameTitle, combinedTerm
 
     // console.log(`titleWordsArray: ${titleWordsArray}`);
 
-    // 1. For each element in array, search library to see if it returns a definition. If so, add 1 to weight, if not, add 2 to weight.
+    // 1. For each element in array, search library to see if it returns a definition. 
+    // If so, add 1 to weight, if not, add 2 to weight.
     for (const word in titleWordsArray) {
         const definitionFound = await hasDefinition(titleWordsArray[word]);
         if (definitionFound) {
             gameTitleWeight++;
+            if (weighFormattedGameTitle && formattedGameTitle.includes(titleWordsArray[word]))
+                formattedGameTitleWeight++;
         }
         else {
             gameTitleWeight += 2;
+            if (weighFormattedGameTitle && formattedGameTitle.includes(titleWordsArray[word]))
+                formattedGameTitleWeight += 2;
         }
     }
-
-    // 2. If weighFormattedGameTitle = true, set the weight
-    if (weighFormattedGameTitle)
-        formattedGameTitleWeight = gameTitleWeight;
-
-    // 3. If the gameTitle contains any kind of number (integer, data, roman numeral), add 1 to gameTitle weight.
+    
+    // 2. If the gameTitle contains any kind of number (integer, data, roman numeral), add 1 to gameTitle weight.
     const hasNumber = gameTitle.match(/[0-9]/);
     if (hasNumber || hasRomanNumerals)
         gameTitleWeight++;

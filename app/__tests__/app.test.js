@@ -1,7 +1,7 @@
 // app.test.js - This file tests the App() component
 
 import React from "react";
-import { getByRole, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import App from "../(routes)/app/page";
 import SearchForm from "../components/SearchForm";
