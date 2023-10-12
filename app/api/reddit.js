@@ -97,8 +97,8 @@ export async function getUserInfo(accessToken) {
     };
 
     try {
-        const response = await axios.request(options);        
-        return response;
+        const response = await axios.request(options);                        
+        return response.data.name;
     }
     catch (err) {
         console.log(`getUserInfo() error: ${err}`);
@@ -125,7 +125,12 @@ export async function getRedditPosts(accessToken, gameTitle, matchTitleExactly){
 
     try {
         const response = await axios.request(options);        
-        return response;
+        
+        console.log(`RESPONSE EXAMPLE:`);
+        console.log(response);
+        
+        // return response;
+        return response.data.data.children;
     }
     catch (err) {
         console.log(`getUserInfo() error: ${err}`);

@@ -88,7 +88,7 @@ export default function App() {
             setIsLoading(true);
             getUserInfo(accessToken)
                 .then(res => {
-                    setRedditUsername(res.data.name);
+                    setRedditUsername(res);
                     setIsLoading(false);
                 })
                 .catch((err) => {
@@ -151,15 +151,15 @@ export default function App() {
         // Set the game info (title, year, platforms etc)
         setGameInfo(gameTitleSearchResult[0]);
 
-        // Search Reddit for this game            
+        // Search Reddit for this game. Returns an array of posts         
         const redditSearchResults = await getRedditPosts(accessToken, gameTitleSearchResult[0].name, matchTitleExactly);
         
         // Process response - Returns a formatted array of Post Objects
         // redditSearchResults.data.data.children = array of returned reddit posts
         // gameTitleSearchResult[0].tags = array of tags related to the game title
         // gameTitleSearchResult[0].platforms = array of platforms the game released on
-        if (redditSearchResults) {
-            const postsArray = processPosts(redditSearchResults.data.data.children, gameTitleSearchResult[0].tags, gameTitleSearchResult[0].platforms, gameTitleSearchResult[0].name);
+        if (redditSearchResults) {            
+            const postsArray = processPosts(redditSearchResults, gameTitleSearchResult[0].tags, gameTitleSearchResult[0].platforms, gameTitleSearchResult[0].name);
         }
     }
 
