@@ -7,14 +7,13 @@ import App from "../(routes)/app/page";
 import userEvent from "@testing-library/user-event";
 import axios from "axios";
 
-
-
 // Tell Jest to mock the axios module
 jest.mock('axios');
 
 // Mocking the <SearchForm> component which is the child component of <App>
 jest.mock('../components/SearchForm.js', () => ({ searchBarInput, handleSearchBarInput, handleSearchSubmit, gameTitles, handleMatchExactlyCheckbox }) => {
 
+    // Set the prop to have mocked data
     gameTitles = ['game1', 'game2', 'game3'];
 
     return (
@@ -36,11 +35,13 @@ jest.mock('../components/SearchForm.js', () => ({ searchBarInput, handleSearchBa
 
 it("Confirms game info (title, release year, platform(s), metacritic score) is displayed on successful search", async () => {
     // Arrange
+    
     render(<App />);
 
     const submitButton = screen.getByRole('button', { name: /Submit/i });
     const searchBar = screen.getByRole('combobox');
 
+    // A mock response of the data returned from RAWG API
     const mockResponse = {
         config: {},
         data: {
@@ -57,17 +58,24 @@ it("Confirms game info (title, release year, platform(s), metacritic score) is d
         statusText: ""
     };
 
-    await userEvent.type(searchBar, 'game2');
-
     // Set the mocked response to be what is returned by 'axios.request'    
     axios.get.mockResolvedValue(mockResponse);
+        
+    //Act
     
+    // Simulate user entering game title in search bar
+    await userEvent.type(searchBar, 'game2');
+
+    // Asserts that the submit button is enabled
     expect(submitButton).toBeInTheDocument();
     expect(submitButton).toBeEnabled();
 
+    // Simulate user clicking the submit button
     await userEvent.click(submitButton);
 
+    // Get the expected displayed text
     const gameTitleLabel = await screen.findByText(/Title:/i);
+    // We use findAllByText for 'game2' since this text will appear both in the displayed game info and the drop-down menu
     const gameTitle = await screen.findAllByText(/game2/i);
     const releaseYearLabel = await screen.findByText(/Release Year:/i);
     const releaseYear = await screen.findByText(/2023/i);
@@ -77,6 +85,7 @@ it("Confirms game info (title, release year, platform(s), metacritic score) is d
     const metacriticScore = await screen.findByText(/75/i);
 
     expect(gameTitleLabel).toBeInTheDocument();
+    // findAllByText returns an array so we check it's length
     expect(gameTitle).toHaveLength(2);
     expect(releaseYearLabel).toBeInTheDocument();
     expect(releaseYear).toBeInTheDocument();

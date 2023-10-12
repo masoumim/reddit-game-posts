@@ -12,6 +12,7 @@ export default function SearchForm({ searchBarInput, handleSearchBarInput, handl
                         return (<option key={index} value={title}>{title}</option>);
                     })}
                 </datalist>
+                {/* Disable search button unless search bar input matches a title in the drop-down menu */}
                 <input type="submit" disabled={!gameTitles.includes(searchBarInput)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-slate-400 disabled:text-slate-500" />
                 <input type="checkbox" onClick={handleMatchExactlyCheckbox} id="check-match-exactly" name="check-match-exactly"/>
                 <label htmlFor="check-match-exactly">match title exactly</label>
