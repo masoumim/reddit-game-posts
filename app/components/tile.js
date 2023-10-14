@@ -4,31 +4,32 @@
 // - A text input element for inputting a comment along with submission button
 // - Buttons for Upvoting and Downvoting the post
 
-export default function Tile({post}){
+export default function Tile({post}){    
     // TODO: Implement onClick expansion of post
     return(
         <>
-            <div>
+            <div>                
                 <p>{post.title}</p>
                 <p>{post.subreddit}</p>
-                <p>{post.postUser}</p>
-                <p>{post.postTime}</p>
-                <p>{post.postVotes}</p>
-                <p>{post.topComment}</p>
-                <p>{post.topCommentUser}</p>
-                <p>{post.topCommentTime}</p>
-                <p>{post.topCommentVotes}</p>
+                <p>{post.author}</p>
+                <p>{post.date}</p>
+                <p>{post.upvotes}</p>
+                <p>{post.topCommentText}</p>
+                <p>{post.topCommentAuthor}</p>
+                <p>{post.commentDate}</p>
+                <p>{post.topCommentUpVotes}</p>
             </div>
 
             <div>
                 <div>
-                    {post.content}                    
+                    {post.content}
                 </div>
                 {/* Upvote button */}
                 {/* Downvote button */}
                 {/* Input text field (comment) */}
                 {/* Submit comment button */}
             </div>
+            <br/>
         </>
     )
 }

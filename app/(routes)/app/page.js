@@ -3,14 +3,16 @@
 // This page will render all of the content for the app.
 
 import { useState, useEffect, useRef } from "react";
-import { authorizeAppOnly, getUserAuthAccessToken, getUserInfo, getRedditPosts } from "@/app/api/reddit.js";
+import { authorizeAppOnly, getUserAuthAccessToken, getUserInfo, getRedditPosts, getPostTopComment } from "@/app/api/reddit.js";
 import { checkGameTitle } from "@/app/api/vgdb";
+import { hasDefinition } from "@/app/api/dictionary";
 import SearchForm from "@/app/components/SearchForm";
-import { processPosts } from "@/app/processPostData";
+import Tile from "@/app/components/Tile";
+import { processPosts, titleWordsToArray, validatePost, formatPost } from "@/app/processPostData";
 
 export default function App() {
 
-    const [isLoading, setIsLoading] = useState(false);                          // Used to conditionally render data while fetching
+    const [isLoading, setIsLoading] = useState(false);                          // Used to conditionally render when fetching username
     const [accessToken, setAccessToken] = useState("");                         // Reddit access token
     const [loggedIn, setLoggedIn] = useState(false);                            // Status representing if user is logged in to Reddit or not    
     const [redditUsername, setRedditUsername] = useState("");                   // The user's Reddit username
@@ -21,8 +23,10 @@ export default function App() {
     const [gameTitle, setGameTitle] = useState("");                             // Title of game being searched for
     const [gameYear, setGameYear] = useState("");                               // Release year of game being searched for
     const [gamePlatforms, setGamePlatforms] = useState([]);                     // Platforms of the game being searched for
+    const [gameTags, setGameTags] = useState([]);                               // Tags associated with the game title
     const [gameMetacritic, setGameMetacritic] = useState("");                   // The Metacritic score of the game being searched for
-    const [posts, setPosts] = useState([]);                                     // Array of Reddit posts to be rendered in Tiles
+    const [posts, setPosts] = useState([]);
+    const [isLoadingPosts, setIsLoadingPosts] = useState (false);
 
     /*
      The useRef Hook allows you to persist values between renders.
@@ -131,40 +135,104 @@ export default function App() {
     function setGameInfo(game) {
         // Toggle state boolean
         setDisplayGameInfo(true);
-        
-        // Get the name each platform the game released on
-        const platforms = game.platforms.map(e => {return e.platform.name});
-        
+
+        // Get the name of each platform the game released on
+        const platforms = game.platforms.map(e => { return e.platform.name });
+
+        // Get the tags associated with the game        
+        const tags = game.tags.map(e => { return e.name });
+
         // Set the values for the game
         setGameTitle(game.name);
-        setGameYear(game.released.match(/\d{4}/));        
+        setGameYear(game.released.match(/\d{4}/));
         setGamePlatforms(platforms);
+        setGameTags(tags);
         setGameMetacritic(game.metacritic);
     }
 
     // Handle search form submit
     async function handleSearchSubmit(event) {
-        event.preventDefault(); // Prevents the page from reloading on submit
+        // Set loading to true when fetching data
+        setIsLoadingPosts(true);
+        
+        // Prevents the page from reloading on submit
+        event.preventDefault();
 
         // We want the first result (index 0) in the returned array
         const gameTitleSearchResult = await checkGameTitle(searchBarInput);
-        
+
         // Set the game info (title, year, platforms etc)
         setGameInfo(gameTitleSearchResult[0]);
 
-        // Search Reddit for this game. Returns an array of posts         
+        // Search Reddit for this game. Returns an array of posts                 
         const redditSearchResults = await getRedditPosts(accessToken, gameTitleSearchResult[0].name, matchTitleExactly);
-        
-        // Process response - Returns a formatted array of Post Objects
-        // redditSearchResults.data.data.children = array of returned reddit posts
-        // gameTitleSearchResult[0].tags = array of tags related to the game title
-        // gameTitleSearchResult[0].platforms = array of platforms the game released on
-        if (redditSearchResults) {            
-            const postsArray = processPosts(redditSearchResults, gameTitleSearchResult[0].tags, gameTitleSearchResult[0].platforms, gameTitleSearchResult[0].name);
-            
-            // Set the state variable
-            setPosts(postsArray);
+
+        // Process the Reddit post
+        const { title, formattedGameTitle, hasRomanNumerals, combinedTerms, filteredPosts } = processPosts(redditSearchResults, gameTitleSearchResult[0].tags, gameTitleSearchResult[0].platforms, gameTitleSearchResult[0].name);
+
+        // Create an array made up of the words in the game's title
+        const titleWordsArray = titleWordsToArray(title);
+
+        // Variables to store the gameTitle weight and the formattedGameTitle weight
+        let gameTitleWeight = 0;
+        let formattedGameTitleWeight = 0;
+        let weighFormattedGameTitle = false;
+
+        // The combinedTerms array does not contain duplicates.
+        // If game title is a single word and no numbers (ie: Destiny), it will appear in the combinedTerms array only once
+        // Because of this, we only want to weigh the formattedGameTitle if it is in the combinedTerms array AND not equal to gameTitle        
+        if (title !== formattedGameTitle && combinedTerms.includes(formattedGameTitle)) {
+            weighFormattedGameTitle = true;
         }
+
+        // 1. For each element in array, search library to see if it returns a definition. 
+        // If so, add 1 to weight, if not, add 2 to weight.
+        for (const word in titleWordsArray) {
+            const definitionFound = await hasDefinition(titleWordsArray[word]);
+            if (definitionFound) {
+                gameTitleWeight++;
+                if (weighFormattedGameTitle && formattedGameTitle.includes(titleWordsArray[word]))
+                    formattedGameTitleWeight++;
+            }
+            else {
+                gameTitleWeight += 2;
+                if (weighFormattedGameTitle && formattedGameTitle.includes(titleWordsArray[word]))
+                    formattedGameTitleWeight += 2;
+            }
+        }
+
+        // 2. If the gameTitle contains any kind of number (integer, data, roman numeral), add 1 to gameTitle weight.
+        const hasNumber = title.match(/[0-9]/);
+        if (hasNumber || hasRomanNumerals)
+            gameTitleWeight++;
+
+        // For each post, determine if it is related to the game title
+        // If so, continue to process the data. Otherwise, skip it
+        const validatedPosts = [];
+        filteredPosts.forEach(post => {
+            const isValid = validatePost(post.data.title, post.data.subreddit, post.data.selftext, combinedTerms, gameTitleWeight, formattedGameTitleWeight, title, formattedGameTitle)
+            if (isValid) {
+                validatedPosts.push(post);
+            }
+        });
+
+        // Create a final array of formatted post objects to be rendered.
+        const formattedPostsArray = [];
+        for(const post in validatedPosts){
+            const postObj = formatPost(validatedPosts[post]);                
+            // Get the top comment for this post and add it to the object
+            const topComment = await getPostTopComment(validatedPosts[post].data.id, postObj.subreddit, accessToken);
+            if (topComment) {
+                postObj.topCommentAuthor = topComment.data.author;  // Top Comment Author
+                postObj.topCommentText = topComment.data.body;      // Top Comment Text
+                postObj.topCommentUpVotes = topComment.data.ups;    // Top Comment Up-votes
+                postObj.commentDate = topComment.data.created;      // Top Comment Date (Unix Timestamp)
+            }
+            formattedPostsArray.push(postObj);
+        }
+                
+        setPosts(formattedPostsArray);  // Set the state variable
+        setIsLoadingPosts(false);       // Set loading to false after fetching data
     }
 
     return (
@@ -179,8 +247,8 @@ export default function App() {
                     <p><b>Platform(s): </b>{gamePlatforms.join(", ")}</p>
                     <p><b>Metacritic score: </b>{gameMetacritic ? gameMetacritic : "N/A"}</p>
                 </>
-                : ""}
-            {/* TODO: For each post in the posts state variable, render a <Tile> using the post data */}
+                : ""}            
+            {isLoadingPosts ? <p>Loading posts...</p> : posts.map((post, index) => { return <Tile key={index} post={post} /> })}
         </>
     )
 }

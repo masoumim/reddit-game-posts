@@ -14,6 +14,8 @@ const redirectURI = process.env.NODE_ENV === "development" ? "http://localhost:3
 // Base URL for Reddit API
 const base_url = 'https://oauth.reddit.com';
 
+const userAgent = `${process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID}:v1 (by /u/OrangeFit90)`;
+
 // Authorize App + User
 // *User grants this client app permission to access their Reddit account.
 export function userAuthorizeApp() {
@@ -115,7 +117,7 @@ export async function getRedditPosts(accessToken, gameTitle, matchTitleExactly){
     const options = {
         method: 'GET',
         url: `${base_url}/search`,
-        headers: { 'Authorization': `bearer ${accessToken}` },
+        headers: { 'Authorization': `bearer ${accessToken}`},
         params: {
             q: title,
             limit: 100,
@@ -124,12 +126,34 @@ export async function getRedditPosts(accessToken, gameTitle, matchTitleExactly){
     };
 
     try {
-        const response = await axios.request(options);        
-        
-        // return response;
+        const response = await axios.request(options);                            
         return response.data.data.children;
     }
     catch (err) {
-        console.log(`getUserInfo() error: ${err}`);
+        console.log(`getRedditPosts() error: ${err}`);
+    }
+}
+
+// Calls Reddit API to get the top comment for a post
+export async function getPostTopComment(postId, subreddit, accessToken){
+        
+    // Set the object to use in the GET request
+    const options = {
+        method: 'GET',
+        url: `${base_url}/r/${subreddit}/comments/${postId}/`,
+        headers: { 'Authorization': `bearer ${accessToken}`},
+        params: {
+            sort: top
+        }
+    };
+
+    try {
+        const response = await axios.request(options);       
+        
+        // Return the first element in the children array which will be the top comment
+        return response.data[1].data.children[0];
+    }
+    catch (err) {
+        console.log(`getPostTopComment() error: ${err}`);
     }
 }
