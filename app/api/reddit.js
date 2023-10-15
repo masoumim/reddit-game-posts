@@ -40,7 +40,7 @@ export function userAuthorizeApp() {
 }
 
 // Returns the Access Token using URL param 'code'
-export async function getUserAuthAccessToken(code) {        
+export async function getUserAuthAccessToken(code) {
     // Set the object to use in the POST request
     const options = {
         method: 'POST',
@@ -90,7 +90,7 @@ export async function authorizeAppOnly() {
 }
 
 // Calls Reddit API to get Reddit username
-export async function getUserInfo(accessToken) {    
+export async function getUserInfo(accessToken) {
     // Set the object to use in the GET request
     const options = {
         method: 'GET',
@@ -99,7 +99,7 @@ export async function getUserInfo(accessToken) {
     };
 
     try {
-        const response = await axios.request(options);                        
+        const response = await axios.request(options);
         return response.data.name;
     }
     catch (err) {
@@ -108,16 +108,16 @@ export async function getUserInfo(accessToken) {
 }
 
 // Calls Reddit API to search for posts about game title
-export async function getRedditPosts(accessToken, gameTitle, matchTitleExactly){
-        
+export async function getRedditPosts(accessToken, gameTitle, matchTitleExactly) {
+
     // If matching title exactly, wrap title in quotes
     const title = matchTitleExactly ? `"${gameTitle}"` : gameTitle;
-    
+
     // Set the object to use in the GET request
     const options = {
         method: 'GET',
         url: `${base_url}/search`,
-        headers: { 'Authorization': `bearer ${accessToken}`},
+        headers: { 'Authorization': `bearer ${accessToken}` },
         params: {
             q: title,
             limit: 100,
@@ -126,7 +126,7 @@ export async function getRedditPosts(accessToken, gameTitle, matchTitleExactly){
     };
 
     try {
-        const response = await axios.request(options);                            
+        const response = await axios.request(options);
         return response.data.data.children;
     }
     catch (err) {
@@ -134,26 +134,18 @@ export async function getRedditPosts(accessToken, gameTitle, matchTitleExactly){
     }
 }
 
-// Calls Reddit API to get the top comment for a post
-export async function getPostTopComment(postId, subreddit, accessToken){
-        
-    // Set the object to use in the GET request
-    const options = {
-        method: 'GET',
-        url: `${base_url}/r/${subreddit}/comments/${postId}/`,
-        headers: { 'Authorization': `bearer ${accessToken}`},
-        params: {
-            sort: top
-        }
-    };
-
+// Calls Reddit API to get the top comment for each post in the array
+export async function getAllTopComments(posts, accessToken) {
     try {
-        const response = await axios.request(options);       
-        
-        // Return the first element in the children array which will be the top comment
-        return response.data[1].data.children[0];
-    }
-    catch (err) {
-        console.log(`getPostTopComment() error: ${err}`);
+        // Create and send api request for each reddit post
+        // Store each returned promise in promisesArray
+        const promisesArray = [];
+        for (const post in posts) {
+            promisesArray.push(axios.request({ method: 'GET', url: `${base_url}/r/${posts[post].data.subreddit}/comments/${posts[post].data.id}/`, headers: { 'Authorization': `bearer ${accessToken}` }, params: { sort: top } }));
+        }
+        // Resolve all promises at once
+        return await Promise.all(promisesArray);
+    } catch (err) {
+        console.log(err);
     }
 }

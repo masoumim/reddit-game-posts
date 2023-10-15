@@ -59,8 +59,7 @@ export function formatGameTitle(gameTitle) {
 
     // Remove roman numerals: Get the string of characters that follow the last whitespace character in the string.
     const charsAfterLastWhitespace = formattedGameTitle.substring(indexOfLastWhitespace + 1, formattedGameTitle.length);
-    // console.log(`charsAfterLastWhitespace = ${charsAfterLastWhitespace}`);
-
+    
     // Remove roman numerals
     if (romanNumerals.includes(charsAfterLastWhitespace)) {
         hasRomanNumerals = true;
@@ -90,41 +89,32 @@ export function validatePost(postTitle, postSubreddit, postText, combinedTerms, 
         if (postTitle.toLowerCase().includes(term)) {
             if (term === gameTitle) {
                 if (!gameTitleWeightAdded) {
-                    // console.log(`postTitle contains: ${term}`);
                     validityScore += gameTitleWeight;
                     gameTitleWeightAdded = true;
                 }
             } else {
-                // console.log(`postTitle contains: ${term}`);
                 validityScore++;
-
             }
         }
 
         // Check post subreddit name
         if (postSubreddit.toLowerCase().includes(term)) {
             if (term === formattedGameTitle) {
-                // console.log(`postSubreddit contains: ${term}`);
                 validityScore += formattedGameTitleWeight;
             } else {
-                // console.log(`postSubreddit contains: ${term}`);
                 validityScore++;
-
             }
         }
 
         // Check post body
         if (postText.toLowerCase().includes(term)) {
             if (term === gameTitle) {
-                if (!gameTitleWeightAdded) {
-                    // console.log(`postText contains: ${term}`);
+                if (!gameTitleWeightAdded) {                    
                     validityScore += gameTitleWeight;
                     gameTitleWeightAdded = false;
                 }
-            } else {
-                // console.log(`postText contains: ${term}`);
+            } else {                
                 validityScore++;
-
             }
         }
     });
@@ -154,18 +144,25 @@ export function titleWordsToArray(gameTitle) {
 }
 
 // Formats post data and returns a Post Object
-export function formatPost(post) {
+export function formatPost(post, topComment) {
     
     // Create post object
     const postObj = {};
 
     // Add post data to object
+    postObj.id = post.data.id                   // Post ID
     postObj.title = post.data.title;            // Post Title
     postObj.subreddit = post.data.subreddit;    // Post Subreddit
     postObj.text = post.data.selftext;          // Post Text Body
     postObj.author = post.data.author;          // Post Author
     postObj.upvotes = post.data.ups;            // Post Up-votes
     postObj.date = post.data.created;           // Post Date (Unix Timestamp)
+    
+    // Add top comment data to object
+    postObj.topCommentText = topComment.data[1].data.children[0].data.body;         // Comment Text
+    postObj.topCommentAuthor = topComment.data[1].data.children[0].data.author;     // Comment Author
+    postObj.commentDate = topComment.data[1].data.children[0].data.created;         // Comment Date (Unix Timestamp)
+    postObj.topCommentUpVotes = topComment.data[1].data.children[0].data.ups;       // Comment Up-Votes
 
     // Get the URL to the post's media content and set the content type
     if (post.data.domain === "youtu.be" || post.data.domain === "youtube.com") {

@@ -14,6 +14,8 @@ export default function Tile({post}){
                 <p>{post.author}</p>
                 <p>{post.date}</p>
                 <p>{post.upvotes}</p>
+                <p>{post.text}</p>
+                <br/>
                 <p>{post.topCommentText}</p>
                 <p>{post.topCommentAuthor}</p>
                 <p>{post.commentDate}</p>

@@ -3,11 +3,11 @@
 // This page will render all of the content for the app.
 
 import { useState, useEffect, useRef } from "react";
-import { authorizeAppOnly, getUserAuthAccessToken, getUserInfo, getRedditPosts, getPostTopComment } from "@/app/api/reddit.js";
+import { authorizeAppOnly, getUserAuthAccessToken, getUserInfo, getRedditPosts, getAllTopComments } from "@/app/api/reddit.js";
 import { checkGameTitle } from "@/app/api/vgdb";
 import { hasDefinition } from "@/app/api/dictionary";
 import SearchForm from "@/app/components/SearchForm";
-import Tile from "@/app/components/Tile";
+import Tile from "@/app/components/Tile.js";
 import { processPosts, titleWordsToArray, validatePost, formatPost } from "@/app/processPostData";
 
 export default function App() {
@@ -26,7 +26,7 @@ export default function App() {
     const [gameTags, setGameTags] = useState([]);                               // Tags associated with the game title
     const [gameMetacritic, setGameMetacritic] = useState("");                   // The Metacritic score of the game being searched for
     const [posts, setPosts] = useState([]);
-    const [isLoadingPosts, setIsLoadingPosts] = useState (false);
+    const [isLoadingPosts, setIsLoadingPosts] = useState(false);
 
     /*
      The useRef Hook allows you to persist values between renders.
@@ -154,14 +154,14 @@ export default function App() {
     async function handleSearchSubmit(event) {
         // Set loading to true when fetching data
         setIsLoadingPosts(true);
-        
+
         // Prevents the page from reloading on submit
         event.preventDefault();
 
-        // We want the first result (index 0) in the returned array
+        // We want the first result (index 0) in the returned array which will return the game title
         const gameTitleSearchResult = await checkGameTitle(searchBarInput);
 
-        // Set the game info (title, year, platforms etc)
+        // Set the game info (title, year, platforms etc) to display
         setGameInfo(gameTitleSearchResult[0]);
 
         // Search Reddit for this game. Returns an array of posts                 
@@ -216,21 +216,19 @@ export default function App() {
             }
         });
 
+        // Get the top comment for each post
+        const topCommentsArray = await getAllTopComments(validatedPosts, accessToken);
+        
         // Create a final array of formatted post objects to be rendered.
-        const formattedPostsArray = [];
-        for(const post in validatedPosts){
-            const postObj = formatPost(validatedPosts[post]);                
-            // Get the top comment for this post and add it to the object
-            const topComment = await getPostTopComment(validatedPosts[post].data.id, postObj.subreddit, accessToken);
-            if (topComment) {
-                postObj.topCommentAuthor = topComment.data.author;  // Top Comment Author
-                postObj.topCommentText = topComment.data.body;      // Top Comment Text
-                postObj.topCommentUpVotes = topComment.data.ups;    // Top Comment Up-votes
-                postObj.commentDate = topComment.data.created;      // Top Comment Date (Unix Timestamp)
-            }
-            formattedPostsArray.push(postObj);
+        let formattedPostsArray = [];
+       
+        // Create a formatted post object out of each post + comment
+        // Add the object to the formattedPostsArray
+        for (const post in validatedPosts) {
+            const postObj = formatPost(validatedPosts[post], topCommentsArray[post]);
+            formattedPostsArray.push(postObj);            
         }
-                
+
         setPosts(formattedPostsArray);  // Set the state variable
         setIsLoadingPosts(false);       // Set loading to false after fetching data
     }
@@ -247,7 +245,7 @@ export default function App() {
                     <p><b>Platform(s): </b>{gamePlatforms.join(", ")}</p>
                     <p><b>Metacritic score: </b>{gameMetacritic ? gameMetacritic : "N/A"}</p>
                 </>
-                : ""}            
+                : ""}
             {isLoadingPosts ? <p>Loading posts...</p> : posts.map((post, index) => { return <Tile key={index} post={post} /> })}
         </>
     )
