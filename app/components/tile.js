@@ -4,34 +4,36 @@
 // - A text input element for inputting a comment along with submission button
 // - Buttons for Upvoting and Downvoting the post
 
-export default function Tile({post}){    
+export default function Tile({ post }) {
     // TODO: Implement onClick expansion of post
-    return(
+    return (
         <>
-            <div>                
-                <p>{post.title}</p>
-                <p>{post.subreddit}</p>
-                <p>{post.author}</p>
-                <p>{post.date}</p>
-                <p>{post.upvotes}</p>
-                <p>{post.text}</p>
-                <br/>
-                <p>{post.topCommentText}</p>
-                <p>{post.topCommentAuthor}</p>
-                <p>{post.commentDate}</p>
-                <p>{post.topCommentUpVotes}</p>
-            </div>
-
             <div>
                 <div>
-                    {post.content}
+                    <p><b>post title: </b>{post.title}</p>
+                    <p>{post.subreddit}</p>
+                    <p>{post.author}</p>
+                    <p>{post.date}</p>
+                    <p>{post.upvotes}</p>
+                    <b>post text: </b>
+                    {post.text}
+                    <br/>                                     
+                    <b>comment: </b>
+                    {post.topCommentText}
+                    <p>{post.topCommentAuthor}</p>
+                    <p>{post.commentDate}</p>
+                    <p>{post.topCommentUpVotes}</p>
                 </div>
-                {/* Upvote button */}
-                {/* Downvote button */}
-                {/* Input text field (comment) */}
-                {/* Submit comment button */}
+                <div>
+                    <div>
+                        {post.content}
+                    </div>
+                    {/* Upvote button */}
+                    {/* Downvote button */}
+                    {/* Input text field (comment) */}
+                    {/* Submit comment button */}
+                </div>                
             </div>
-            <br/>
         </>
     )
 }

@@ -2,6 +2,8 @@
 // - Determining and measuring the likelihood that a post is about the game
 // - Removing / Filtering out posts with low likelihood
 
+// html-react-parser Converts an HTML string to one or more React elements.
+import parse from 'html-react-parser';
 import { hasDefinition } from "./api/dictionary";
 import { getRedditPosts, getAllTopComments } from "./api/reddit";
 
@@ -15,7 +17,7 @@ export async function processPosts(accessToken, gameTitle, gameTags, gamePlatfor
     let gameDate = "";
     let title = gameTitle;
     let dateRegEx = /\(\d{4}\)/; // RegEx: a 4 digit number between parentheses.
-    
+
     // Set the game date if it is in the gameTitle.
     // *RAWG will append the date in parentheses to some games, mainly retro games.        
     const extractedDate = title.match(dateRegEx);
@@ -25,27 +27,27 @@ export async function processPosts(accessToken, gameTitle, gameTags, gamePlatfor
     }
 
     // remove date from the title (if it exists)
-    title = title.replace(dateRegEx, "").toLowerCase().trim();      
+    title = title.replace(dateRegEx, "").toLowerCase().trim();
 
     // Get the formattedGameTitle and hasRomanNumerals boolean by destructuring
     const { formattedGameTitle, hasRomanNumerals } = formatGameTitle(title);
 
     // Extract the game tags
     const tags = gameTags.map(e => e.name.toLowerCase());
-                    
+
     // Extract the platforms
     const platforms = gamePlatforms.map(e => e.platform.name.toLowerCase());
-    
+
     // Combine the arrays of terms, game title and formatted game title into single array without duplicates using SET
     const combinedTerms = [...new Set([...gameTerms, ...tags, ...platforms, ...[title], ...[formattedGameTitle]])];
-    
+
     // Search Reddit for this game. Returns an array of posts                 
     const redditSearchResults = await getRedditPosts(accessToken, gameTitle, matchTitleExactly);
-            
+
     // Filter / remove posts with Subredit names in a removePosts array    
-    const removePosts = ["gamecollecting", "gameswap", "gamesale", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals"];        
+    const removePosts = ["gamecollecting", "gameswap", "gamesale", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals"];
     const filteredPosts = redditSearchResults.filter(post => !removePosts.includes(post.data.subreddit.toLowerCase()));
-        
+
     // Get the weight for the game title and the formatted game title
     const { gameTitleWeight, formattedGameTitleWeight } = await determineTitleWeights(title, formattedGameTitle, combinedTerms, hasRomanNumerals);
 
@@ -58,10 +60,10 @@ export async function processPosts(accessToken, gameTitle, gameTags, gamePlatfor
             validatedPosts.push(post);
         }
     });
-    
+
     // Get the top comment for each post
     const topCommentsArray = await getAllTopComments(validatedPosts, accessToken);
-    
+
     // Create a final array of formatted post objects to be returned.
     let formattedPostsArray = [];
 
@@ -70,8 +72,8 @@ export async function processPosts(accessToken, gameTitle, gameTags, gamePlatfor
     for (const post in validatedPosts) {
         const postObj = formatPost(validatedPosts[post], topCommentsArray[post]);
         formattedPostsArray.push(postObj);
-    }    
-    
+    }
+
     return formattedPostsArray;
 }
 
@@ -90,7 +92,7 @@ export function formatGameTitle(gameTitle) {
 
     // Remove roman numerals: Get the string of characters that follow the last whitespace character in the string.
     const charsAfterLastWhitespace = formattedGameTitle.substring(indexOfLastWhitespace + 1, formattedGameTitle.length);
-    
+
     // Remove roman numerals
     if (romanNumerals.includes(charsAfterLastWhitespace)) {
         hasRomanNumerals = true;
@@ -105,7 +107,7 @@ export function formatGameTitle(gameTitle) {
 
 // Determines the weights of gameTitle and formattedGameTitle
 export async function determineTitleWeights(title, formattedGameTitle, combinedTerms, hasRomanNumerals) {
-    
+
     // Variables to store the gameTitle weight and the formattedGameTitle weight
     let gameTitleWeight = 0;
     let formattedGameTitleWeight = 0;
@@ -141,13 +143,13 @@ export async function determineTitleWeights(title, formattedGameTitle, combinedT
     const hasNumber = title.match(/[0-9]/);
     if (hasNumber || hasRomanNumerals)
         gameTitleWeight++;
-    
+
     return { gameTitleWeight, formattedGameTitleWeight }
 }
 
 // Determines if a given post is about the game title. If it is, return TRUE, otherwise return FALSE
 export function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTitleWeight, formattedGameTitleWeight, gameTitle, formattedGameTitle) {
-    
+
     // Represents the likelihood of a valid post - 4+ is considered valid
     let validityScore = 0;
 
@@ -182,11 +184,11 @@ export function validatePost(postTitle, postSubreddit, postText, combinedTerms, 
         // Check post body
         if (postText.toLowerCase().includes(term)) {
             if (term === gameTitle) {
-                if (!gameTitleWeightAdded) {                    
+                if (!gameTitleWeightAdded) {
                     validityScore += gameTitleWeight;
                     gameTitleWeightAdded = false;
                 }
-            } else {                
+            } else {
                 validityScore++;
             }
         }
@@ -225,23 +227,74 @@ export function formatPost(post, topComment) {
     // Add post data to object
     postObj.id = post.data.id                   // Post ID
     postObj.title = post.data.title;            // Post Title
-    postObj.subreddit = post.data.subreddit;    // Post Subreddit
-    postObj.text = post.data.selftext;          // Post Text Body
+    postObj.subreddit = post.data.subreddit;    // Post Subreddit      
     postObj.author = post.data.author;          // Post Author
     postObj.upvotes = post.data.ups;            // Post Up-votes
     postObj.date = post.data.created;           // Post Date (Unix Timestamp)
-    
+
+    // Create a new DOMParser object                                                     
+    const parser = new DOMParser();
+
+    // Get the post's text html (selftext_html) returned by Reddit API        
+    const postHTMLStr = post.data.selftext_html;
+
+    // If post isn't null, convert the post's text body into HTML:
+    if (postHTMLStr !== null) {        
+        // Convert selftext_html's HTML character entities to HTML element tags     
+        const postHTMLElements = parser.parseFromString(postHTMLStr, 'text/html');
+
+        // Extract just the <body> portion of the converted HTML
+        const postBody = postHTMLElements.body;
+
+        // Get the textContent of the parsed HTML which gives us an HTML string        
+        const postBodyText = postBody.textContent;
+
+        // Replace newlines with a single Line Break element     
+        const postBodyTextLineBreak = postBodyText.replace(/\n/g, "</br>").replace(/<\/br><\/br>/g, "</br>");
+
+        // Convert the HTML string to a React element using html-react-parser    
+        const parsedBody = parse(postBodyTextLineBreak);
+
+        // Body Text
+        postObj.text = parsedBody;
+    }
+    else {        
+        postObj.text = "";
+    }
+
     // Add top comment data to object  
     if (topComment.data[1].data.children.length > 0) {
-        postObj.topCommentText = topComment.data[1].data.children[0].data.body;         // Comment Text
-        postObj.topCommentAuthor = topComment.data[1].data.children[0].data.author;     // Comment Author
-        postObj.commentDate = topComment.data[1].data.children[0].data.created;         // Comment Date (Unix Timestamp)
-        postObj.topCommentUpVotes = topComment.data[1].data.children[0].data.ups;       // Comment Up-Votes
+        postObj.topCommentAuthor = topComment.data[1].data.children[0].data.author;      // Comment Author
+        postObj.commentDate = topComment.data[1].data.children[0].data.created;          // Comment Date (Unix Timestamp)
+        postObj.topCommentUpVotes = topComment.data[1].data.children[0].data.ups;        // Comment Up-Votes
+
+        // Convert the comment into HTML:
+
+        // Get the comment text returned by Reddit API
+        const commentHTMLStr = topComment.data[1].data.children[0].data.body_html;
+
+        // Convert the HTML string's character entities into HTML element tags
+        const commentHTMLElements = parser.parseFromString(commentHTMLStr, 'text/html')
+
+        // Extract just the <body> portion of the converted HTML
+        const commentBody = commentHTMLElements.body;
+
+        // Get the textContent of the parsed HTML which gives us an HTML string
+        const commentBodyText = commentBody.textContent
+
+        // Replace newlines with a single Line Break element 
+        const commentBodyTextLineBreak = commentBodyText.replace(/\n/g, "</br>").replace(/<\/br><\/br>/g, "</br>");
+
+        // Convert the HTML string to a React element using html-react-parser
+        const parsedComment = parse(commentBodyTextLineBreak);
+
+        // Comment Text
+        postObj.topCommentText = parsedComment;
     }
-    else{
+    else {
         postObj.topCommentText = "No comments";
     }
-    
+
     // Get the URL to the post's media content and set the content type
     if (post.data.domain === "youtu.be" || post.data.domain === "youtube.com") {
         postObj.mediaURL = post.data.url;

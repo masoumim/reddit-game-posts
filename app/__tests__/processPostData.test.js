@@ -19,16 +19,16 @@ it("tests the processPosts() function which returns an array of valid posts", as
 
     // Mock response for getRedditPosts()
     const getRedditPostsMockResponse = [
-        { data: { author: "author1", created: 1455703937, domain: "twitter.com", id: "123", selftext: "SMW on Super Nintendo is my favorite retro platformer.", subreddit: "subreddit1", title: "Super Mario World is my favorite game!", ups: 100, url: "www.abc.com" } },
-        { data: { author: "author2", created: 1893738948, domain: "youtube.com", id: "456", selftext: "I love Super Mario World on Super Nintendo. I get such nostalgia when I play that retro platformer", subreddit: "subreddit2", title: "Super Mario World is pure nostalgia", ups: 75, url: "www.xyz.com" } },
-        { data: { author: "author3", created: 8343290834, domain: "i.reddit.com", id: "789", selftext: "I remember playing SMW on Game Boy Advance. Such a great retro platformer", subreddit: "subreddit3", title: "Anyone play Super Mario World on Game Boy Advance?", ups: 150, url: "www.foo.com" } }
+        { data: { author: "author1", created: 1455703937, domain: "twitter.com", id: "123", selftext_html: "SMW on Super Nintendo is my favorite retro platformer.", subreddit: "subreddit1", title: "Super Mario World is my favorite game!", ups: 100, url: "www.abc.com" } },
+        { data: { author: "author2", created: 1893738948, domain: "youtube.com", id: "456", selftext_html: "I love Super Mario World on Super Nintendo. I get such nostalgia when I play that retro platformer", subreddit: "subreddit2", title: "Super Mario World is pure nostalgia", ups: 75, url: "www.xyz.com" } },
+        { data: { author: "author3", created: 8343290834, domain: "i.reddit.com", id: "789", selftext_html: "I remember playing SMW on Game Boy Advance. Such a great retro platformer", subreddit: "subreddit3", title: "Anyone play Super Mario World on Game Boy Advance?", ups: 150, url: "www.foo.com" } }
     ]
 
     // Mock response for getAllTopComments()
     const getAllTopCommentsMockResponse = [
-        { data: [{}, { data: { children: [{ data: { author: "commentAuthor1", body: "commentAuthor1's comment", created: 1455723984, ups: 100 } }] } }] },
-        { data: [{}, { data: { children: [{ data: { author: "commentAuthor2", body: "commentAuthor2's comment", created: 1455723985, ups: 200 } }] } }] },
-        { data: [{}, { data: { children: [{ data: { author: "commentAuthor3", body: "commentAuthor3's comment", created: 1455723986, ups: 150 } }] } }] }
+        { data: [{}, { data: { children: [{ data: { author: "commentAuthor1", body_html: "commentAuthor1's comment", created: 1455723984, ups: 100 } }] } }] },
+        { data: [{}, { data: { children: [{ data: { author: "commentAuthor2", body_html: "commentAuthor2's comment", created: 1455723985, ups: 200 } }] } }] },
+        { data: [{}, { data: { children: [{ data: { author: "commentAuthor3", body_html: "commentAuthor3's comment", created: 1455723986, ups: 150 } }] } }] }
     ]
 
     // Set the mocked return value for getRedditPosts
