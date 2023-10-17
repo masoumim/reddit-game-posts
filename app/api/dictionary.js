@@ -9,14 +9,12 @@ export async function hasDefinition(word) {
     try {
         // Call the API using the word
         const response = await axios.get(`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=${process.env.NEXT_PUBLIC_DICTIONARY_KEY}`);
-        
+                
         // Check response for definition
-        if(response.data[0].shortdef){
-            // console.log(`Definition found for: ${word}`);
+        if(response.data.length > 0){            
             return true;
         }
-        else{
-            // console.log(`No definition found for: ${word}`);
+        else{            
             return false;
         }
     } catch (error) {

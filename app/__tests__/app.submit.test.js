@@ -5,7 +5,7 @@ import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import App from "../(routes)/app/page";
 import userEvent from "@testing-library/user-event";
-import { checkGameTitle } from "../api/vgdb.js"; // Import the actual module that we want mocked
+import { checkGameTitle } from "../api/vgdb.js"; // Import the actual function from the module that we want mocked
 
 // Tell Jest to mock the implementation of this module
 // *This will use the mocked version of the module in the __mocks__ folder.

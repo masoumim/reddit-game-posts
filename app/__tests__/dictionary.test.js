@@ -15,7 +15,7 @@ it('tests the hasDefinition() method which returns TRUE or FALSE depending on if
     const mockResponse = {
         data: [{
             meta: { id: "foo" },
-            shortdef: []
+            shortdef: ["foo definition"]
         }]
     };
 

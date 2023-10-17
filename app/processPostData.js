@@ -41,7 +41,7 @@ export async function processPosts(accessToken, gameTitle, gameTags, gamePlatfor
     
     // Search Reddit for this game. Returns an array of posts                 
     const redditSearchResults = await getRedditPosts(accessToken, gameTitle, matchTitleExactly);
-        
+            
     // Filter / remove posts with Subredit names in a removePosts array    
     const removePosts = ["gamecollecting", "gameswap", "gamesale", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals"];        
     const filteredPosts = redditSearchResults.filter(post => !removePosts.includes(post.data.subreddit.toLowerCase()));
@@ -61,7 +61,7 @@ export async function processPosts(accessToken, gameTitle, gameTags, gamePlatfor
     
     // Get the top comment for each post
     const topCommentsArray = await getAllTopComments(validatedPosts, accessToken);
-
+    
     // Create a final array of formatted post objects to be returned.
     let formattedPostsArray = [];
 
@@ -70,8 +70,8 @@ export async function processPosts(accessToken, gameTitle, gameTags, gamePlatfor
     for (const post in validatedPosts) {
         const postObj = formatPost(validatedPosts[post], topCommentsArray[post]);
         formattedPostsArray.push(postObj);
-    }
-
+    }    
+    
     return formattedPostsArray;
 }
 
