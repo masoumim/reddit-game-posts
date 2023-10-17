@@ -3,12 +3,11 @@
 // This page will render all of the content for the app.
 
 import { useState, useEffect, useRef } from "react";
-import { authorizeAppOnly, getUserAuthAccessToken, getUserInfo, getRedditPosts, getAllTopComments } from "@/app/api/reddit.js";
+import { authorizeAppOnly, getUserAuthAccessToken, getUserInfo } from "@/app/api/reddit.js";
 import { checkGameTitle } from "@/app/api/vgdb";
-import { hasDefinition } from "@/app/api/dictionary";
 import SearchForm from "@/app/components/SearchForm";
 import Tile from "@/app/components/Tile.js";
-import { processPosts, titleWordsToArray, validatePost, formatPost } from "@/app/processPostData";
+import { processPosts } from "@/app/processPostData";
 
 export default function App() {
 
@@ -115,7 +114,7 @@ export default function App() {
         const gameTitleSearchResults = await checkGameTitle(event.target.value);
 
         // Populate the matchingGameTitles array for each result returned by the API
-        if (gameTitleSearchResults) {
+        if (gameTitleSearchResults) {            
             gameTitleSearchResults.forEach(result => {
                 matchingGameTitles.push(result.name);
             });
@@ -136,10 +135,10 @@ export default function App() {
         // Toggle state boolean
         setDisplayGameInfo(true);
 
-        // Get the name of each platform the game released on
+        // Get the name of each platform the game released on        
         const platforms = game.platforms.map(e => { return e.platform.name });
 
-        // Get the tags associated with the game        
+        // Get the tags associated with the game                
         const tags = game.tags.map(e => { return e.name });
 
         // Set the values for the game
@@ -152,11 +151,11 @@ export default function App() {
 
     // Handle search form submit
     async function handleSearchSubmit(event) {
-        // Set loading to true when fetching data
-        setIsLoadingPosts(true);
-
         // Prevents the page from reloading on submit
         event.preventDefault();
+        
+        // Set loading to true when fetching data
+        setIsLoadingPosts(true);
 
         // We want the first result (index 0) in the returned array which will return the game title
         const gameTitleSearchResult = await checkGameTitle(searchBarInput);
@@ -164,70 +163,8 @@ export default function App() {
         // Set the game info (title, year, platforms etc) to display
         setGameInfo(gameTitleSearchResult[0]);
 
-        // Search Reddit for this game. Returns an array of posts                 
-        const redditSearchResults = await getRedditPosts(accessToken, gameTitleSearchResult[0].name, matchTitleExactly);
-
-        // Process the Reddit post
-        const { title, formattedGameTitle, hasRomanNumerals, combinedTerms, filteredPosts } = processPosts(redditSearchResults, gameTitleSearchResult[0].tags, gameTitleSearchResult[0].platforms, gameTitleSearchResult[0].name);
-
-        // Create an array made up of the words in the game's title
-        const titleWordsArray = titleWordsToArray(title);
-
-        // Variables to store the gameTitle weight and the formattedGameTitle weight
-        let gameTitleWeight = 0;
-        let formattedGameTitleWeight = 0;
-        let weighFormattedGameTitle = false;
-
-        // The combinedTerms array does not contain duplicates.
-        // If game title is a single word and no numbers (ie: Destiny), it will appear in the combinedTerms array only once
-        // Because of this, we only want to weigh the formattedGameTitle if it is in the combinedTerms array AND not equal to gameTitle        
-        if (title !== formattedGameTitle && combinedTerms.includes(formattedGameTitle)) {
-            weighFormattedGameTitle = true;
-        }
-
-        // 1. For each element in array, search library to see if it returns a definition. 
-        // If so, add 1 to weight, if not, add 2 to weight.
-        for (const word in titleWordsArray) {
-            const definitionFound = await hasDefinition(titleWordsArray[word]);
-            if (definitionFound) {
-                gameTitleWeight++;
-                if (weighFormattedGameTitle && formattedGameTitle.includes(titleWordsArray[word]))
-                    formattedGameTitleWeight++;
-            }
-            else {
-                gameTitleWeight += 2;
-                if (weighFormattedGameTitle && formattedGameTitle.includes(titleWordsArray[word]))
-                    formattedGameTitleWeight += 2;
-            }
-        }
-
-        // 2. If the gameTitle contains any kind of number (integer, data, roman numeral), add 1 to gameTitle weight.
-        const hasNumber = title.match(/[0-9]/);
-        if (hasNumber || hasRomanNumerals)
-            gameTitleWeight++;
-
-        // For each post, determine if it is related to the game title
-        // If so, continue to process the data. Otherwise, skip it
-        const validatedPosts = [];
-        filteredPosts.forEach(post => {
-            const isValid = validatePost(post.data.title, post.data.subreddit, post.data.selftext, combinedTerms, gameTitleWeight, formattedGameTitleWeight, title, formattedGameTitle)
-            if (isValid) {
-                validatedPosts.push(post);
-            }
-        });
-
-        // Get the top comment for each post
-        const topCommentsArray = await getAllTopComments(validatedPosts, accessToken);
-        
-        // Create a final array of formatted post objects to be rendered.
-        let formattedPostsArray = [];
-       
-        // Create a formatted post object out of each post + comment
-        // Add the object to the formattedPostsArray
-        for (const post in validatedPosts) {
-            const postObj = formatPost(validatedPosts[post], topCommentsArray[post]);
-            formattedPostsArray.push(postObj);            
-        }
+        // Get an array of formatted post objects ready for rendering
+        const formattedPostsArray = await processPosts(accessToken, gameTitleSearchResult[0].name, gameTitleSearchResult[0].tags, gameTitleSearchResult[0].platforms, matchTitleExactly)
 
         setPosts(formattedPostsArray);  // Set the state variable
         setIsLoadingPosts(false);       // Set loading to false after fetching data

@@ -40,7 +40,7 @@ it("tests validatePost() using data that should result in the function returning
 it("tests validatePost() using data that should result in the function returning false", () => {
     // Arrange
     const postTitle = "Looking for a cool spot to hangout";
-    const postSubreddit = "coolspot";
+    const postSubreddit = "toronto";
     const postText = "Anybody know any cool places where we can hangout in Toronto?";
     const combinedTerms = ["game", "gaming", "videogame", "video game", "sega", "nintendo", "xbox", "playstation", "console", "controller", "backlog", "steam", "playtime", "nostalgia", "pc", "snes", "genesis", "cool spot", "coolspot"];
     const gameTitleweight = 2;

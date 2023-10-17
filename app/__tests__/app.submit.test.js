@@ -5,10 +5,11 @@ import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import App from "../(routes)/app/page";
 import userEvent from "@testing-library/user-event";
-import axios from "axios";
+import { checkGameTitle } from "../api/vgdb.js"; // Import the actual module that we want mocked
 
-// Tell Jest to mock the axios module
-jest.mock('axios');
+// Tell Jest to mock the implementation of this module
+// *This will use the mocked version of the module in the __mocks__ folder.
+jest.mock("../api/vgdb.js");
 
 // Mocking the <SearchForm> component which is the child component of <App>
 jest.mock('../components/SearchForm.js', () => ({ searchBarInput, handleSearchBarInput, handleSearchSubmit, gameTitles, handleMatchExactlyCheckbox }) => {
@@ -34,39 +35,30 @@ jest.mock('../components/SearchForm.js', () => ({ searchBarInput, handleSearchBa
 });
 
 it("Confirms game info (title, release year, platform(s), metacritic score) is displayed on successful search", async () => {
-    // Arrange
-    
+    // Arrange    
     render(<App />);
 
     const submitButton = screen.getByRole('button', { name: /Submit/i });
     const searchBar = screen.getByRole('combobox');
 
     // A mock response of the data returned from RAWG API
-    const mockResponse = {
-        config: {},
-        data: {
-            results: [{
-                name: 'game2',
-                released: '2023-01-01',
-                platforms: [{ platform: { name: 'system1' } }, { platform: { name: 'system2' } }],
-                metacritic: '75'
-            }]
-        },
-        headers: {},
-        request: {},
-        status: 200,
-        statusText: ""
-    };
+    const mockResponse = [{
+        name: 'game2',
+        released: '2023-01-01',
+        platforms: [{ platform: { name: 'system1' } }, { platform: { name: 'system2' } }],
+        tags: [{ name: 'tag1' }, { name: 'tag2' }, { name: 'tag3' }],
+        metacritic: '75'
+    }];
 
-    // Set the mocked response to be what is returned by 'axios.request'    
-    axios.get.mockResolvedValue(mockResponse);
-        
+    // Set the mocked return value for checkGameTitle
+    checkGameTitle.mockResolvedValue(mockResponse);
+
     //Act
     
     // Simulate user entering game title in search bar
     await userEvent.type(searchBar, 'game2');
 
-    // Asserts that the submit button is enabled
+    // Asserts that the submit button is present and enabled
     expect(submitButton).toBeInTheDocument();
     expect(submitButton).toBeEnabled();
 
