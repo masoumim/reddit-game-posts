@@ -1,10 +1,14 @@
 // layout.js - This is the root layout file for the whole app.
 // Any styling included in this file will apply to ALL app components.
 
-import './globals.css'
-import { Inter } from 'next/font/google'
+import './globals.css';
+import { Inter } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'] })
+import Navbar from './components/Navbar';
+import Providers from './components/providers';
+
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
   title: 'Reddit Game Posts',
@@ -12,13 +16,16 @@ export const metadata = {
 }
 
 export default function RootLayout({ children }) {
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        <nav>
-          <p>Reddit Game Posts</p>
-        </nav>
+        <Providers>
+          <nav>
+            <Navbar />
+          </nav>
           {children}
+        </Providers>
       </body>
     </html>
   )

@@ -14,8 +14,6 @@ const redirectURI = process.env.NODE_ENV === "development" ? "http://localhost:3
 // Base URL for Reddit API
 const base_url = 'https://oauth.reddit.com';
 
-const userAgent = `${process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID}:v1 (by /u/OrangeFit90)`;
-
 // Authorize App + User
 // *User grants this client app permission to access their Reddit account.
 export function userAuthorizeApp() {
@@ -90,7 +88,7 @@ export async function authorizeAppOnly() {
 }
 
 // Calls Reddit API to get Reddit username
-export async function getUserInfo(accessToken) {
+export async function getUserInfo(accessToken) {        
     // Set the object to use in the GET request
     const options = {
         method: 'GET',
@@ -99,7 +97,7 @@ export async function getUserInfo(accessToken) {
     };
 
     try {
-        const response = await axios.request(options);
+        const response = await axios.request(options);        
         return response.data.name;
     }
     catch (err) {

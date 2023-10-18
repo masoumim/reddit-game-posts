@@ -8,10 +8,19 @@ import { checkGameTitle } from "@/app/api/vgdb";
 import SearchForm from "@/app/components/SearchForm";
 import Tile from "@/app/components/Tile.js";
 import { processPosts } from "@/app/processPostData";
+import Link from "next/link";
+import { userAuthorizeApp } from "@/app/api/reddit.js";
+
+import { useContext } from "react";
+import { ctx } from "@/app/components/providers";
 
 export default function App() {
 
-    const [isLoading, setIsLoading] = useState(false);                          // Used to conditionally render when fetching username
+    const context = useContext(ctx);
+    const test = context[0];
+    const setTest = context[1];
+
+    const [isLoadingUser, setIsLoadingUser] = useState(false);                  // Used to conditionally render when fetching username
     const [accessToken, setAccessToken] = useState("");                         // Reddit access token
     const [loggedIn, setLoggedIn] = useState(false);                            // Status representing if user is logged in to Reddit or not    
     const [redditUsername, setRedditUsername] = useState("");                   // The user's Reddit username
@@ -26,6 +35,7 @@ export default function App() {
     const [gameMetacritic, setGameMetacritic] = useState("");                   // The Metacritic score of the game being searched for
     const [posts, setPosts] = useState([]);
     const [isLoadingPosts, setIsLoadingPosts] = useState(false);
+    const [displayLoginButton, setDisplayLoginButton] = useState(false);
 
     /*
      The useRef Hook allows you to persist values between renders.
@@ -79,6 +89,8 @@ export default function App() {
                 .then(token => {
                     // Set the access token state variable
                     setAccessToken(token);
+                    setTest(<button onClick={userAuthorizeApp}>Log In</button>);
+                    setDisplayLoginButton(true);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -89,11 +101,13 @@ export default function App() {
     // Get user's Reddit profile name
     useEffect(() => {
         if (loggedIn) {
-            setIsLoading(true);
+            setIsLoadingUser(true);
+            setTest("Loading...");
             getUserInfo(accessToken)
                 .then(res => {
                     setRedditUsername(res);
-                    setIsLoading(false);
+                    setTest(<Link href={`https://www.reddit.com/user/${res}`}>{res}</Link>);
+                    setIsLoadingUser(false);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -114,7 +128,7 @@ export default function App() {
         const gameTitleSearchResults = await checkGameTitle(event.target.value);
 
         // Populate the matchingGameTitles array for each result returned by the API
-        if (gameTitleSearchResults) {            
+        if (gameTitleSearchResults) {
             gameTitleSearchResults.forEach(result => {
                 matchingGameTitles.push(result.name);
             });
@@ -153,7 +167,7 @@ export default function App() {
     async function handleSearchSubmit(event) {
         // Prevents the page from reloading on submit
         event.preventDefault();
-        
+
         // Set loading to true when fetching data
         setIsLoadingPosts(true);
 
@@ -172,7 +186,6 @@ export default function App() {
 
     return (
         <>
-            {isLoading ? <p>Loading...</p> : redditUsername}
             <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} matchTitleExactly={matchTitleExactly} />
             <br />
             {displayGameInfo ?

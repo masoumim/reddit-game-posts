@@ -55,7 +55,8 @@ export async function processPosts(accessToken, gameTitle, gameTags, gamePlatfor
     // If so, add the post to the validatedPosts array. Otherwise, skip the post.
     const validatedPosts = [];
     filteredPosts.forEach(post => {
-        const isValid = validatePost(post.data.title, post.data.subreddit, post.data.selftext, combinedTerms, gameTitleWeight, formattedGameTitleWeight, title, formattedGameTitle)
+        console.log(post);
+        const isValid = validatePost(post.data.title, post.data.subreddit, post.data.selftext_html, combinedTerms, gameTitleWeight, formattedGameTitleWeight, title, formattedGameTitle)
         if (isValid) {
             validatedPosts.push(post);
         }
@@ -182,7 +183,7 @@ export function validatePost(postTitle, postSubreddit, postText, combinedTerms, 
         }
 
         // Check post body
-        if (postText.toLowerCase().includes(term)) {
+        if (postText !== null && postText.toLowerCase().includes(term)) {
             if (term === gameTitle) {
                 if (!gameTitleWeightAdded) {
                     validityScore += gameTitleWeight;
