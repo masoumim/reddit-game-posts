@@ -54,8 +54,7 @@ export async function processPosts(accessToken, gameTitle, gameTags, gamePlatfor
     // For each post in filteredPosts, determine if the post is related to the game title.
     // If so, add the post to the validatedPosts array. Otherwise, skip the post.
     const validatedPosts = [];
-    filteredPosts.forEach(post => {
-        console.log(post);
+    filteredPosts.forEach(post => {        
         const isValid = validatePost(post.data.title, post.data.subreddit, post.data.selftext_html, combinedTerms, gameTitleWeight, formattedGameTitleWeight, title, formattedGameTitle)
         if (isValid) {
             validatedPosts.push(post);

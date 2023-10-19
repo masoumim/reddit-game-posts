@@ -6,6 +6,7 @@ import "@testing-library/jest-dom";
 import App from "../(routes)/app/page";
 import userEvent from "@testing-library/user-event";
 import { checkGameTitle } from "../api/vgdb.js"; // Import the actual function from the module that we want mocked
+import { ctx } from "@/app/components/providers";
 
 // Tell Jest to mock the implementation of this module
 // *This will use the mocked version of the module in the __mocks__ folder.
@@ -36,7 +37,16 @@ jest.mock('../components/SearchForm.js', () => ({ searchBarInput, handleSearchBa
 
 it("Confirms game info (title, release year, platform(s), metacritic score) is displayed on successful search", async () => {
     // Arrange    
-    render(<App />);
+    // The <App> component uses useContext to create a Context object, we must simulate that in our tests when rendering <App>   
+    const navContent = jest.fn();       // Mock the first Context object
+    const setNavContent = jest.fn();    // Mock the second Context object
+
+    // When we render <App>, wrap it in the imported Context (ctx) <Provider> component
+    render(
+        <ctx.Provider value={[navContent, setNavContent]}>
+            <App />
+        </ctx.Provider>
+    );
 
     const submitButton = screen.getByRole('button', { name: /Submit/i });
     const searchBar = screen.getByRole('combobox');
@@ -54,7 +64,7 @@ it("Confirms game info (title, release year, platform(s), metacritic score) is d
     checkGameTitle.mockResolvedValue(mockResponse);
 
     //Act
-    
+
     // Simulate user entering game title in search bar
     await userEvent.type(searchBar, 'game2');
 
@@ -84,5 +94,5 @@ it("Confirms game info (title, release year, platform(s), metacritic score) is d
     expect(platformsLabel).toBeInTheDocument();
     expect(platforms).toBeInTheDocument();
     expect(metacriticScoreLabel).toBeInTheDocument();
-    expect(metacriticScore).toBeInTheDocument();    
+    expect(metacriticScore).toBeInTheDocument();
 });

@@ -2,28 +2,21 @@
 // page.js - This file establishes the route: /app
 // This page will render all of the content for the app.
 
-import { useState, useEffect, useRef } from "react";
-import { authorizeAppOnly, getUserAuthAccessToken, getUserInfo } from "@/app/api/reddit.js";
+import { useState, useEffect, useRef, useContext } from "react";
+import { userAuthorizeApp, authorizeAppOnly, getUserAuthAccessToken, getUserInfo } from "@/app/api/reddit.js";
 import { checkGameTitle } from "@/app/api/vgdb";
+import { processPosts } from "@/app/processPostData";
 import SearchForm from "@/app/components/SearchForm";
 import Tile from "@/app/components/Tile.js";
-import { processPosts } from "@/app/processPostData";
 import Link from "next/link";
-import { userAuthorizeApp } from "@/app/api/reddit.js";
-
-import { useContext } from "react";
 import { ctx } from "@/app/components/providers";
 
 export default function App() {
 
-    const context = useContext(ctx);
-    const test = context[0];
-    const setTest = context[1];
-
-    const [isLoadingUser, setIsLoadingUser] = useState(false);                  // Used to conditionally render when fetching username
+    const context = useContext(ctx);                                            // The React Context 'Provider' component    
+    const setNavContent = context[1];                                           // Used to set the state of the navbar content        
     const [accessToken, setAccessToken] = useState("");                         // Reddit access token
-    const [loggedIn, setLoggedIn] = useState(false);                            // Status representing if user is logged in to Reddit or not    
-    const [redditUsername, setRedditUsername] = useState("");                   // The user's Reddit username
+    const [loggedIn, setLoggedIn] = useState(false);                            // Status representing if user is logged in to Reddit or not        
     const [searchBarInput, setSearchBarInput] = useState("");                   // The text entered into the search bar
     const [gameTitles, setGameTitles] = useState([]);                           // Array of results returned by RAWG API
     const [matchTitleExactly, setMatchTitleExactly] = useState(false);          // Toggled by the 'match title exactly' checkbox
@@ -33,10 +26,9 @@ export default function App() {
     const [gamePlatforms, setGamePlatforms] = useState([]);                     // Platforms of the game being searched for
     const [gameTags, setGameTags] = useState([]);                               // Tags associated with the game title
     const [gameMetacritic, setGameMetacritic] = useState("");                   // The Metacritic score of the game being searched for
-    const [posts, setPosts] = useState([]);
-    const [isLoadingPosts, setIsLoadingPosts] = useState(false);
-    const [displayLoginButton, setDisplayLoginButton] = useState(false);
-
+    const [posts, setPosts] = useState([]);                                     // The array of formatted post objects to be rendered
+    const [isLoadingPosts, setIsLoadingPosts] = useState(false);                // Used for conditionally rendering the posts or "Loading..." if fetching posts
+    
     /*
      The useRef Hook allows you to persist values between renders.
      It can be used to store a mutable value that does not cause a re-render when updated.
@@ -89,8 +81,8 @@ export default function App() {
                 .then(token => {
                     // Set the access token state variable
                     setAccessToken(token);
-                    setTest(<button onClick={userAuthorizeApp}>Log In</button>);
-                    setDisplayLoginButton(true);
+                    // Set the navbar content to a Login button
+                    setNavContent(<button onClick={userAuthorizeApp}>Log in to Reddit</button>);                    
                 })
                 .catch((err) => {
                     console.log(err);
@@ -100,14 +92,13 @@ export default function App() {
 
     // Get user's Reddit profile name
     useEffect(() => {
-        if (loggedIn) {
-            setIsLoadingUser(true);
-            setTest("Loading...");
+        if (loggedIn) {            
+            // Set navbar content to loading message while fetching username
+            setNavContent("Loading...");
             getUserInfo(accessToken)
-                .then(res => {
-                    setRedditUsername(res);
-                    setTest(<Link href={`https://www.reddit.com/user/${res}`}>{res}</Link>);
-                    setIsLoadingUser(false);
+                .then(res => {                    
+                    // Set the navbar content to the Reddit username which links to their Reddit profile
+                    setNavContent(<Link href={`https://www.reddit.com/user/${res}`}>{res}</Link>);                    
                 })
                 .catch((err) => {
                     console.log(err);

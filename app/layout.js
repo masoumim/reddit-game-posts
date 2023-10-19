@@ -4,9 +4,9 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
 
+// The Navbar component's content is conditionally rendered using the React Content 'Providers" component
 import Navbar from './components/Navbar';
 import Providers from './components/providers';
-
 
 const inter = Inter({ subsets: ['latin'] });
 
