@@ -118,7 +118,7 @@ export async function getRedditPosts(accessToken, gameTitle, matchTitleExactly) 
         headers: { 'Authorization': `bearer ${accessToken}` },
         params: {
             q: title,
-            limit: 50,
+            limit: 100,
             restrict_sr: false
         }
     };

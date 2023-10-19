@@ -249,8 +249,8 @@ export function formatPost(post, topComment) {
         // Get the textContent of the parsed HTML which gives us an HTML string        
         const postBodyText = postBody.textContent;
 
-        // Replace newlines with a single Line Break element     
-        const postBodyTextLineBreak = postBodyText.replace(/\n/g, "</br>").replace(/<\/br><\/br>/g, "</br>");
+        // Replace newlines with a single Line Break element (and remove the LAST line break from the post text)     
+        const postBodyTextLineBreak = postBodyText.replace(/\n/g, "</br>").replace(/<\/br><\/br>/g, "</br>").replace(/(<\/br>)(?!.*\1)/g, "");;
 
         // Convert the HTML string to a React element using html-react-parser    
         const parsedBody = parse(postBodyTextLineBreak);
@@ -282,8 +282,8 @@ export function formatPost(post, topComment) {
         // Get the textContent of the parsed HTML which gives us an HTML string
         const commentBodyText = commentBody.textContent
 
-        // Replace newlines with a single Line Break element 
-        const commentBodyTextLineBreak = commentBodyText.replace(/\n/g, "</br>").replace(/<\/br><\/br>/g, "</br>");
+        // Replace newlines with a single Line Break element (and remove the LAST line break from the comment)
+        const commentBodyTextLineBreak = commentBodyText.replace(/\n/g, "</br>").replace(/<\/br><\/br>/g, "</br>").replace(/(<\/br>)(?!.*\1)/g, "");
 
         // Convert the HTML string to a React element using html-react-parser
         const parsedComment = parse(commentBodyTextLineBreak);

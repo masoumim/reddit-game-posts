@@ -4,8 +4,21 @@
 // - A text input element for inputting a comment along with submission button
 // - Buttons for Upvoting and Downvoting the post
 
+import Image from "next/image"
+
 export default function Tile({ post }) {
     // TODO: Implement onClick expansion of post
+
+    // Embeds the post's media depending on mediaType
+    function embedPostMedia(post){
+        
+        // Consider using a switch case here...
+        
+        if(post.mediaType === "image"){                        
+            return <Image src={post.mediaURL} width={500} height={500} alt=""/>
+        }
+    }
+
     return (
         <>
             <div>
@@ -15,19 +28,16 @@ export default function Tile({ post }) {
                     <p>{post.author}</p>
                     <p>{post.date}</p>
                     <p>{post.upvotes}</p>
-                    <b>post text: </b>
+                    <b>post: </b>
                     {post.text}
-                    <br/>                                     
+                    {embedPostMedia(post)}                                                        
                     <b>comment: </b>
                     {post.topCommentText}
                     <p>{post.topCommentAuthor}</p>
                     <p>{post.commentDate}</p>
                     <p>{post.topCommentUpVotes}</p>
                 </div>
-                <div>
-                    <div>
-                        {post.content}
-                    </div>
+                <div>                    
                     {/* Upvote button */}
                     {/* Downvote button */}
                     {/* Input text field (comment) */}
