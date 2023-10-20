@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+
+// The images.remotePatterns array contains image sources that have been whitelisted.
 const nextConfig = {
     images: {
         remotePatterns: [

@@ -4,19 +4,36 @@
 // - A text input element for inputting a comment along with submission button
 // - Buttons for Upvoting and Downvoting the post
 
-import Image from "next/image"
+import Image from "next/image";
+import Link from "next/link";
+import ReactPlayer from 'react-player/youtube';
+import { Tweet } from 'react-tweet';
+
 
 export default function Tile({ post }) {
     // TODO: Implement onClick expansion of post
 
     // Embeds the post's media depending on mediaType
-    function embedPostMedia(post){
-        
-        // Consider using a switch case here...
-        
-        if(post.mediaType === "image"){                        
-            return <Image src={post.mediaURL} width={500} height={500} alt=""/>
+    function embedPostMedia(post) {
+        let embeddedMedia = "";
+
+        switch (post.mediaType) {
+            case "image":
+                embeddedMedia = <Image src={post.mediaURL} width={500} height={500} alt="" />;
+                break;
+            case "video":
+                embeddedMedia = <video autoPlay width={320} height={240} controls src={post.mediaURL} type="video/mp4" />;
+                break;
+            case "youtube":
+                embeddedMedia = <ReactPlayer url={post.mediaURL} />
+                break;
+            case "twitter":
+                embeddedMedia = <Tweet id={post.mediaURL} />
+                break;
+            case "link":
+                embeddedMedia = <Link href={post.mediaURL}>{post.mediaURL}</Link>
         }
+        return embeddedMedia;
     }
 
     return (
@@ -30,19 +47,19 @@ export default function Tile({ post }) {
                     <p>{post.upvotes}</p>
                     <b>post: </b>
                     {post.text}
-                    {embedPostMedia(post)}                                                        
+                    {embedPostMedia(post)}
                     <b>comment: </b>
                     {post.topCommentText}
                     <p>{post.topCommentAuthor}</p>
                     <p>{post.commentDate}</p>
                     <p>{post.topCommentUpVotes}</p>
                 </div>
-                <div>                    
+                <div>
                     {/* Upvote button */}
                     {/* Downvote button */}
                     {/* Input text field (comment) */}
                     {/* Submit comment button */}
-                </div>                
+                </div>
             </div>
         </>
     )

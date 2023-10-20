@@ -54,7 +54,7 @@ export async function processPosts(accessToken, gameTitle, gameTags, gamePlatfor
     // For each post in filteredPosts, determine if the post is related to the game title.
     // If so, add the post to the validatedPosts array. Otherwise, skip the post.
     const validatedPosts = [];
-    filteredPosts.forEach(post => {        
+    filteredPosts.forEach(post => {
         const isValid = validatePost(post.data.title, post.data.subreddit, post.data.selftext_html, combinedTerms, gameTitleWeight, formattedGameTitleWeight, title, formattedGameTitle)
         if (isValid) {
             validatedPosts.push(post);
@@ -186,7 +186,7 @@ export function validatePost(postTitle, postSubreddit, postText, combinedTerms, 
             if (term === gameTitle) {
                 if (!gameTitleWeightAdded) {
                     validityScore += gameTitleWeight;
-                    gameTitleWeightAdded = false;
+                    gameTitleWeightAdded = true;
                 }
             } else {
                 validityScore++;
@@ -239,7 +239,7 @@ export function formatPost(post, topComment) {
     const postHTMLStr = post.data.selftext_html;
 
     // If post isn't null, convert the post's text body into HTML:
-    if (postHTMLStr !== null) {        
+    if (postHTMLStr !== null) {
         // Convert selftext_html's HTML character entities to HTML element tags     
         const postHTMLElements = parser.parseFromString(postHTMLStr, 'text/html');
 
@@ -258,7 +258,7 @@ export function formatPost(post, topComment) {
         // Body Text
         postObj.text = parsedBody;
     }
-    else {        
+    else {
         postObj.text = "";
     }
 
@@ -295,13 +295,26 @@ export function formatPost(post, topComment) {
         postObj.topCommentText = "No comments";
     }
 
+    // TODO: Refactor this code block. Only 1 out of the 5 mediaURL's isn't post.data.url...
     // Get the URL to the post's media content and set the content type
-    if (post.data.domain === "youtu.be" || post.data.domain === "youtube.com") {
+    if (post.data.domain === "youtu.be" || post.data.domain === "youtube.com") {                
         postObj.mediaURL = post.data.url;
         postObj.mediaType = "youtube";
     }
     else if (post.data.domain === "twitter.com" || post.data.domain === "mobile.twitter.com") {
-        postObj.mediaURL = post.data.url;
+        // Extract the Tweet ID from the URL:
+        let tweetID = "";
+        
+        // If the URL contains a '?'
+        if(post.data.url.includes('?')){            
+            const matchID = post.data.url.match(/(\/)(?!.*\1).*\?/g);   // Match everything from the last '/' to a '?'
+            tweetID = matchID[0].replace("/", "").replace("?", "");     // Remove the '/' and the '?'        
+        }
+        else{
+            const matchID = post.data.url.match(/[^/]+$/g);             // Match everything after the last '/'
+            tweetID = matchID[0];
+        }
+        postObj.mediaURL = tweetID;
         postObj.mediaType = "twitter";
     }
     else if (post.data.domain === "i.reddit.com" || post.data.domain === "i.imgur.com") {
@@ -313,9 +326,9 @@ export function formatPost(post, topComment) {
         postObj.mediaType = "video";
     }
     else {
+        // TODO: Do a check for images and if found, render an <Image> instead of a <Link>
         postObj.mediaURL = post.data.url;
         postObj.mediaType = "link";
     }
-
     return postObj;
 }
