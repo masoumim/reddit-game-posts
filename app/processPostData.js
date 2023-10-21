@@ -63,13 +63,13 @@ export async function processPosts(accessToken, gameTitle, gameTags, gamePlatfor
 
     // Get the top comment for each post
     const topCommentsArray = await getAllTopComments(validatedPosts, accessToken);
-
+    
     // Create a final array of formatted post objects to be returned.
     let formattedPostsArray = [];
 
     // Create a formatted post object out of each post + comment
     // Add the object to the formattedPostsArray
-    for (const post in validatedPosts) {
+    for (const post in validatedPosts) {        
         const postObj = formatPost(validatedPosts[post], topCommentsArray[post]);
         formattedPostsArray.push(postObj);
     }
@@ -295,38 +295,47 @@ export function formatPost(post, topComment) {
         postObj.topCommentText = "No comments";
     }
 
-    // TODO: Refactor this code block. Only 1 out of the 5 mediaURL's isn't post.data.url...
-    // Get the URL to the post's media content and set the content type
-    if (post.data.domain === "youtu.be" || post.data.domain === "youtube.com") {                
+    
+    // Use the Data.Domain value returned by the Reddit API to determine:
+    // 1. The media type of the post content
+    // 2. The url to the post content
+
+    // YOUTUBE 
+    if (post.data.domain === "youtu.be" || post.data.domain === "youtube.com") {
         postObj.mediaURL = post.data.url;
         postObj.mediaType = "youtube";
     }
+    // TWITTER
     else if (post.data.domain === "twitter.com" || post.data.domain === "mobile.twitter.com") {
-        // Extract the Tweet ID from the URL:
-        let tweetID = "";
-        
-        // If the URL contains a '?'
-        if(post.data.url.includes('?')){            
-            const matchID = post.data.url.match(/(\/)(?!.*\1).*\?/g);   // Match everything from the last '/' to a '?'
-            tweetID = matchID[0].replace("/", "").replace("?", "");     // Remove the '/' and the '?'        
-        }
-        else{
-            const matchID = post.data.url.match(/[^/]+$/g);             // Match everything after the last '/'
-            tweetID = matchID[0];
-        }
+        // Tweets will be rendered using the Tweet ID of the Tweet URL.                         
+        const matchID = post.data.url.match(/\/[0-9]+/g);   // Match a '/' followed by any number of digits
+        const tweetID = matchID[0].replace("/", "");        // Remove the '/'
         postObj.mediaURL = tweetID;
         postObj.mediaType = "twitter";
     }
-    else if (post.data.domain === "i.reddit.com" || post.data.domain === "i.imgur.com") {
+    // IMAGE
+    else if (post.data.domain === "i.reddit.com" || post.data.domain === "i.imgur.com" || post.data.domain === "i.redd.it") {
         postObj.mediaURL = post.data.url;
         postObj.mediaType = "image";
     }
+    // VIDEO
     else if (post.data.domain === "v.redd.it") {
         postObj.mediaURL = post.data.media.reddit_video.fallback_url;
         postObj.mediaType = "video";
     }
     else {
-        // TODO: Do a check for images and if found, render an <Image> instead of a <Link>
+        // 1. Else If Data.Domain is NULL, determine the media type by checking the file format of the url:
+        // (.jpg, .png, .gif, .webp, .webm (google others to add to list))
+        // If the media type can't be determined, we simply render the URL in a <Link> component
+        // console.log(`data.domain = ${post.data.domain} -- data.url = ${post.data.url}`);
+
+
+        // 2. Else: Render everything else in a <Link> 
+        // if post.data.domain includes 'self', then the URL is simply a link to the Reddit Post
+        // if post.data.domain = clips.twitch.tv, then the URL is to a Twitch Video. Just render <Link>
+        // if post.data.domain = reddit.com, then it URL is to a Reddit hosted Image gallery - just provide <Link>
+
+
         postObj.mediaURL = post.data.url;
         postObj.mediaType = "link";
     }

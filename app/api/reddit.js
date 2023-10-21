@@ -139,11 +139,12 @@ export async function getAllTopComments(posts, accessToken) {
         // Store each returned promise in promisesArray
         const promisesArray = [];
         for (const post in posts) {
-            promisesArray.push(axios.request({ method: 'GET', url: `${base_url}/r/${posts[post].data.subreddit}/comments/${posts[post].data.id}/`, headers: { 'Authorization': `bearer ${accessToken}` }, params: { sort: top } }));
+            // promisesArray.push(axios.request({ method: 'GET', url: `${base_url}/r/${posts[post].data.subreddit}/comments/${posts[post].data.id}/`, headers: { 'Authorization': `bearer ${accessToken}` }, params: { sort: top } }));
+            promisesArray.push(axios.request({ method: 'GET', url: `${base_url}/r/${posts[post].data.subreddit}/comments/${posts[post].data.id}/?sort=top`, headers: { 'Authorization': `bearer ${accessToken}` } }));
         }
         // Resolve all promises at once
         return await Promise.all(promisesArray);
     } catch (err) {
-        console.log(err);
+        console.log(`Error getting comments: ${err}`);
     }
 }

@@ -7,7 +7,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import ReactPlayer from 'react-player/youtube';
-import { Tweet } from 'react-tweet';
+import { TwitterTweetEmbed } from 'react-twitter-embed';
 
 
 export default function Tile({ post }) {
@@ -27,11 +27,12 @@ export default function Tile({ post }) {
             case "youtube":
                 embeddedMedia = <ReactPlayer url={post.mediaURL} />
                 break;
-            case "twitter":
-                embeddedMedia = <Tweet id={post.mediaURL} />
+            case "twitter":                
+                embeddedMedia = <TwitterTweetEmbed tweetId={post.mediaURL} />                
                 break;
             case "link":
                 embeddedMedia = <Link href={post.mediaURL}>{post.mediaURL}</Link>
+                break;
         }
         return embeddedMedia;
     }

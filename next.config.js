@@ -6,13 +6,20 @@ const nextConfig = {
         remotePatterns: [
             {
                 protocol: 'http',
-                hostname: 'i.imgur.com',
+                hostname: 'i.imgur.com'
             },
             {
                 protocol: 'https',
-                hostname: 'i.imgur.com',
+                hostname: 'i.imgur.com'
+            },
+            {
+                protocol: 'http',
+                hostname: 'i.redd.it'
+            },
+            {
+                protocol: 'https',
+                hostname: 'i.redd.it'
             }
-
         ]
     }
 }
