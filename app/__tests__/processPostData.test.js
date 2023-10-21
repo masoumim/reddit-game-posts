@@ -19,9 +19,9 @@ it("tests the processPosts() function which returns an array of valid posts", as
 
     // Mock response for getRedditPosts()
     const getRedditPostsMockResponse = [
-        { data: { author: "author1", created: 1455703937, domain: "twitter.com", id: "123", selftext_html: "SMW on Super Nintendo is my favorite retro platformer.", subreddit: "subreddit1", title: "Super Mario World is my favorite game!", ups: 100, url: "www.abc.com" } },
-        { data: { author: "author2", created: 1893738948, domain: "youtube.com", id: "456", selftext_html: "I love Super Mario World on Super Nintendo. I get such nostalgia when I play that retro platformer", subreddit: "subreddit2", title: "Super Mario World is pure nostalgia", ups: 75, url: "www.xyz.com" } },
-        { data: { author: "author3", created: 8343290834, domain: "i.reddit.com", id: "789", selftext_html: "I remember playing SMW on Game Boy Advance. Such a great retro platformer", subreddit: "subreddit3", title: "Anyone play Super Mario World on Game Boy Advance?", ups: 150, url: "www.foo.com" } }
+        { data: { author: "author1", created: 1455703937, domain: "abc.com", id: "123", selftext_html: "SMW on Super Nintendo is my favorite retro platformer.", subreddit: "subreddit1", title: "Super Mario World is my favorite game!", ups: 100, url: "www.abc.com" } },
+        { data: { author: "author2", created: 1893738948, domain: "xyz.com", id: "456", selftext_html: "I love Super Mario World on Super Nintendo. I get such nostalgia when I play that retro platformer", subreddit: "subreddit2", title: "Super Mario World is pure nostalgia", ups: 75, url: "www.xyz.com" } },
+        { data: { author: "author3", created: 8343290834, domain: "foo.com", id: "789", selftext_html: "I remember playing SMW on Game Boy Advance. Such a great retro platformer", subreddit: "subreddit3", title: "Anyone play Super Mario World on Game Boy Advance?", ups: 150, url: "www.foo.com" } }
     ]
 
     // Mock response for getAllTopComments()
@@ -39,9 +39,9 @@ it("tests the processPosts() function which returns an array of valid posts", as
 
     // Expected response
     const expectedResponse = [
-        { id: "123", title: "Super Mario World is my favorite game!", subreddit: "subreddit1", text: "SMW on Super Nintendo is my favorite retro platformer.", author: "author1", upvotes: 100, date: 1455703937, topCommentText: "commentAuthor1's comment", topCommentAuthor: "commentAuthor1", commentDate: 1455723984, topCommentUpVotes: 100, mediaURL: "www.abc.com", mediaType: "twitter" },
-        { id: "456", title: "Super Mario World is pure nostalgia", subreddit: "subreddit2", text: "I love Super Mario World on Super Nintendo. I get such nostalgia when I play that retro platformer", author: "author2", upvotes: 75, date: 1893738948, topCommentText: "commentAuthor2's comment", topCommentAuthor: "commentAuthor2", commentDate: 1455723985, topCommentUpVotes: 200, mediaURL: "www.xyz.com", mediaType: "youtube" },
-        { id: "789", title: "Anyone play Super Mario World on Game Boy Advance?", subreddit: "subreddit3", text: "I remember playing SMW on Game Boy Advance. Such a great retro platformer", author: "author3", upvotes: 150, date: 8343290834, topCommentText: "commentAuthor3's comment", topCommentAuthor: "commentAuthor3", commentDate: 1455723986, topCommentUpVotes: 150, mediaURL: "www.foo.com", mediaType: "image" }
+        { id: "123", title: "Super Mario World is my favorite game!", subreddit: "subreddit1", text: "SMW on Super Nintendo is my favorite retro platformer.", author: "author1", upvotes: 100, date: 1455703937, topCommentText: "commentAuthor1's comment", topCommentAuthor: "commentAuthor1", commentDate: 1455723984, topCommentUpVotes: 100, mediaURL: "www.abc.com", mediaType: "link" },
+        { id: "456", title: "Super Mario World is pure nostalgia", subreddit: "subreddit2", text: "I love Super Mario World on Super Nintendo. I get such nostalgia when I play that retro platformer", author: "author2", upvotes: 75, date: 1893738948, topCommentText: "commentAuthor2's comment", topCommentAuthor: "commentAuthor2", commentDate: 1455723985, topCommentUpVotes: 200, mediaURL: "www.xyz.com", mediaType: "link" },
+        { id: "789", title: "Anyone play Super Mario World on Game Boy Advance?", subreddit: "subreddit3", text: "I remember playing SMW on Game Boy Advance. Such a great retro platformer", author: "author3", upvotes: 150, date: 8343290834, topCommentText: "commentAuthor3's comment", topCommentAuthor: "commentAuthor3", commentDate: 1455723986, topCommentUpVotes: 150, mediaURL: "www.foo.com", mediaType: "link" }
     ]
 
     // Act

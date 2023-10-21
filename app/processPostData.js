@@ -2,10 +2,10 @@
 // - Determining and measuring the likelihood that a post is about the game
 // - Removing / Filtering out posts with low likelihood
 
-// html-react-parser Converts an HTML string to one or more React elements.
-import parse from 'html-react-parser';
+import parse from 'html-react-parser'; // html-react-parser Converts an HTML string to one or more React elements.
 import { hasDefinition } from "./api/dictionary";
 import { getRedditPosts, getAllTopComments } from "./api/reddit";
+import timeago from 'epoch-timeago'; // Converts Unix Timestamp to formatted string of amount of time past
 
 // General game related terms
 const gameTerms = ["game", "gaming", "videogame", "video game", "sega", "nintendo", "xbox", "playstation", "console", "controller", "backlog", "steam", "playtime", "nostalgia"];
@@ -44,8 +44,11 @@ export async function processPosts(accessToken, gameTitle, gameTags, gamePlatfor
     // Search Reddit for this game. Returns an array of posts                 
     const redditSearchResults = await getRedditPosts(accessToken, gameTitle, matchTitleExactly);
 
+    console.log(redditSearchResults);
+    console.log(combinedTerms);
+
     // Filter / remove posts with Subredit names in a removePosts array    
-    const removePosts = ["gamecollecting", "gameswap", "gamesale", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals"];
+    const removePosts = ["gamecollecting", "gameswap", "indiegameswap", "steamgameswap", "gametrade", "gamesale", "steam_giveaway", "gamedeals", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals", "ama"];
     const filteredPosts = redditSearchResults.filter(post => !removePosts.includes(post.data.subreddit.toLowerCase()));
 
     // Get the weight for the game title and the formatted game title
@@ -63,13 +66,13 @@ export async function processPosts(accessToken, gameTitle, gameTags, gamePlatfor
 
     // Get the top comment for each post
     const topCommentsArray = await getAllTopComments(validatedPosts, accessToken);
-    
+
     // Create a final array of formatted post objects to be returned.
     let formattedPostsArray = [];
 
     // Create a formatted post object out of each post + comment
     // Add the object to the formattedPostsArray
-    for (const post in validatedPosts) {        
+    for (const post in validatedPosts) {
         const postObj = formatPost(validatedPosts[post], topCommentsArray[post]);
         formattedPostsArray.push(postObj);
     }
@@ -149,7 +152,7 @@ export async function determineTitleWeights(title, formattedGameTitle, combinedT
 
 // Determines if a given post is about the game title. If it is, return TRUE, otherwise return FALSE
 export function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTitleWeight, formattedGameTitleWeight, gameTitle, formattedGameTitle) {
-
+    
     // Represents the likelihood of a valid post - 4+ is considered valid
     let validityScore = 0;
 
@@ -225,12 +228,12 @@ export function formatPost(post, topComment) {
     const postObj = {};
 
     // Add post data to object
-    postObj.id = post.data.id                   // Post ID
-    postObj.title = post.data.title;            // Post Title
-    postObj.subreddit = post.data.subreddit;    // Post Subreddit      
-    postObj.author = post.data.author;          // Post Author
-    postObj.upvotes = post.data.ups;            // Post Up-votes
-    postObj.date = post.data.created;           // Post Date (Unix Timestamp)
+    postObj.id = post.data.id                           // Post ID
+    postObj.title = post.data.title;                    // Post Title
+    postObj.subreddit = post.data.subreddit;            // Post Subreddit      
+    postObj.author = post.data.author;                  // Post Author
+    postObj.upvotes = post.data.ups;                    // Post Up-votes
+    postObj.date = timeago(post.data.created * 1000);   // Post Date (Unix Timestamp) Converted to 'time ago' string
 
     // Create a new DOMParser object                                                     
     const parser = new DOMParser();
@@ -245,15 +248,9 @@ export function formatPost(post, topComment) {
 
         // Extract just the <body> portion of the converted HTML
         const postBody = postHTMLElements.body;
-
-        // Get the textContent of the parsed HTML which gives us an HTML string        
-        const postBodyText = postBody.textContent;
-
-        // Replace newlines with a single Line Break element (and remove the LAST line break from the post text)     
-        const postBodyTextLineBreak = postBodyText.replace(/\n/g, "</br>").replace(/<\/br><\/br>/g, "</br>").replace(/(<\/br>)(?!.*\1)/g, "");;
-
+                        
         // Convert the HTML string to a React element using html-react-parser    
-        const parsedBody = parse(postBodyTextLineBreak);
+        const parsedBody = parse(postBody.textContent);
 
         // Body Text
         postObj.text = parsedBody;
@@ -264,9 +261,9 @@ export function formatPost(post, topComment) {
 
     // Add top comment data to object  
     if (topComment.data[1].data.children.length > 0) {
-        postObj.topCommentAuthor = topComment.data[1].data.children[0].data.author;      // Comment Author
-        postObj.commentDate = topComment.data[1].data.children[0].data.created;          // Comment Date (Unix Timestamp)
-        postObj.topCommentUpVotes = topComment.data[1].data.children[0].data.ups;        // Comment Up-Votes
+        postObj.topCommentAuthor = topComment.data[1].data.children[0].data.author;                 // Comment Author        
+        postObj.commentDate = timeago(topComment.data[1].data.children[0].data.created * 1000);     // Post Date (Unix Timestamp) Converted to 'time ago' string
+        postObj.topCommentUpVotes = topComment.data[1].data.children[0].data.ups;                   // Comment Up-Votes
 
         // Convert the comment into HTML:
 
@@ -279,14 +276,8 @@ export function formatPost(post, topComment) {
         // Extract just the <body> portion of the converted HTML
         const commentBody = commentHTMLElements.body;
 
-        // Get the textContent of the parsed HTML which gives us an HTML string
-        const commentBodyText = commentBody.textContent
-
-        // Replace newlines with a single Line Break element (and remove the LAST line break from the comment)
-        const commentBodyTextLineBreak = commentBodyText.replace(/\n/g, "</br>").replace(/<\/br><\/br>/g, "</br>").replace(/(<\/br>)(?!.*\1)/g, "");
-
         // Convert the HTML string to a React element using html-react-parser
-        const parsedComment = parse(commentBodyTextLineBreak);
+        const parsedComment = parse(commentBody.textContent);
 
         // Comment Text
         postObj.topCommentText = parsedComment;
@@ -295,7 +286,6 @@ export function formatPost(post, topComment) {
         postObj.topCommentText = "No comments";
     }
 
-    
     // Use the Data.Domain value returned by the Reddit API to determine:
     // 1. The media type of the post content
     // 2. The url to the post content
@@ -306,38 +296,45 @@ export function formatPost(post, topComment) {
         postObj.mediaType = "youtube";
     }
     // TWITTER
-    else if (post.data.domain === "twitter.com" || post.data.domain === "mobile.twitter.com") {
+    else if (post.data.domain === "twitter.com" || post.data.domain === "mobile.twitter.com") {        
         // Tweets will be rendered using the Tweet ID of the Tweet URL.                         
         const matchID = post.data.url.match(/\/[0-9]+/g);   // Match a '/' followed by any number of digits
-        const tweetID = matchID[0].replace("/", "");        // Remove the '/'
-        postObj.mediaURL = tweetID;
-        postObj.mediaType = "twitter";
+        if (matchID) {
+            const tweetID = matchID[0].replace("/", "");    // Remove the '/'
+            postObj.mediaURL = tweetID;
+            postObj.mediaType = "twitter";
+        }
+        else {
+            postObj.mediaURL = post.data.url;
+            postObj.mediaType = "link";
+        }
     }
     // IMAGE
-    else if (post.data.domain === "i.reddit.com" || post.data.domain === "i.imgur.com" || post.data.domain === "i.redd.it") {
+    else if (post.data.domain === "i.reddit.com" || post.data.domain === "i.imgur.com" || post.data.domain === "i.redd.it" || post.data.domain === "gfycat.com") {
         postObj.mediaURL = post.data.url;
         postObj.mediaType = "image";
     }
     // VIDEO
     else if (post.data.domain === "v.redd.it") {
-        postObj.mediaURL = post.data.media.reddit_video.fallback_url;
-        postObj.mediaType = "video";
+        if (post.data.media) {
+            postObj.mediaURL = post.data.media.reddit_video.fallback_url;
+            postObj.mediaType = "video";
+        }
+        else {
+            postObj.mediaURL = post.data.url;
+            postObj.mediaType = "link";
+        }
     }
+    // LINK
     else {
-        // 1. Else If Data.Domain is NULL, determine the media type by checking the file format of the url:
-        // (.jpg, .png, .gif, .webp, .webm (google others to add to list))
-        // If the media type can't be determined, we simply render the URL in a <Link> component
-        // console.log(`data.domain = ${post.data.domain} -- data.url = ${post.data.url}`);
-
-
-        // 2. Else: Render everything else in a <Link> 
-        // if post.data.domain includes 'self', then the URL is simply a link to the Reddit Post
-        // if post.data.domain = clips.twitch.tv, then the URL is to a Twitch Video. Just render <Link>
-        // if post.data.domain = reddit.com, then it URL is to a Reddit hosted Image gallery - just provide <Link>
-
-
-        postObj.mediaURL = post.data.url;
-        postObj.mediaType = "link";
+        // For all other values of 'post.data.domain' we render 'post.data.url' in a <Link> component
+        // The only exception is if 'post.data.domain' contains the world 'self'. 
+        // If these cases, the url is redundant as it is simply a url back to the Reddit post itself.
+                
+        if (!post.data.domain.includes('self')) {
+            postObj.mediaURL = post.data.url;
+            postObj.mediaType = "link";
+        }
     }
     return postObj;
 }

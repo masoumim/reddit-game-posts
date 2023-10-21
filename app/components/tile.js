@@ -36,9 +36,8 @@ export default function Tile({ post }) {
         }
         return embeddedMedia;
     }
-
     return (
-        <>
+        <>            
             <div>
                 <div>
                     <p><b>post title: </b>{post.title}</p>

@@ -181,10 +181,13 @@ export default function App() {
             <br />
             {displayGameInfo ?
                 <>
+                    {isLoadingPosts ? <p><b>Results: </b>Loading...</p> : <p><b>Results: </b>{posts.length}</p>}
+                    <br />
                     <p><b>Title: </b>{gameTitle}</p>
                     <p><b>Release Year: </b>{gameYear}</p>
                     <p><b>Platform(s): </b>{gamePlatforms.join(", ")}</p>
                     <p><b>Metacritic score: </b>{gameMetacritic ? gameMetacritic : "N/A"}</p>
+                    <br />
                 </>
                 : ""}
             {isLoadingPosts ? <p>Loading posts...</p> : posts.map((post, index) => { return <Tile key={index} post={post} /> })}
