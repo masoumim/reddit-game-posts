@@ -13,7 +13,7 @@ const gameTerms = ["game", "gaming", "videogame", "video game", "sega", "nintend
 // Roman numerals (from 1 to 20)
 const romanNumerals = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii", "xiii", "xiv", "xv", "xvi", "xvii", "xviii", "xix", "xx"];
 
-export async function processPosts(accessToken, gameTitle, gameTags, gamePlatforms, matchTitleExactly) {
+export async function processPosts(accessToken, gameTitle, gameTags, gamePlatform, matchTitleExactly) {
     let gameDate = "";
     let title = gameTitle;
     let dateRegEx = /\(\d{4}\)/; // RegEx: a 4 digit number between parentheses.
@@ -35,20 +35,20 @@ export async function processPosts(accessToken, gameTitle, gameTags, gamePlatfor
     // Extract the game tags
     const tags = gameTags.map(e => e.name.toLowerCase());
 
-    // Extract the platforms
-    const platforms = gamePlatforms.map(e => e.platform.name.toLowerCase());
-
     // Combine the arrays of terms, game title and formatted game title into single array without duplicates using SET
-    const combinedTerms = [...new Set([...gameTerms, ...tags, ...platforms, ...[title], ...[formattedGameTitle]])];
+    // const combinedTerms = [...new Set([...gameTerms, ...tags, ...[gamePlatform.toLowerCase()], ...[title], ...[formattedGameTitle]])];
+    const combinedTerms = [...new Set([...gameTerms, ...tags])];
+
 
     // Search Reddit for this game. Returns an array of posts                 
-    const redditSearchResults = await getRedditPosts(accessToken, gameTitle, matchTitleExactly);
+    const redditSearchResults = await getRedditPosts(accessToken, title, gamePlatform, matchTitleExactly);
 
     console.log(redditSearchResults);
     console.log(combinedTerms);
+    console.log(combinedTerms);
 
     // Filter / remove posts with Subredit names in a removePosts array    
-    const removePosts = ["gamecollecting", "gameswap", "indiegameswap", "steamgameswap", "gametrade", "gamesale", "steam_giveaway", "gamedeals", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals", "ama"];
+    const removePosts = ["gamecollecting", "gameswap", "indiegameswap", "steamgameswap", "gametrade", "gamesale", "steam_giveaway", "gamedeals", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals", "ama", "digitalcodesell", "uvtrade"];
     const filteredPosts = redditSearchResults.filter(post => !removePosts.includes(post.data.subreddit.toLowerCase()));
 
     // Get the weight for the game title and the formatted game title
@@ -58,7 +58,7 @@ export async function processPosts(accessToken, gameTitle, gameTags, gamePlatfor
     // If so, add the post to the validatedPosts array. Otherwise, skip the post.
     const validatedPosts = [];
     filteredPosts.forEach(post => {
-        const isValid = validatePost(post.data.title, post.data.subreddit, post.data.selftext_html, combinedTerms, gameTitleWeight, formattedGameTitleWeight, title, formattedGameTitle)
+        const isValid = validatePost(post.data.title, post.data.subreddit, post.data.selftext_html, combinedTerms, gameTitleWeight, formattedGameTitleWeight, title, formattedGameTitle, gamePlatform)
         if (isValid) {
             validatedPosts.push(post);
         }
@@ -151,54 +151,14 @@ export async function determineTitleWeights(title, formattedGameTitle, combinedT
 }
 
 // Determines if a given post is about the game title. If it is, return TRUE, otherwise return FALSE
-export function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTitleWeight, formattedGameTitleWeight, gameTitle, formattedGameTitle) {
-    
-    // Represents the likelihood of a valid post - 4+ is considered valid
-    let validityScore = 0;
-
-    // We only want to include the gameTitle weight in the validityScore once.
-    // Either in the Reddit post title OR the Reddit post text body but NOT both.
-    let gameTitleWeightAdded = false;
-
-    // Check if post includes terms
-    combinedTerms.forEach(term => {
-
-        // Check post title
-        if (postTitle.toLowerCase().includes(term)) {
-            if (term === gameTitle) {
-                if (!gameTitleWeightAdded) {
-                    validityScore += gameTitleWeight;
-                    gameTitleWeightAdded = true;
-                }
-            } else {
-                validityScore++;
-            }
+export function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTitleWeight, formattedGameTitleWeight, gameTitle, formattedGameTitle, gamePlatform) {
+    // 1. Check for game title in post
+    if (postTitle.toLowerCase().includes(gameTitle) || (postText && postText.toLowerCase().includes(gameTitle))) {
+        // 2. Check for platform name in post
+        if (postTitle.toLowerCase().includes(gamePlatform) || (postText && postText.toLowerCase().includes(gamePlatform))) {
+            return true;
         }
-
-        // Check post subreddit name
-        if (postSubreddit.toLowerCase().includes(term)) {
-            if (term === formattedGameTitle) {
-                validityScore += formattedGameTitleWeight;
-            } else {
-                validityScore++;
-            }
-        }
-
-        // Check post body
-        if (postText !== null && postText.toLowerCase().includes(term)) {
-            if (term === gameTitle) {
-                if (!gameTitleWeightAdded) {
-                    validityScore += gameTitleWeight;
-                    gameTitleWeightAdded = true;
-                }
-            } else {
-                validityScore++;
-            }
-        }
-    });
-
-    // Return TRUE if validityScore is 5 or greater
-    return validityScore >= 4 ? true : false;
+    }
 }
 
 // Returns an array of words that make up the game title

@@ -23,7 +23,7 @@ export default function App() {
     const [displayGameInfo, setDisplayGameInfo] = useState(false);              // Toggled when search for title is performed and result is received
     const [gameTitle, setGameTitle] = useState("");                             // Title of game being searched for
     const [gameYear, setGameYear] = useState("");                               // Release year of game being searched for
-    const [gamePlatforms, setGamePlatforms] = useState([]);                     // Platforms of the game being searched for
+    const [gamePlatform, setGamePlatform] = useState([]);                       // Platform of the game being searched for
     const [platformOptions, setPlatformOptions] = useState([]);                 // Used to populate the <select> element of playforms the game has released on
     const [selectedPlatform, setSelectedPlatform] = useState("");               // The platform that the user has selected form the drop-down menu
     const [searchButtonDisabled, setSearchButtonDisabled] = useState(true);     // Toggles the search button enabled / disabled
@@ -138,6 +138,7 @@ export default function App() {
             if (gameTitles.includes(searchBarInput)) {
                 // Populate the <select> element with platform <options>
                 const result = await checkGameTitle(searchBarInput);
+                console.log(result[0].platforms);
                 setPlatformOptions(result[0].platforms);
             }
             else{
@@ -171,17 +172,13 @@ export default function App() {
         // Toggle state boolean
         setDisplayGameInfo(true);
 
-        // Get the name of each platform the game released on        
-        const platforms = game.platforms.map(e => { return e.platform.name });
-
         // Get the tags associated with the game                
         const tags = game.tags.map(e => { return e.name });
 
         // Set the values for the game
         setGameTitle(game.name);
         setGameYear(game.released.match(/\d{4}/));
-        setGamePlatforms(platforms);
-        setGameTags(tags);
+        setGamePlatform(selectedPlatform);
         setGameMetacritic(game.metacritic);
     }
 
@@ -200,7 +197,8 @@ export default function App() {
         setGameInfo(gameTitleSearchResult[0]);
 
         // Get an array of formatted post objects ready for rendering
-        const formattedPostsArray = await processPosts(accessToken, gameTitleSearchResult[0].name, gameTitleSearchResult[0].tags, gameTitleSearchResult[0].platforms, matchTitleExactly)
+        // const formattedPostsArray = await processPosts(accessToken, gameTitleSearchResult[0].name, gameTitleSearchResult[0].tags, gameTitleSearchResult[0].platforms, matchTitleExactly)
+        const formattedPostsArray = await processPosts(accessToken, gameTitleSearchResult[0].name, gameTitleSearchResult[0].tags, selectedPlatform, matchTitleExactly)
 
         setPosts(formattedPostsArray);  // Set the state variable
         setIsLoadingPosts(false);       // Set loading to false after fetching data
@@ -216,7 +214,7 @@ export default function App() {
                     <br />
                     <p><b>Title: </b>{gameTitle}</p>
                     <p><b>Release Year: </b>{gameYear}</p>
-                    <p><b>Platform(s): </b>{gamePlatforms.join(", ")}</p>
+                    <p><b>Platform: </b>{selectedPlatform}</p>
                     <p><b>Metacritic score: </b>{gameMetacritic ? gameMetacritic : "N/A"}</p>
                     <br />
                 </>
