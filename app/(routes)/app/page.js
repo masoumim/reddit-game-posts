@@ -24,11 +24,14 @@ export default function App() {
     const [gameTitle, setGameTitle] = useState("");                             // Title of game being searched for
     const [gameYear, setGameYear] = useState("");                               // Release year of game being searched for
     const [gamePlatforms, setGamePlatforms] = useState([]);                     // Platforms of the game being searched for
+    const [platformOptions, setPlatformOptions] = useState([]);                 // Used to populate the <select> element of playforms the game has released on
+    const [selectedPlatform, setSelectedPlatform] = useState("");               // The platform that the user has selected form the drop-down menu
+    const [searchButtonDisabled, setSearchButtonDisabled] = useState(true);     // Toggles the search button enabled / disabled
     const [gameTags, setGameTags] = useState([]);                               // Tags associated with the game title
     const [gameMetacritic, setGameMetacritic] = useState("");                   // The Metacritic score of the game being searched for
     const [posts, setPosts] = useState([]);                                     // The array of formatted post objects to be rendered
     const [isLoadingPosts, setIsLoadingPosts] = useState(false);                // Used for conditionally rendering the posts or "Loading..." if fetching posts
-    
+
     /*
      The useRef Hook allows you to persist values between renders.
      It can be used to store a mutable value that does not cause a re-render when updated.
@@ -82,7 +85,7 @@ export default function App() {
                     // Set the access token state variable
                     setAccessToken(token);
                     // Set the navbar content to a Login button
-                    setNavContent(<button onClick={userAuthorizeApp}>Log in to Reddit</button>);                    
+                    setNavContent(<button onClick={userAuthorizeApp}>Log in to Reddit</button>);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -92,13 +95,13 @@ export default function App() {
 
     // Get user's Reddit profile name
     useEffect(() => {
-        if (loggedIn) {            
+        if (loggedIn) {
             // Set navbar content to loading message while fetching username
             setNavContent("Loading...");
             getUserInfo(accessToken)
-                .then(res => {                    
+                .then(res => {
                     // Set the navbar content to the Reddit username which links to their Reddit profile
-                    setNavContent(<Link href={`https://www.reddit.com/user/${res}`}>{res}</Link>);                    
+                    setNavContent(<Link href={`https://www.reddit.com/user/${res}`}>{res}</Link>);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -127,6 +130,34 @@ export default function App() {
 
         // Set the state variable
         setGameTitles(matchingGameTitles);
+    }
+
+    // Populates the <select> element with Platform names
+    useEffect(() => {
+        async function fetchData() {
+            if (gameTitles.includes(searchBarInput)) {
+                // Populate the <select> element with platform <options>
+                const result = await checkGameTitle(searchBarInput);
+                setPlatformOptions(result[0].platforms);
+            }
+            else{
+                setPlatformOptions([]);
+                setSearchButtonDisabled(true);
+            }
+        }
+        fetchData();
+    }, [searchBarInput])
+
+    // Handles the selection of an <option> from the platform <select> element
+    // Also toggles the search button enabled / disabled depending on if a platform has been selected
+    function handleSelectPlatform(event) {
+        setSelectedPlatform(event.target.value);
+        if (event.target.value) {
+            setSearchButtonDisabled(false);
+        }
+        else {
+            setSearchButtonDisabled(true);
+        }
     }
 
     // Handle 'match title exactly' checkbox
@@ -162,7 +193,7 @@ export default function App() {
         // Set loading to true when fetching data
         setIsLoadingPosts(true);
 
-        // We want the first result (index 0) in the returned array which will return the game title
+        // We want the first result (index 0) in the returned array which will return the game title and data
         const gameTitleSearchResult = await checkGameTitle(searchBarInput);
 
         // Set the game info (title, year, platforms etc) to display
@@ -177,7 +208,7 @@ export default function App() {
 
     return (
         <>
-            <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} matchTitleExactly={matchTitleExactly} />
+            <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} searchButtonDisabled={searchButtonDisabled} platformOptions={platformOptions} selectedPlatform={selectedPlatform} handleSelectPlatform={handleSelectPlatform} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} matchTitleExactly={matchTitleExactly} />
             <br />
             {displayGameInfo ?
                 <>
