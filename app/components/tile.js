@@ -40,6 +40,7 @@ export default function Tile({ post }) {
         <>            
             <div>
                 <div>
+                    <p><b>post rank: </b>{post.rank}</p>
                     <p><b>post title: </b>{post.title}</p>
                     <p>{post.subreddit}</p>
                     <p>{post.author}</p>

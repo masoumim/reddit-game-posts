@@ -197,8 +197,7 @@ export default function App() {
         setGameInfo(gameTitleSearchResult[0]);
 
         // Get an array of formatted post objects ready for rendering
-        // const formattedPostsArray = await processPosts(accessToken, gameTitleSearchResult[0].name, gameTitleSearchResult[0].tags, gameTitleSearchResult[0].platforms, matchTitleExactly)
-        const formattedPostsArray = await processPosts(accessToken, gameTitleSearchResult[0].name, gameTitleSearchResult[0].tags, selectedPlatform, matchTitleExactly)
+        const formattedPostsArray = await processPosts(accessToken, gameTitleSearchResult[0].name, selectedPlatform, matchTitleExactly)
 
         setPosts(formattedPostsArray);  // Set the state variable
         setIsLoadingPosts(false);       // Set loading to false after fetching data
