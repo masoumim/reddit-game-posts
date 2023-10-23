@@ -111,39 +111,37 @@ export default function App() {
 
     // Updates the searchBarInput state on every change to the input field
     async function handleSearchBarInput(event) {
-
         // Set the state variable
         setSearchBarInput(event.target.value);
-
-        // Create empty array to hold matching game titles
-        const matchingGameTitles = [];
-
-        // Do a search for games matching user input
-        const gameTitleSearchResults = await checkGameTitle(event.target.value);
-
-        // Populate the matchingGameTitles array for each result returned by the API
-        if (gameTitleSearchResults) {
-            gameTitleSearchResults.forEach(result => {
-                matchingGameTitles.push(result.name);
-            });
-        }
-
-        // Set the state variable
-        setGameTitles(matchingGameTitles);
     }
 
     // Populates the <select> element with Platform names
     useEffect(() => {
-        async function fetchData() {
-            if (gameTitles.includes(searchBarInput)) {
-                // Populate the <select> element with platform <options>
-                const result = await checkGameTitle(searchBarInput);
-                console.log(result[0].platforms);
-                setPlatformOptions(result[0].platforms);
-            }
-            else{
-                setPlatformOptions([]);
-                setSearchButtonDisabled(true);
+        async function fetchData() {                        
+            
+            // Clear the platform options
+            setPlatformOptions([]);
+            // Disable search button
+            setSearchButtonDisabled(true);
+            
+            if (searchBarInput) {                
+                const matchingGameTitles = [];
+                let gameTitleSearchResults = []
+                // Do a search for games matching user input
+                gameTitleSearchResults = await checkGameTitle(searchBarInput);
+
+                if (gameTitleSearchResults) {
+                    // Populate the matchingGameTitles array for each result returned by the API
+                    gameTitleSearchResults.forEach(result => {
+                        matchingGameTitles.push(result.name);
+                    });
+                    setGameTitles(matchingGameTitles);
+                }
+                if (matchingGameTitles.includes(searchBarInput)) {
+                    // Populate the <select> element with platform <options>                    
+                    console.log(gameTitleSearchResults[0].platforms);
+                    setPlatformOptions(gameTitleSearchResults[0].platforms);
+                }
             }
         }
         fetchData();

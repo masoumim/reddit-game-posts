@@ -47,7 +47,7 @@ export async function processPosts(accessToken, gameTitle, gamePlatform, matchTi
 
     // Get the top comment for each post
     const topCommentsArray = await getAllTopComments(validatedPosts, accessToken);
-
+    
     // Create a final array of formatted post objects to be returned.
     let formattedPostsArray = [];
 

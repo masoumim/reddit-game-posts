@@ -135,7 +135,7 @@ export async function getRedditPosts(accessToken, gameTitle, gamePlatform, match
 
 // Calls Reddit API to get the top comment for each post in the array
 export async function getAllTopComments(posts, accessToken) {
-    try {
+    try {        
         // Create and send api request for each reddit post
         // Store each returned promise in promisesArray
         const promisesArray = [];
