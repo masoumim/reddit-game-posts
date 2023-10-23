@@ -138,8 +138,7 @@ export default function App() {
                     setGameTitles(matchingGameTitles);
                 }
                 if (matchingGameTitles.includes(searchBarInput)) {
-                    // Populate the <select> element with platform <options>                    
-                    console.log(gameTitleSearchResults[0].platforms);
+                    // Populate the <select> element with platform <options>                                        
                     setPlatformOptions(gameTitleSearchResults[0].platforms);
                 }
             }

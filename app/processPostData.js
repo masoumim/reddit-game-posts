@@ -32,7 +32,7 @@ export async function processPosts(accessToken, gameTitle, gamePlatform, matchTi
     const redditSearchResults = await getRedditPosts(accessToken, title, gamePlatform, matchTitleExactly);
 
     // Filter / remove posts with Subredit names in a removePosts array    
-    const removePosts = ["gamecollecting", "gameswap", "3dsqrcodes", "indiegameswap", "steamgameswap", "gametrade", "gamesale", "steam_giveaway", "gamedeals", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals", "ama", "digitalcodesell", "uvtrade"];
+    const removePosts = ["gamecollecting", "gameswap", "3dsqrcodes", "indiegameswap", "steamgameswap", "gametrade", "gamesale", "steam_giveaway", "gamedeals", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals", "ama", "digitalcodesell", "uvtrade", "romhacking", "roms"];
     const filteredPosts = redditSearchResults.filter(post => !removePosts.includes(post.data.subreddit.toLowerCase()));
 
     // For each post in filteredPosts, determine if the post is related to the game title.
@@ -57,6 +57,9 @@ export async function processPosts(accessToken, gameTitle, gamePlatform, matchTi
         const postObj = formatPost(validatedPosts[post], topCommentsArray[post]);
         formattedPostsArray.push(postObj);
     }
+
+    // Sort posts by Rank (Descending)
+    formattedPostsArray.sort(function (a, b) { return b.rank - a.rank });
 
     return formattedPostsArray;
 }
@@ -218,6 +221,9 @@ export function getPlatformAliases(platform) {
     switch (platform) {
         case "NES":
             platformAliases = ["NES", "Nintendo Entertainment System"];
+            break;
+        case "SNES":
+            platformAliases = ["SNES", "Super Nintendo", "Super Nintendo Entertainment System"];
             break;
     }
 
