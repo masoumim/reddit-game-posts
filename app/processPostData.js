@@ -45,10 +45,9 @@ export async function processPosts(accessToken, gameTitle, gameTags, gamePlatfor
 
     console.log(redditSearchResults);
     console.log(combinedTerms);
-    console.log(combinedTerms);
 
     // Filter / remove posts with Subredit names in a removePosts array    
-    const removePosts = ["gamecollecting", "gameswap", "indiegameswap", "steamgameswap", "gametrade", "gamesale", "steam_giveaway", "gamedeals", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals", "ama", "digitalcodesell", "uvtrade"];
+    const removePosts = ["gamecollecting", "gameswap", "3dsqrcodes", "indiegameswap", "steamgameswap", "gametrade", "gamesale", "steam_giveaway", "gamedeals", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals", "ama", "digitalcodesell", "uvtrade"];
     const filteredPosts = redditSearchResults.filter(post => !removePosts.includes(post.data.subreddit.toLowerCase()));
 
     // Get the weight for the game title and the formatted game title
@@ -152,18 +151,16 @@ export async function determineTitleWeights(title, formattedGameTitle, combinedT
 
 // Determines if a given post is about the game title. If it is, return TRUE, otherwise return FALSE
 export function validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTitleWeight, formattedGameTitleWeight, gameTitle, formattedGameTitle, gamePlatform) {
-    // 1. Check for game title in post
-    if (postTitle.toLowerCase().includes(gameTitle) || (postText && postText.toLowerCase().includes(gameTitle))) {
-        // 2. Check for platform name in post
-        if (postTitle.toLowerCase().includes(gamePlatform) || (postText && postText.toLowerCase().includes(gamePlatform))) {
-            return true;
-        }
-    }
+    console.log(`validatePost()`);
+    console.log(`postTitle: ${postTitle}`);
+    console.log(`postSubreddit: ${postSubreddit}`);
+    console.log(`postText: ${postText}`);
+    
+    return true;
 }
 
 // Returns an array of words that make up the game title
 export function titleWordsToArray(gameTitle) {
-
     // Put each word in the gameTitle into an array
     // RegEx: 4 digit numbers, space followed by single number at end of string, space followed by number followed by space,
     // space followed by number followed by colon, colon, hyphen.

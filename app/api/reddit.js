@@ -109,7 +109,7 @@ export async function getUserInfo(accessToken) {
 export async function getRedditPosts(accessToken, gameTitle, gamePlatform, matchTitleExactly) {
 
     // If matching title exactly, wrap title in quotes
-    // const title = matchTitleExactly ? `"${gameTitle}"` : gameTitle;
+    const title = matchTitleExactly ? `"${gameTitle}"` : `${gameTitle}`;
 
     // Set the object to use in the GET request
     const options = {
@@ -117,7 +117,7 @@ export async function getRedditPosts(accessToken, gameTitle, gamePlatform, match
         url: `${base_url}/search`,
         headers: { 'Authorization': `bearer ${accessToken}` },
         params: {
-            q: `"${gameTitle}" ${gamePlatform}`,
+            q: title + ` ${gamePlatform}`,
             limit: 100,
             restrict_sr: false
         }
