@@ -4,7 +4,7 @@
 
 import parse from 'html-react-parser'; // html-react-parser Converts an HTML string to one or more React elements.
 import { getRedditPosts, getAllTopComments } from "./api/reddit";
-import timeago from 'epoch-timeago'; // Converts Unix Timestamp to formatted string of amount of time past
+import timeago from 'epoch-timeago'; // Converts Unix Timestamp to formatted string of the 'amount of time that has past'
 
 // Roman numerals (from 1 to 20)
 const romanNumerals = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii", "xiii", "xiv", "xv", "xvi", "xvii", "xviii", "xix", "xx"];
@@ -23,7 +23,8 @@ export async function processPosts(accessToken, gameTitle, gamePlatform, matchTi
     }
 
     // remove date from the title (if it exists)
-    title = title.replace(dateRegEx, "").toLowerCase().trim();
+    // title = title.replace(dateRegEx, "").toLowerCase().trim();
+    title = title.toLowerCase();
 
     // Get the formattedGameTitle and hasRomanNumerals boolean by destructuring
     const formattedGameTitle = formatGameTitle(title);
@@ -40,14 +41,14 @@ export async function processPosts(accessToken, gameTitle, gamePlatform, matchTi
     const validatedPosts = [];
     filteredPosts.forEach(post => {
         const validityScore = validatePost(post.data.title, post.data.subreddit, post.data.selftext, title, formattedGameTitle, gamePlatform)
-        if (validityScore) {            
-            validatedPosts.push({post, validityScore});
+        if (validityScore) {
+            validatedPosts.push({ post, validityScore });
         }
     });
 
     // Get the top comment for each post
     const topCommentsArray = await getAllTopComments(validatedPosts, accessToken);
-    
+
     // Create a final array of formatted post objects to be returned.
     let formattedPostsArray = [];
 
@@ -78,7 +79,7 @@ export function formatGameTitle(gameTitle) {
     const charsAfterLastWhitespace = formattedGameTitle.substring(indexOfLastWhitespace + 1, formattedGameTitle.length);
 
     // Remove roman numerals
-    if (romanNumerals.includes(charsAfterLastWhitespace)) {        
+    if (romanNumerals.includes(charsAfterLastWhitespace)) {
         formattedGameTitle = formattedGameTitle.replace(charsAfterLastWhitespace, "");
     }
 
@@ -99,13 +100,13 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
 
     // 1. Analyze the Post Title:
     /////////////////////////////
-    
+
     // Check for game title
     if (containsGameTitle(gameTitle, postTitle.toLowerCase()) === true) {
         console.log(`validatePost() - post title contains game title!`);
         validityScore++;
     }
-    
+
     // Check for platform
     if (containsPlatform(gamePlatform, postTitle.toLowerCase()) === true) {
         console.log(`validatePost() - post title contains platform!`);
@@ -114,16 +115,16 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
 
     // 2. Analyze the Post Subreddit:
     /////////////////////////////////
-    
+
     // Check for platform
     if (containsPlatform(gamePlatform, postSubreddit.toLowerCase()) === true) {
         console.log(`validatePost() - post subreddit contains platform!`);
         validityScore++;
         hasSubredditScore = true;
     }
-    
+
     // Check for formattedTitle (game title formatted in subreddit naming style / convention)
-    if(!hasSubredditScore && (postSubreddit.toLowerCase() === formattedGameTitle)){
+    if (!hasSubredditScore && (postSubreddit.toLowerCase() === formattedGameTitle)) {
         validityScore++;
         hasSubredditScore = true;
         console.log(`validatePost() - subreddit === ${formattedGameTitle}!`);
@@ -144,20 +145,20 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
 
     // Check for game related subreddits
     const gameSubreddits = ["gaming", "games", "truegaming", "gamernews", "indiegaming", "speedrun", "retrogaming", "tipofmyjoystick", "nostalgia"];
-    if(!hasSubredditScore && gameSubreddits.includes(postSubreddit.toLowerCase())){
+    if (!hasSubredditScore && gameSubreddits.includes(postSubreddit.toLowerCase())) {
         validityScore++;
         console.log(`validatePost() - post subreddit is gaming related!`);
     }
-    
+
     // 3. Analyze the Post Text:
     ////////////////////////////
-    
+
     // Check for game title
     if (postText && (containsGameTitle(gameTitle, postText.toLowerCase()) === true)) {
         console.log(`validatePost() - post text contains game title!`);
         validityScore++;
     }
-       
+
     // Check for platform
     if (postText && (containsPlatform(gamePlatform, postText.toLowerCase()) === true)) {
         console.log(`validatePost() - post text contains platform!`);
@@ -165,7 +166,7 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
     }
 
     // Return validity score
-    return validityScore;    
+    return validityScore;
 }
 
 // Returns true if supplied text contains the game title, false otherwise.
@@ -198,12 +199,12 @@ export function containsGameTitle(gameTitle, text) {
 // Returns true if supplied text contains the game platform, false otherwise.
 export function containsPlatform(platform, text) {
     // Get array of platform aliases
-    const platformAliases = getPlatformAliases(platform);    
+    const platformAliases = getPlatformAliases(platform);
     let doesContainPlatform = false;
     console.log(`containsPlatform() - platformAliases: ${platformAliases}`);
 
-    platformAliases.forEach(platform => {        
-        if (text.includes(platform.toLowerCase())) {                        
+    platformAliases.forEach(platform => {
+        if (text.includes(platform.toLowerCase())) {
             doesContainPlatform = true;
             return;
         }
@@ -211,19 +212,161 @@ export function containsPlatform(platform, text) {
     return doesContainPlatform;
 }
 
-// Returns an array of platform name aliases
+// Returns an array of platform name aliases + associated subreddit names
 export function getPlatformAliases(platform) {
-    // https://www.reddit.com/r/gaming/wiki/list-sorted-by-subscribers/
-    
+
     let platformAliases;
 
-    // TODO: Add remaining platforms
     switch (platform) {
         case "NES":
             platformAliases = ["NES", "Nintendo Entertainment System"];
             break;
         case "SNES":
             platformAliases = ["SNES", "Super Nintendo", "Super Nintendo Entertainment System"];
+            break;
+        case "Nintendo 64":
+            platformAliases = ["Nintendo 64", "N64"];
+            break;
+        case "GameCube":
+            platformAliases = ["GameCube", "Nintendo GameCube", "NGC"];
+            break;
+        case "Wii":
+            platformAliases = ["Wii", "Nintendo Wii"];
+            break;
+        case "Wii U":
+            platformAliases = ["Wii U", "Nintendo Wii U", "WiiU"];
+            break;
+        case "Nintendo Switch":
+            platformAliases = ["Nintendo Switch", "Switch"];
+            break;
+        case "Game Boy":
+            platformAliases = ["Game Boy", "Nintendo Game Boy", "GameBoy", "GB", "PocketGamers", "handheld"];
+            break;
+        case "Game Boy Color":
+            platformAliases = ["Game Boy Color", "Nintendo Game Boy Color", "GameBoy Color", "GBC", "PocketGamers", "handheld"];
+            break;
+        case "Game Boy Advance":
+            platformAliases = ["Game Boy Advance", "Nintendo Game Boy Advance", "GBA", "GBA SP", "GBASP", "PocketGamers", "handheld"];
+            break;
+        case "Nintendo DS":
+            platformAliases = ["Nintendo DS", "Nintendo Dual Screen", "DS", "NDS", "PocketGamers", "handheld"];
+            break;
+        case "Nintendo 3DS":
+            platformAliases = ["Nintendo 3DS", "3DS", "N3DS", "PocketGamers", "handheld"];
+            break;
+        case "SEGA Master System":
+            platformAliases = ["SEGA Master System", "Master System", "MasterSystem", "Sega Mark III"];
+            break;
+        case "Genesis":
+            platformAliases = ["Genesis", "Sega Genesis", "SegaGenesis", "Sega Mega Drive", "Mega Drive", "MegaDrive"];
+            break;
+        case "SEGA CD":
+            platformAliases = ["SEGA CD", "Mega Drive CD", "SEGACD", "MegaCD"];
+            break;
+        case "SEGA 32X":
+            platformAliases = ["SEGA 32X", "32X", "SEGA32X"];
+            break;
+        case "SEGA Saturn":
+            platformAliases = ["SEGA Saturn", "SegaSaturn"];
+            break;
+        case "Dreamcast":
+            platformAliases = ["Dreamcast", "Sega Dreamcast"];
+            break;
+        case "Game Gear":
+            platformAliases = ["Game Gear", "Sega Game Gear", "GameGear", "Game_Gear", "PocketGamers", "handheld"];
+            break;
+        case "PlayStation":
+            platformAliases = ["PlayStation", "PSOne", "PS One", "PS1", "PSX"];
+            break;
+        case "PlayStation 2":
+            platformAliases = ["PlayStation 2", "PS2"];
+            break;
+        case "PlayStation 3":
+            platformAliases = ["PlayStation 3", "PS3"];
+            break;
+        case "PlayStation 4":
+            platformAliases = ["PlayStation 4", "PS4"];
+            break;
+        case "PlayStation 5":
+            platformAliases = ["PlayStation 5", "PS5"];
+            break;
+        case "PSP":
+            platformAliases = ["PSP", "PlayStation Portable", "PocketGamers", "handheld"];
+            break;
+        case "PS Vita":
+            platformAliases = ["PS Vita", "PlayStation Vita", "Vita", "PocketGamers", "handheld"];
+            break;
+        case "Xbox":
+            platformAliases = ["Xbox", "Microsoft Xbox"];
+            break;
+        case "Xbox 360":
+            platformAliases = ["Xbox 360", "Microsoft Xbox 360", "Xbox360", "XB360"];
+            break;
+        case "Xbox One":
+            platformAliases = ["Xbox One", "Microsoft Xbox One", "Xbone", "XB1"];
+            break;
+        case "Xbox Series S/X":
+            platformAliases = ["Xbox Series X/S", "Microsoft Xbox Series S/X", "XBSX", "XBSS", "Xbox Series S", "Xbox Series X"];
+            break;
+        case "Commodore / Amiga":
+            platformAliases = ["Commodore / Amiga", "Commodore", "Amiga"];
+            break;
+        case "Atari 2600":
+            platformAliases = ["Atari 2600", "Atari", "Atari2600"];
+            break;
+        case "Atari 5200":
+            platformAliases = ["Atari 5200", "Atari", "Atari5200"];
+            break;
+        case "Atari 7800":
+            platformAliases = ["Atari 7800", "Atari", "Atari7800"];
+            break;
+        case "Atari ST":
+            platformAliases = ["Atari ST", "Atari", "AtariST"];
+            break;
+        case "Atari Flashback":
+            platformAliases = ["Atari Flashback", "Atari", "AtariFlashback"];
+            break;
+        case "Atari 8-bit":
+            platformAliases = ["Atari 8-bit", "Atari", "Atari8bit"];
+            break;
+        case "Atari XEGS":
+            platformAliases = ["Atari XEGS", "Atari", "AtariXEGS"];
+            break;
+        case "Jaguar":
+            platformAliases = ["Jaguar", "Atari", "AtariJaguar"];
+            break;
+        case "Atari Lynx":
+            platformAliases = ["Atari Lynx", "Atari", "AtariLynx", "PocketGamers", "handheld"];
+            break;
+        case "3DO":
+            platformAliases = ["3DO", "Panasonic 3DO"];
+            break;
+        case "Neo Geo":
+            platformAliases = ["Neo Geo", "NeoGeo"];
+            break;
+        case "PC":
+            platformAliases = ["PC", "Windows", "pcgaming", "steam", "pcmasterrace", "pcmr"];
+            break;
+        case "macOS":
+            platformAliases = ["macOS", "macgaming", "MobileGaming"];
+            break;
+        case "Classic Macintosh":
+            platformAliases = ["Classic Macintosh", "macgaming"];
+            break;
+        case "Apple II":
+            platformAliases = ["Apple II", "macgaming", "apple2"];
+            break;
+        case "Linux":
+            platformAliases = ["Linux", "linux_gaming"];
+            break;
+        case "Android":
+            platformAliases = ["Android", "AndroidGaming", "MobileGaming"];
+            break;
+        case "iOS":
+            platformAliases = ["iOS", "iOSGaming", "MobileGaming"];
+            break;
+        case "Web":
+            platformAliases = ["Web", "WebGames", "FreeWebGames"];
             break;
     }
 
@@ -354,15 +497,24 @@ export function formatPost(post, topComment) {
             postObj.mediaType = "link";
         }
     }
-    // LINK
+    // LINK OR IMAGE
     else {
-        // For all other values of 'post.data.domain' we render 'post.data.url' in a <Link> component
-        // The only exception is if 'post.data.domain' contains the world 'self'. 
-        // If these cases, the url is redundant as it is simply a url back to the Reddit post itself.
+        // For all other values of 'post.post.data.domain' we render 'post.data.url' as either:
+        // 1. A <Link> component
+        // 2. An <Image> component if the 'post.post.data.url' contains an image link (ending in .jpg, .png, .gif etc)        
 
+        // If 'post.post.data.domain' contains the world 'self', the url is redundant as it is simply a url to the Reddit post itself.
         if (!post.post.data.domain.includes('self')) {
-            postObj.mediaURL = post.post.data.url;
-            postObj.mediaType = "link";
+            const matchImage = post.post.data.url.match(/(https|http)(.*)(jpg|jpeg|svg|png|tiff|gif|webp)/g);
+            if (matchImage) {
+                const imgUrl = matchImage[0];
+                postObj.mediaURL = imgUrl;
+                postObj.mediaType = "image"
+            }
+            else {
+                postObj.mediaURL = post.post.data.url;
+                postObj.mediaType = "link";
+            }
         }
     }
     return postObj;
