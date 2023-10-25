@@ -4,15 +4,15 @@
 // - A text input element for inputting a comment along with submission button
 // - Buttons for Upvoting and Downvoting the post
 
+// Collapse component: https://daisyui.com/components/collapse/
+
 import Image from "next/image";
 import Link from "next/link";
 import ReactPlayer from 'react-player/youtube';
 import { TwitterTweetEmbed } from 'react-twitter-embed';
 
-
 export default function Tile({ post }) {
-    // TODO: Implement onClick expansion of post
-
+    
     // Embeds the post's media depending on mediaType
     function embedPostMedia(post) {
         let embeddedMedia = "";
@@ -27,8 +27,8 @@ export default function Tile({ post }) {
             case "youtube":
                 embeddedMedia = <ReactPlayer url={post.mediaURL} />
                 break;
-            case "twitter":                
-                embeddedMedia = <TwitterTweetEmbed tweetId={post.mediaURL} />                
+            case "twitter":
+                embeddedMedia = <TwitterTweetEmbed tweetId={post.mediaURL} />
                 break;
             case "link":
                 embeddedMedia = <Link href={post.mediaURL}>{post.mediaURL}</Link>
@@ -36,24 +36,31 @@ export default function Tile({ post }) {
         }
         return embeddedMedia;
     }
+
+    // Render Tile component
     return (
-        <>            
+        <>
             <div>
                 <div>
-                    <p><b>post rank: </b>{post.rank}</p>
-                    <p><b>post title: </b>{post.title}</p>
-                    <p>{post.subreddit}</p>
-                    <p>{post.author}</p>
-                    <p>{post.date}</p>
-                    <p>{post.upvotes}</p>
-                    <b>post: </b>
-                    {post.text}
-                    {embedPostMedia(post)}
-                    <b>comment: </b>
-                    {post.topCommentText}
-                    <p>{post.topCommentAuthor}</p>
-                    <p>{post.commentDate}</p>
-                    <p>{post.topCommentUpVotes}</p>
+                </div>
+                <div className="collapse bg-base-200">
+                    <input type="checkbox" />
+                    <div className="collapse-title text-xl font-medium">
+                        {/* <p><b>post rank: </b>{post.rank}</p> */}
+                        <p>{post.title}</p>
+                        <p>{post.subreddit}</p>
+                        <p>{post.author}</p>
+                        <p>{post.date}</p>
+                        <p>{post.upvotes}</p>                        
+                        {post.topCommentText}
+                        <p>{post.topCommentAuthor}</p>
+                        <p>{post.commentDate}</p>
+                        <p>{post.topCommentUpVotes}</p>
+                    </div>
+                    <div className="collapse-content">
+                        {post.text}
+                        {embedPostMedia(post)}
+                    </div>
                 </div>
                 <div>
                     {/* Upvote button */}
