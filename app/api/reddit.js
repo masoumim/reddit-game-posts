@@ -31,7 +31,7 @@ export function userAuthorizeApp() {
     params.append("state", stateString);
     params.append("redirect_uri", redirectURI);
     params.append("duration", 'permanent');
-    params.append("scope", "identity read");
+    params.append("scope", "identity read submit");
 
     // Redirect user to Reddit 'authorization' URL where user can grant this app access to their profile data.
     document.location = `https://www.reddit.com/api/v1/authorize?${params.toString()}`;
@@ -49,7 +49,7 @@ export async function getUserAuthAccessToken(code) {
             grant_type: 'authorization_code',
             code: code,
             redirect_uri: redirectURI,
-            scope: "identity read",
+            scope: "identity read submit",
             duration: 'permanent'
         }
     };
@@ -86,6 +86,29 @@ export async function authorizeAppOnly() {
     // Return access token from the responseObject
     return responseObject.data.access_token;
 }
+
+// POST a comment to a Reddit Post
+export async function postComment(postID, commentInput, accessToken) {
+    // Set the object to use in the POST request
+    const options = {
+        method: 'POST',
+        url: `${base_url}/api/comment`,
+        headers: { 'Authorization': `bearer ${accessToken}`, 'content-type': 'application/x-www-form-urlencoded' },        
+        data: {            
+            thing_id: `t3_${postID}`,
+            text: commentInput                     
+        }
+    };
+
+    try {
+        const responseObject = await axios.request(options);
+        return responseObject;
+    }
+    catch (err) {
+        console.log(`postComment() error: ${err}`);
+    }
+}
+
 
 // Calls Reddit API to get Reddit username
 export async function getUserInfo(accessToken) {        

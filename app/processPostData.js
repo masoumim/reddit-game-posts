@@ -33,7 +33,7 @@ export async function processPosts(accessToken, gameTitle, gamePlatform, matchTi
     const redditSearchResults = await getRedditPosts(accessToken, title, gamePlatform, matchTitleExactly);
 
     // Filter / remove posts with Subredit names in a removePosts array    
-    const removePosts = ["gamecollecting", "gameswap", "3dsqrcodes", "indiegameswap", "steamgameswap", "gametrade", "gamesale", "steam_giveaway", "gamedeals", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals", "ama", "digitalcodesell", "uvtrade", "romhacking", "roms"];
+    const removePosts = ["gamecollecting", "gameswap", "3dsqrcodes", "indiegameswap", "steamgameswap", "gametrade", "gamesale", "steam_giveaway", "gamedeals", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals", "ama", "digitalcodesell", "uvtrade", "romhacking", "roms", "videogamedealscanada", "videogamedealsus", "gamepreorderscanada", "gamepreordersus"];
     const filteredPosts = redditSearchResults.filter(post => !removePosts.includes(post.data.subreddit.toLowerCase()));
 
     // For each post in filteredPosts, determine if the post is related to the game title.
@@ -397,7 +397,7 @@ export function formatPost(post, topComment) {
 
     // Create post object
     const postObj = {};
-
+    
     // Add post data to object
     postObj.rank = post.validityScore;                       // The validity ranking of the post   
     postObj.id = post.post.data.id;                          // Post ID
@@ -406,6 +406,8 @@ export function formatPost(post, topComment) {
     postObj.author = post.post.data.author;                  // Post Author
     postObj.upvotes = post.post.data.ups;                    // Post Up-votes
     postObj.date = timeago(post.post.data.created * 1000);   // Post Date (Unix Timestamp) Converted to 'time ago' string
+    postObj.link = post.post.data.permalink;                 // Post URL
+    postObj.archived = post.post.data.archived;              // Boolean that tells if post is archived or not
 
     // Create a new DOMParser object                                                     
     const parser = new DOMParser();

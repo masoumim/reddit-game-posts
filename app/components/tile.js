@@ -11,8 +11,8 @@ import Link from "next/link";
 import ReactPlayer from 'react-player/youtube';
 import { TwitterTweetEmbed } from 'react-twitter-embed';
 
-export default function Tile({ post }) {
-    
+export default function Tile({ post, handleCommentSubmit, loggedIn, userAuthorizeApp, handleCommentInput, commentInput, setCommentInput, handleCommentSubmitButtonClick }) {
+
     // Embeds the post's media depending on mediaType
     function embedPostMedia(post) {
         let embeddedMedia = "";
@@ -41,17 +41,14 @@ export default function Tile({ post }) {
     return (
         <>
             <div>
-                <div>
-                </div>
                 <div className="collapse bg-base-200">
                     <input type="checkbox" />
                     <div className="collapse-title text-xl font-medium">
-                        {/* <p><b>post rank: </b>{post.rank}</p> */}
                         <p>{post.title}</p>
                         <p>{post.subreddit}</p>
                         <p>{post.author}</p>
                         <p>{post.date}</p>
-                        <p>{post.upvotes}</p>                        
+                        <p>{post.upvotes}</p>
                         {post.topCommentText}
                         <p>{post.topCommentAuthor}</p>
                         <p>{post.commentDate}</p>
@@ -60,13 +57,23 @@ export default function Tile({ post }) {
                     <div className="collapse-content">
                         {post.text}
                         {embedPostMedia(post)}
+                        <br />
+                        {loggedIn ?
+                            !post.archived ?
+                                <>
+                                    <div>
+                                        {/* Submit comment button */}
+                                        <form onSubmit={handleCommentSubmit}>
+                                            {/* Input text field (comment) */}
+                                            <input required autoComplete="off" onInput={handleCommentInput} input={commentInput} placeholder="enter a comment" name="comment" className="comment" minLength={1} maxLength={40000} />
+                                            {/* Submit comment button */}
+                                            <input type="submit" onClick={() => { handleCommentSubmitButtonClick(post.id); setCommentInput("") }} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-slate-400 disabled:text-slate-500" />
+                                        </form>
+                                    </div>
+                                </>
+                                : <b>Sorry, thread is archived. New comments cannot be posted.</b>
+                            : <><button onClick={userAuthorizeApp}>Log in to Reddit</button> to submit comments</>}
                     </div>
-                </div>
-                <div>
-                    {/* Upvote button */}
-                    {/* Downvote button */}
-                    {/* Input text field (comment) */}
-                    {/* Submit comment button */}
                 </div>
             </div>
         </>
