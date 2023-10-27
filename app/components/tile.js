@@ -6,12 +6,43 @@
 
 // Collapse component: https://daisyui.com/components/collapse/
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ReactPlayer from 'react-player/youtube';
 import { TwitterTweetEmbed } from 'react-twitter-embed';
+import { postComment } from "../api/reddit";
 
-export default function Tile({ post, handleCommentSubmit, loggedIn, userAuthorizeApp, handleCommentInput, commentInput, setCommentInput, handleCommentSubmitButtonClick }) {
+export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) {
+
+    const [commentInput, setCommentInput] = useState("");           // Comment text
+    const [submitStatusMsg, setSubmitStatusMsg] = useState("");     // Comment submission status message
+
+    // Handle submission of a comment
+    async function handleCommentSubmit(event) {
+        event.preventDefault();
+
+        try {
+            // POST the comment using the Reddit API
+            await postComment(post.id, commentInput, accessToken);
+
+            // Clear the input field
+            setCommentInput("");
+
+            // Set the status message
+            setSubmitStatusMsg("Comment submitted successfully!");
+        }
+        catch (err) {
+            setSubmitStatusMsg(`There was an error submitting your comment: ${err}`);
+        }
+    }
+
+    // Clears the submit status message after 3 seconds
+    useEffect(() => {
+        setTimeout(() => {
+            setSubmitStatusMsg("");
+        }, 3000);
+    }, [submitStatusMsg]);
 
     // Embeds the post's media depending on mediaType
     function embedPostMedia(post) {
@@ -37,7 +68,6 @@ export default function Tile({ post, handleCommentSubmit, loggedIn, userAuthoriz
         return embeddedMedia;
     }
 
-    // Render Tile component
     return (
         <>
             <div>
@@ -65,9 +95,11 @@ export default function Tile({ post, handleCommentSubmit, loggedIn, userAuthoriz
                                         {/* Submit comment button */}
                                         <form onSubmit={handleCommentSubmit}>
                                             {/* Input text field (comment) */}
-                                            <input required autoComplete="off" onInput={handleCommentInput} input={commentInput} placeholder="enter a comment" name="comment" className="comment" minLength={1} maxLength={40000} />
+                                            <input required autoComplete="off" onChange={(e) => setCommentInput(e.currentTarget.value)} value={commentInput} placeholder="enter a comment" name="comment" className="comment" minLength={1} maxLength={40000} />
                                             {/* Submit comment button */}
-                                            <input type="submit" onClick={() => handleCommentSubmitButtonClick(post.id)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-slate-400 disabled:text-slate-500" />
+                                            <input type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-slate-400 disabled:text-slate-500" />
+                                            {/* Comment Submission status message */}
+                                            {submitStatusMsg}
                                         </form>
                                     </div>
                                 </>

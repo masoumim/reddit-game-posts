@@ -3,7 +3,7 @@
 // This page will render all of the content for the app.
 
 import { useState, useEffect, useRef, useContext } from "react";
-import { userAuthorizeApp, authorizeAppOnly, getUserAuthAccessToken, getUserInfo, postComment } from "@/app/api/reddit.js";
+import { userAuthorizeApp, authorizeAppOnly, getUserAuthAccessToken, getUserInfo } from "@/app/api/reddit.js";
 import { checkGameTitle } from "@/app/api/vgdb";
 import { processPosts } from "@/app/processPostData";
 import SearchForm from "@/app/components/SearchForm";
@@ -30,9 +30,6 @@ export default function App() {
     const [gameMetacritic, setGameMetacritic] = useState("");                   // The Metacritic score of the game being searched for
     const [posts, setPosts] = useState([]);                                     // The array of formatted post objects to be rendered
     const [isLoadingPosts, setIsLoadingPosts] = useState(false);                // Used for conditionally rendering the posts or "Loading..." if fetching posts
-    const [commentInput, setCommentInput] = useState("");                       // Text entered into the text input element in the Tile component
-    const [postID, setPostID] = useState("");                                   // The ID of the Reddit Post
-
 
     /*
      The useRef Hook allows you to persist values between renders.
@@ -214,31 +211,6 @@ export default function App() {
         setIsLoadingPosts(false);       // Set loading to false after fetching data
     }
 
-    // Handle comment input
-    function handleCommentInput(event) {
-        setCommentInput(event.target.value);
-    }
-
-    // Handle submission of a comment
-    async function handleCommentSubmit(event) {
-        event.preventDefault();
-
-      
-        
-        // POST the comment using the Reddit API
-        const response = await postComment(postID, commentInput, accessToken);
-        setFoo(true);
-
-    }
-
-    // Handles clicking the comment form submit button
-    // Used for getting the URL of the Reddit Post being commented on
-    function handleCommentSubmitButtonClick(id) {
-        setPostID(id);
-    }
-
-
-    // Render Search, Game Info and Game Post <Tile>s
     return (
         <>
             <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} searchButtonDisabled={searchButtonDisabled} platformOptions={platformOptions} selectedPlatform={selectedPlatform} handleSelectPlatform={handleSelectPlatform} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} matchTitleExactly={matchTitleExactly} />
@@ -254,7 +226,7 @@ export default function App() {
                     <br />
                 </>
                 : ""}
-            {isLoadingPosts ? <p>Loading posts...</p> : posts.map((post, index) => { return <Tile key={index} post={post} handleCommentSubmit={handleCommentSubmit} loggedIn={loggedIn} userAuthorizeApp={userAuthorizeApp} handleCommentInput={handleCommentInput} commentInput={commentInput} setCommentInput={setCommentInput} handleCommentSubmitButtonClick={handleCommentSubmitButtonClick} /> })}
+            {isLoadingPosts ? <p>Loading posts...</p> : posts.map((post, index) => { return <Tile key={index} post={post} loggedIn={loggedIn} userAuthorizeApp={userAuthorizeApp} accessToken={accessToken} /> })}
         </>
     )
 }
