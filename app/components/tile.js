@@ -67,7 +67,7 @@ export default function Tile({ post, handleCommentSubmit, loggedIn, userAuthoriz
                                             {/* Input text field (comment) */}
                                             <input required autoComplete="off" onInput={handleCommentInput} input={commentInput} placeholder="enter a comment" name="comment" className="comment" minLength={1} maxLength={40000} />
                                             {/* Submit comment button */}
-                                            <input type="submit" onClick={() => { handleCommentSubmitButtonClick(post.id); setCommentInput("") }} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-slate-400 disabled:text-slate-500" />
+                                            <input type="submit" onClick={() => handleCommentSubmitButtonClick(post.id)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-slate-400 disabled:text-slate-500" />
                                         </form>
                                     </div>
                                 </>

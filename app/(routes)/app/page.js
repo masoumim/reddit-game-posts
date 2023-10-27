@@ -31,7 +31,8 @@ export default function App() {
     const [posts, setPosts] = useState([]);                                     // The array of formatted post objects to be rendered
     const [isLoadingPosts, setIsLoadingPosts] = useState(false);                // Used for conditionally rendering the posts or "Loading..." if fetching posts
     const [commentInput, setCommentInput] = useState("");                       // Text entered into the text input element in the Tile component
-    const [postID, setPostID] = useState("");                                   // The ID of the Reddit Post    
+    const [postID, setPostID] = useState("");                                   // The ID of the Reddit Post
+
 
     /*
      The useRef Hook allows you to persist values between renders.
@@ -118,13 +119,13 @@ export default function App() {
 
     // Populates the <select> element with Platform names
     useEffect(() => {
-        async function fetchData() {                                    
+        async function fetchData() {
             // Clear the platform options
             setPlatformOptions([]);
             // Disable search button
             setSearchButtonDisabled(true);
-            
-            if (searchBarInput) {                
+
+            if (searchBarInput) {
                 const matchingGameTitles = [];
                 let gameTitleSearchResults = []
                 // Do a search for games matching user input
@@ -148,7 +149,7 @@ export default function App() {
 
     // Handles the selection of an <option> from the platform <select> element
     // Also toggles the search button enabled / disabled depending on if a platform has been selected
-    function handleSelectPlatform(event) {        
+    function handleSelectPlatform(event) {
         setSelectedPlatform(event.target.value);
         if (event.target.value) {
             setSearchButtonDisabled(false);
@@ -165,25 +166,25 @@ export default function App() {
     }
 
     // Sets the game info
-    function setGameInfo(game) {        
+    function setGameInfo(game) {
         // Toggle state boolean
         setDisplayGameInfo(true);
 
         // Set the values for the game
         setGameTitle(game.name);
-        if(game.released){
+        if (game.released) {
             setGameYear(game.released.match(/\d{4}/));
         }
-        else{
+        else {
             setGameYear("N/A");
-        }        
+        }
         setGamePlatform(selectedPlatform);
-        
+
         setGameMetacritic(game.metacritic);
     }
 
     // Handle search form submit
-    async function handleSearchSubmit(event) {        
+    async function handleSearchSubmit(event) {
         // Prevents the page from reloading on submit
         event.preventDefault();
 
@@ -199,7 +200,7 @@ export default function App() {
         // Set the game info (title, year, platforms etc) to display
         // setGameInfo(gameTitleSearchResult[0]);
         gameTitleSearchResult.forEach(result => {
-            if(result.name === searchBarInput){
+            if (result.name === searchBarInput) {
                 setGameInfo(result);
                 gameTitle = result.name;
             }
@@ -214,23 +215,28 @@ export default function App() {
     }
 
     // Handle comment input
-    function handleCommentInput(event){        
+    function handleCommentInput(event) {
         setCommentInput(event.target.value);
     }
-        
+
     // Handle submission of a comment
-    async function handleCommentSubmit(event){                
+    async function handleCommentSubmit(event) {
         event.preventDefault();
-                      
+
+      
+        
         // POST the comment using the Reddit API
         const response = await postComment(postID, commentInput, accessToken);
+        setFoo(true);
+
     }
 
     // Handles clicking the comment form submit button
     // Used for getting the URL of the Reddit Post being commented on
-    function handleCommentSubmitButtonClick(id){        
-        setPostID(id);        
+    function handleCommentSubmitButtonClick(id) {
+        setPostID(id);
     }
+
 
     // Render Search, Game Info and Game Post <Tile>s
     return (
@@ -248,7 +254,7 @@ export default function App() {
                     <br />
                 </>
                 : ""}
-            {isLoadingPosts ? <p>Loading posts...</p> : posts.map((post, index) => { return <Tile key={index} post={post} handleCommentSubmit={handleCommentSubmit} loggedIn={loggedIn} userAuthorizeApp={userAuthorizeApp} handleCommentInput={handleCommentInput} commentInput={commentInput} setCommentInput={setCommentInput} handleCommentSubmitButtonClick={handleCommentSubmitButtonClick}/> })}
+            {isLoadingPosts ? <p>Loading posts...</p> : posts.map((post, index) => { return <Tile key={index} post={post} handleCommentSubmit={handleCommentSubmit} loggedIn={loggedIn} userAuthorizeApp={userAuthorizeApp} handleCommentInput={handleCommentInput} commentInput={commentInput} setCommentInput={setCommentInput} handleCommentSubmitButtonClick={handleCommentSubmitButtonClick} /> })}
         </>
     )
 }
