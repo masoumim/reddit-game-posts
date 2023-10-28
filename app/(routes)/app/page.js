@@ -29,8 +29,7 @@ export default function App() {
     const [searchButtonDisabled, setSearchButtonDisabled] = useState(true);     // Toggles the search button enabled / disabled   
     const [gameMetacritic, setGameMetacritic] = useState("");                   // The Metacritic score of the game being searched for
     const [posts, setPosts] = useState([]);                                     // The array of formatted post objects to be rendered
-    const [isLoadingPosts, setIsLoadingPosts] = useState(false);                // Used for conditionally rendering the posts or "Loading..." if fetching posts
-    const [isLoadingPlatforms, setIsLoadingPlatforms] = useState(false);        // Used for conditionally rendering the platforms dropdown list's options
+    const [isLoadingPosts, setIsLoadingPosts] = useState(false);                // Used for conditionally rendering the posts or "Loading..." if fetching posts    
     const [selectedGame, setSelectedGame] = useState({});                       // An object returned by RAWG API representing the selected game
 
     /*
@@ -132,41 +131,41 @@ export default function App() {
 
         // Debouncing function:
         const fetchData = setTimeout(async () => {
+            
             // Check for input in the search bar
             if (searchBarInput) {
                 
                 // Do a search for games matching user input:
                 let gameTitleSearchResults = await checkGameTitle(searchBarInput);
-
+                                                
                 // If a game has been selected from the list:
-                if (gameTitles.includes(searchBarInput)) {
-                    
+                if (gameTitles.includes(searchBarInput)) {                    
                     // Display platforms
                     gameTitleSearchResults.forEach(result => {
                         if (result.name === searchBarInput) {                            
                             // Set the platforms
                             setPlatformOptions(result.platforms);
                             // Set the selected game
-                            setSelectedGame(result);                           
+                            setSelectedGame(result);                                                    
                         }
-                    });
+                    });                    
                 }
-                else {
+                else {                    
                     // Populate the game titles drop-down                   
                     const matchingGameTitles = [];
                     if (gameTitleSearchResults) {
                         gameTitleSearchResults.forEach(result => {
                             matchingGameTitles.push(result.name);
                         });
-                        setGameTitles(matchingGameTitles);
-                    }
-                }
+                        setGameTitles(matchingGameTitles);                        
+                    }                    
+                }                                 
             }
             else {
                 // If search bar is empty, clear the drop down menu of game titles
                 setGameTitles([]);
-            }
-        }, 250)
+            }            
+        }, 300)
 
         // Destroy instance of the useEffect Hook using return
         // Then call clearTimeout to cancel the previous 'timeOut' that was created using 'callTimeout'
@@ -232,7 +231,7 @@ export default function App() {
 
     return (
         <>
-            <SearchForm isLoadingPlatforms={isLoadingPlatforms} handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} searchButtonDisabled={searchButtonDisabled} platformOptions={platformOptions} selectedPlatform={selectedPlatform} handleSelectPlatform={handleSelectPlatform} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} matchTitleExactly={matchTitleExactly} />
+            <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} searchButtonDisabled={searchButtonDisabled} platformOptions={platformOptions} selectedPlatform={selectedPlatform} handleSelectPlatform={handleSelectPlatform} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} matchTitleExactly={matchTitleExactly} />
             <br />
             {displayGameInfo ?
                 <>

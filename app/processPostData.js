@@ -33,7 +33,7 @@ export async function processPosts(accessToken, gameTitle, gamePlatform, matchTi
     const redditSearchResults = await getRedditPosts(accessToken, title, gamePlatform, matchTitleExactly);
 
     // Filter / remove posts with Subredit names in a removePosts array    
-    const removePosts = ["gamecollecting", "gameswap", "3dsqrcodes", "indiegameswap", "steamgameswap", "gametrade", "gamesale", "steam_giveaway", "gamedeals", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals", "ama", "digitalcodesell", "uvtrade", "romhacking", "roms", "videogamedealscanada", "videogamedealsus", "gamepreorderscanada", "gamepreordersus"];
+    const removePosts = ["gamecollecting", "gameswap", "3dsqrcodes", "indiegameswap", "steamgameswap", "gametrade", "gamesale", "steam_giveaway", "gamedeals", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals", "ama", "digitalcodesell", "uvtrade", "romhacking", "roms", "videogamedealscanada", "videogamedealsus", "gamepreorderscanada", "gamepreordersus", "warehouseconsoledeals"];
     const filteredPosts = redditSearchResults.filter(post => !removePosts.includes(post.data.subreddit.toLowerCase()));
 
     // For each post in filteredPosts, determine if the post is related to the game title.
@@ -103,13 +103,13 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
 
     // Check for game title
     if (containsGameTitle(gameTitle, postTitle.toLowerCase()) === true) {
-        console.log(`validatePost() - post title contains game title!`);
+        // console.log(`validatePost() - post title contains game title!`);
         validityScore++;
     }
 
     // Check for platform
     if (containsPlatform(gamePlatform, postTitle.toLowerCase()) === true) {
-        console.log(`validatePost() - post title contains platform!`);
+        // console.log(`validatePost() - post title contains platform!`);
         validityScore++;
     }
 
@@ -118,7 +118,7 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
 
     // Check for platform
     if (containsPlatform(gamePlatform, postSubreddit.toLowerCase()) === true) {
-        console.log(`validatePost() - post subreddit contains platform!`);
+        // console.log(`validatePost() - post subreddit contains platform!`);
         validityScore++;
         hasSubredditScore = true;
     }
@@ -127,7 +127,7 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
     if (!hasSubredditScore && (postSubreddit.toLowerCase() === formattedGameTitle)) {
         validityScore++;
         hasSubredditScore = true;
-        console.log(`validatePost() - subreddit === ${formattedGameTitle}!`);
+        // console.log(`validatePost() - subreddit === ${formattedGameTitle}!`);
     }
 
     // Check for game title word      
@@ -137,7 +137,7 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
             if (word.includes(postSubreddit.toLowerCase())) {
                 validityScore++;
                 hasSubredditScore = true;
-                console.log(`validatePost() - subreddit contains game title word!`);
+                // console.log(`validatePost() - subreddit contains game title word!`);
                 return;
             }
         });
@@ -147,7 +147,7 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
     const gameSubreddits = ["gaming", "games", "truegaming", "gamernews", "indiegaming", "speedrun", "retrogaming", "tipofmyjoystick", "nostalgia"];
     if (!hasSubredditScore && gameSubreddits.includes(postSubreddit.toLowerCase())) {
         validityScore++;
-        console.log(`validatePost() - post subreddit is gaming related!`);
+        // console.log(`validatePost() - post subreddit is gaming related!`);
     }
 
     // 3. Analyze the Post Text:
@@ -155,13 +155,13 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
 
     // Check for game title
     if (postText && (containsGameTitle(gameTitle, postText.toLowerCase()) === true)) {
-        console.log(`validatePost() - post text contains game title!`);
+        // console.log(`validatePost() - post text contains game title!`);
         validityScore++;
     }
 
     // Check for platform
     if (postText && (containsPlatform(gamePlatform, postText.toLowerCase()) === true)) {
-        console.log(`validatePost() - post text contains platform!`);
+        // console.log(`validatePost() - post text contains platform!`);
         validityScore++;
     }
 
@@ -174,10 +174,10 @@ export function containsGameTitle(gameTitle, text) {
     const gameTitleWordsArray = titleWordsToArray(gameTitle);
     let wordsFound = 0;
 
-    console.log(`containsGameTitle():`);
-    console.log(`gameTitle: ${gameTitle}`);
-    console.log(`text: ${text}`);
-    console.log(`gameTitleWordsArray: ${gameTitleWordsArray}`);
+    // console.log(`containsGameTitle():`);
+    // console.log(`gameTitle: ${gameTitle}`);
+    // console.log(`text: ${text}`);
+    // console.log(`gameTitleWordsArray: ${gameTitleWordsArray}`);
 
 
     gameTitleWordsArray.forEach(word => {
@@ -185,7 +185,7 @@ export function containsGameTitle(gameTitle, text) {
             wordsFound++;
     });
 
-    console.log(`(wordsFound / gameTitleWordsArray.length) * 100: ${(wordsFound / gameTitleWordsArray.length) * 100}`);
+    // console.log(`(wordsFound / gameTitleWordsArray.length) * 100: ${(wordsFound / gameTitleWordsArray.length) * 100}`);
 
     // There must be at least 75% of the title's words present in the text
     if (((wordsFound / gameTitleWordsArray.length) * 100) >= 75) {
@@ -201,7 +201,7 @@ export function containsPlatform(platform, text) {
     // Get array of platform aliases
     const platformAliases = getPlatformAliases(platform);
     let doesContainPlatform = false;
-    console.log(`containsPlatform() - platformAliases: ${platformAliases}`);
+    // console.log(`containsPlatform() - platformAliases: ${platformAliases}`);
 
     platformAliases.forEach(platform => {
         if (text.includes(platform.toLowerCase())) {
