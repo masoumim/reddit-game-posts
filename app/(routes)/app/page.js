@@ -110,22 +110,27 @@ export default function App() {
 
     // Updates the searchBarInput state on every change to the input field
     async function handleSearchBarInput(event) {
-        // Set the state variable
-        setSearchBarInput(event.target.value);
+        // Set the state variable        
+        setSearchBarInput(event.target.value);        
     }
 
-    // Populates the <select> element with Platform names
+    // Populates the Platforms <select> element with Platform names:
+    // Debouncing function:
+    // This RUNS every time there is a change to searchBarInput,
+    // including when a game is selected from the drop-down list (which counts as a change to the input)
+    // However, fetchData is only EXECUTED once every 300ms to prevent calling RAWG API for every char entered in input
     useEffect(() => {
-        async function fetchData() {
+        const fetchData = setTimeout(async () => {
             // Clear the platform options
             setPlatformOptions([]);
             // Disable search button
             setSearchButtonDisabled(true);
-
+            
             if (searchBarInput) {
                 const matchingGameTitles = [];
                 let gameTitleSearchResults = []
-                // Do a search for games matching user input
+
+                // Do a search for games matching user input:
                 gameTitleSearchResults = await checkGameTitle(searchBarInput);
 
                 if (gameTitleSearchResults) {
@@ -140,9 +145,16 @@ export default function App() {
                     setPlatformOptions(gameTitleSearchResults[0].platforms);
                 }
             }
-        }
-        fetchData();
+            else {
+                setGameTitles([]);
+            }
+        }, 300)
+
+        // Destroy instance of the useEffect Hook using return
+        // Then call clearTimeout to cancel the previous 'timeOut' created using 'callTimeout'
+        return () => clearTimeout(fetchData);
     }, [searchBarInput])
+    
 
     // Handles the selection of an <option> from the platform <select> element
     // Also toggles the search button enabled / disabled depending on if a platform has been selected

@@ -6,14 +6,14 @@ export default function SearchForm({ searchBarInput, handleSelectPlatform, searc
     return (
         <>
             <form onSubmit={handleSearchSubmit}>
-                {/* GAME TITLE */}
+                {/* GAME TITLES */}
                 <input required autoComplete="off" placeholder="enter a game title" list="game-titles" name="searchBar" className="outline" input={searchBarInput} onInput={handleSearchBarInput} />
                 <datalist id="game-titles">
                     {gameTitles.map((title, index) => {
                         return (<option key={index} value={title}>{title}</option>);
                     })}
                 </datalist>
-                {/* PLATFORM */}
+                {/* PLATFORMS */}
                 <select required onChange={handleSelectPlatform}>
                     <option value={""}>{"Select a platform"}</option>
                     {platformOptions.map((e, index) => {
