@@ -8,20 +8,18 @@ import { getRedditPosts, getAllTopComments } from "../api/reddit"; // Import the
 // *This will use the mocked version of the module in the __mocks__ folder.
 jest.mock("../api/reddit");
 
-// Implement test once processPosts() is fully implemented.
 it("tests the processPosts() function which returns an array of valid posts", async () => {
     // Arrange
     const accessToken = "";
     const gameTitle = "Super Mario World";
-    const gameTags = [{ name: "platformer" }, { name: "retro" }, { name: "nostalgia" }];
-    const gamePlatforms = [{ platform: { name: "Super Nintendo" } }, { platform: { name: "Game Boy Advance" } }];
+    const gamePlatform = "SNES";
     const matchTitleExactly = false;
 
     // Mock response for getRedditPosts()
     const getRedditPostsMockResponse = [
-        { data: { author: "author1", created: 1455703937, domain: "abc.com", id: "123", selftext_html: "SMW on Super Nintendo is my favorite retro platformer.", subreddit: "subreddit1", title: "Super Mario World is my favorite game!", ups: 100, url: "www.abc.com" } },
-        { data: { author: "author2", created: 1893738948, domain: "xyz.com", id: "456", selftext_html: "I love Super Mario World on Super Nintendo. I get such nostalgia when I play that retro platformer", subreddit: "subreddit2", title: "Super Mario World is pure nostalgia", ups: 75, url: "www.xyz.com" } },
-        { data: { author: "author3", created: 8343290834, domain: "foo.com", id: "789", selftext_html: "I remember playing SMW on Game Boy Advance. Such a great retro platformer", subreddit: "subreddit3", title: "Anyone play Super Mario World on Game Boy Advance?", ups: 150, url: "www.foo.com" } }
+        { data: { author: "author1", created: 1455703937, domain: "abc.com", id: "123", selftext_html: "SMW on Super Nintendo is my favorite retro platformer.", subreddit: "subreddit1", title: "Super Mario World is my favorite game!", ups: 100, url: "www.abc.com", archived: "false", permalink: "r/link1" } },
+        { data: { author: "author2", created: 1893738948, domain: "xyz.com", id: "456", selftext_html: "I love Super Mario World on Super Nintendo. I get such nostalgia when I play that retro platformer", subreddit: "subreddit2", title: "Super Mario World is pure nostalgia", ups: 75, url: "www.xyz.com", archived: "false", permalink: "r/link2" } },
+        { data: { author: "author3", created: 8343290834, domain: "foo.com", id: "789", selftext_html: "I remember playing SMW on Game Boy Advance. Such a great retro platformer", subreddit: "subreddit3", title: "Anyone play Super Mario World on Game Boy Advance?", ups: 150, url: "www.foo.com", archived: "false", permalink: "r/link3" } }
     ]
 
     // Mock response for getAllTopComments()
@@ -39,77 +37,57 @@ it("tests the processPosts() function which returns an array of valid posts", as
 
     // Expected response
     const expectedResponse = [
-        { id: "123", title: "Super Mario World is my favorite game!", subreddit: "subreddit1", text: "SMW on Super Nintendo is my favorite retro platformer.", author: "author1", upvotes: 100, date: 1455703937, topCommentText: "commentAuthor1's comment", topCommentAuthor: "commentAuthor1", commentDate: 1455723984, topCommentUpVotes: 100, mediaURL: "www.abc.com", mediaType: "link" },
-        { id: "456", title: "Super Mario World is pure nostalgia", subreddit: "subreddit2", text: "I love Super Mario World on Super Nintendo. I get such nostalgia when I play that retro platformer", author: "author2", upvotes: 75, date: 1893738948, topCommentText: "commentAuthor2's comment", topCommentAuthor: "commentAuthor2", commentDate: 1455723985, topCommentUpVotes: 200, mediaURL: "www.xyz.com", mediaType: "link" },
-        { id: "789", title: "Anyone play Super Mario World on Game Boy Advance?", subreddit: "subreddit3", text: "I remember playing SMW on Game Boy Advance. Such a great retro platformer", author: "author3", upvotes: 150, date: 8343290834, topCommentText: "commentAuthor3's comment", topCommentAuthor: "commentAuthor3", commentDate: 1455723986, topCommentUpVotes: 150, mediaURL: "www.foo.com", mediaType: "link" }
+        { id: "123", rank: 1, title: "Super Mario World is my favorite game!", subreddit: "subreddit1", text: "SMW on Super Nintendo is my favorite retro platformer.", author: "author1", upvotes: 100, date: "7 years ago", topCommentText: "commentAuthor1's comment", topCommentAuthor: "commentAuthor1", commentDate: "7 years ago", topCommentUpVotes: 100, mediaURL: "www.abc.com", mediaType: "link", archived: "false", link: "r/link1"  },
+        { id: "456", rank: 1, title: "Super Mario World is pure nostalgia", subreddit: "subreddit2", text: "I love Super Mario World on Super Nintendo. I get such nostalgia when I play that retro platformer", author: "author2", upvotes: 75, date: "just now", topCommentText: "commentAuthor2's comment", topCommentAuthor: "commentAuthor2", commentDate: "7 years ago", topCommentUpVotes: 200, mediaURL: "www.xyz.com", mediaType: "link", archived: "false", link: "r/link2" },
+        { id: "789", rank: 1, title: "Anyone play Super Mario World on Game Boy Advance?", subreddit: "subreddit3", text: "I remember playing SMW on Game Boy Advance. Such a great retro platformer", author: "author3", upvotes: 150, date: "just now", topCommentText: "commentAuthor3's comment", topCommentAuthor: "commentAuthor3", commentDate: "7 years ago", topCommentUpVotes: 150, mediaURL: "www.foo.com", mediaType: "link", archived: "false", link: "r/link3" }
     ]
 
     // Act
-    const actualResponse = await processPosts(accessToken, gameTitle, gameTags, gamePlatforms, matchTitleExactly);
+    const actualResponse = await processPosts(accessToken, gameTitle, gamePlatform, matchTitleExactly);
 
     // Assert
     expect(actualResponse).toEqual(expectedResponse);
 });
 
-it("tests formatGameTitle() which returns subreddit-formatted title and whether the title had roman numerals", () => {
+it("tests formatGameTitle() which returns subreddit-formatted title and tests whether the title had roman numerals", () => {
     // Arrange
     const gameTitle = "street fighter ii: the world warrior"
 
     // Act
-    const { formattedGameTitle, hasRomanNumerals } = formatGameTitle(gameTitle);
+    const formattedGameTitle = formatGameTitle(gameTitle);
 
     // Assert
     expect(formattedGameTitle).toEqual("streetfighter");
-    expect(hasRomanNumerals).toEqual(true);
 });
 
-it("tests determineTitleWeights() which returns an integer value for titleWight and formattedTitleWight", async () => {
-    // Arrange
-    const gameTitle = "street fighter ii: the world warrior";
-    const formattedGameTitle = "streetfighter";
-    const combinedTerms = ["game", "gaming", "videogame", "video game", "sega", "nintendo", "xbox", "playstation", "console", "controller", "backlog", "steam", "playtime", "nostalgia", "singleplayer", "2 players", "pc", "playstation 3", "wii u", "wii", "game boy", "snes", "commodore / amiga", "atari st", "genesis", "3do", "street fighter ii: the world warrior", "streetfighter", "1991"];
-    const hasRomanNumerals = true;
-
-    // Act
-    const { gameTitleWeight, formattedGameTitleWeight } = await determineTitleWeights(gameTitle, formattedGameTitle, combinedTerms, hasRomanNumerals);
-
-    // Assert
-    expect(gameTitleWeight).toEqual(6);
-    expect(formattedGameTitleWeight).toEqual(2);
-});
-
-it("tests validatePost() using data that should result in the function returning true", () => {
+it("tests validatePost() using data that should result in the function returning a validity score of 3", () => {
     // Arrange
     const postTitle = "Street Fighter II is my favorite game";
     const postSubreddit = "streetfighter";
     const postText = "I remember playing Street Fighter II: The World Warrior on my SNES, Genesis and 3do. It was my favorite game back in 1991. I get nostalgia when I pickup my controller and play. Definitely my favorite video game";
-    const combinedTerms = ["game", "gaming", "videogame", "video game", "sega", "nintendo", "xbox", "playstation", "console", "controller", "backlog", "steam", "playtime", "nostalgia", "singleplayer", "2 players", "pc", "playstation 3", "wii u", "wii", "game boy", "snes", "commodore / amiga", "atari st", "genesis", "3do", "street fighter ii: the world warrior", "streetfighter", "1991"];
-    const gameTitleweight = 5;
-    const formattedGameTitleWeight = 2;
     const gameTitle = "street fighter ii: the world warrior";
     const formattedGameTitle = "streetfighter";
+    const gamePlatform = "SNES";
 
     // Act
-    const isValid = validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTitleweight, formattedGameTitleWeight, gameTitle, formattedGameTitle);
+    const validityScore = validatePost(postTitle, postSubreddit, postText, gameTitle, formattedGameTitle, gamePlatform);
 
     // Assert
-    expect(isValid).toEqual(true);
+    expect(validityScore).toEqual(3);
 });
 
-it("tests validatePost() using data that should result in the function returning false", () => {
+it("tests validatePost() using data that should result in the function returning a validity score of 1", () => {
     // Arrange
-    const postTitle = "Looking for a cool spot to hangout";
+    const postTitle = "Cool spot in Toronto?";
     const postSubreddit = "toronto";
-    const postText = "Anybody know any cool places where we can hangout in Toronto?";
-    const combinedTerms = ["game", "gaming", "videogame", "video game", "sega", "nintendo", "xbox", "playstation", "console", "controller", "backlog", "steam", "playtime", "nostalgia", "pc", "snes", "genesis", "cool spot", "coolspot"];
-    const gameTitleweight = 2;
-    const formattedGameTitleWeight = 2;
+    const postText = "I am looking for a cool areas of the city to hang out, can anyone help?";
     const gameTitle = "cool spot";
     const formattedGameTitle = "coolspot";
+    const gamePlatform = "SNES";
 
     // Act
-    const isValid = validatePost(postTitle, postSubreddit, postText, combinedTerms, gameTitleweight, formattedGameTitleWeight, gameTitle, formattedGameTitle);
+    const validityScore = validatePost(postTitle, postSubreddit, postText, gameTitle, formattedGameTitle, gamePlatform);
 
     // Assert
-    expect(isValid).toEqual(false);
+    expect(validityScore).toEqual(1);
 });

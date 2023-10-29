@@ -148,7 +148,6 @@ export async function getRedditPosts(accessToken, gameTitle, gamePlatform, match
 
     try {
         const response = await axios.request(options);
-        console.log(response);
         return response.data.data.children;
     }
     catch (err) {

@@ -16,6 +16,7 @@ export async function processPosts(accessToken, gameTitle, gamePlatform, matchTi
 
     // Set the game date if it is in the gameTitle.
     // *RAWG will append the date in parentheses to some games, mainly retro games.        
+    console.log(`title: ${title}`);
     const extractedDate = title.match(dateRegEx);
     if (extractedDate) {
         const dateWithParentheses = extractedDate[0];           // get the date (first element in array returned by match())
@@ -26,7 +27,7 @@ export async function processPosts(accessToken, gameTitle, gamePlatform, matchTi
     // title = title.replace(dateRegEx, "").toLowerCase().trim();
     title = title.toLowerCase();
 
-    // Get the formattedGameTitle and hasRomanNumerals boolean by destructuring
+    // Get the formattedGameTitle
     const formattedGameTitle = formatGameTitle(title);
 
     // Search Reddit for this game. Returns an array of posts                 
@@ -91,12 +92,12 @@ export function formatGameTitle(gameTitle) {
 
 // Determines if a given post is about the game title. If it is, return TRUE, otherwise return FALSE
 export function validatePost(postTitle, postSubreddit, postText, gameTitle, formattedGameTitle, gamePlatform) {
+    // Initialize validity score to 0
+    let validityScore = 0;
+    
     // Toggles T/F depending on if the subreddit has been analyzed 
     // and given a validity score (we only want to score it once)    
     let hasSubredditScore = false;
-
-    // Initialize validity score to 0
-    let validityScore = 0;
 
     // 1. Analyze the Post Title:
     /////////////////////////////

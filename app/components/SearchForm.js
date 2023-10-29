@@ -13,8 +13,8 @@ export default function SearchForm({ searchBarInput, handleSelectPlatform, searc
                         return (<option key={index} value={title}>{title}</option>);
                     })}
                 </datalist>
-                {/* PLATFORMS */}
-                <select required onChange={handleSelectPlatform}>
+                {/* PLATFORMS */}                
+                <select required aria-label="selectPlatform" onChange={handleSelectPlatform}>
                     <option value={""}>{"Select a platform"}</option>
                     {platformOptions.map((e, index) => {
                         return (<option key={index} value={e.platform.name}>{e.platform.name}</option>);

@@ -134,12 +134,15 @@ export default function App() {
             
             // Check for input in the search bar
             if (searchBarInput) {
-                
+                console.log(`inside useeffect...searchBarInput`);
                 // Do a search for games matching user input:
                 let gameTitleSearchResults = await checkGameTitle(searchBarInput);
                                                 
                 // If a game has been selected from the list:
                 if (gameTitles.includes(searchBarInput)) {                    
+                    
+                    console.log(`!!! game titled selected !!!`);
+                    
                     // Display platforms
                     gameTitleSearchResults.forEach(result => {
                         if (result.name === searchBarInput) {                            
@@ -151,12 +154,17 @@ export default function App() {
                     });                    
                 }
                 else {                    
-                    // Populate the game titles drop-down                   
+                    // Populate the game titles drop-down
+                    
+                    console.log(`!!! populating game titles drop down !!!`);
+
                     const matchingGameTitles = [];
                     if (gameTitleSearchResults) {
                         gameTitleSearchResults.forEach(result => {
                             matchingGameTitles.push(result.name);
                         });
+
+                        console.log(`setGameTitles() to matchingGameTitles: ${matchingGameTitles}`);
                         setGameTitles(matchingGameTitles);                        
                     }                    
                 }                                 
@@ -192,6 +200,9 @@ export default function App() {
 
     // Sets the game info
     function setGameInfo(game) {
+        console.log(`setting game info!! game:`);
+        console.log(game);
+        
         // Toggle state boolean
         setDisplayGameInfo(true);
 
