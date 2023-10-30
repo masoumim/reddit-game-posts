@@ -15,8 +15,7 @@ export async function processPosts(accessToken, gameTitle, gamePlatform, matchTi
     let dateRegEx = /\(\d{4}\)/; // RegEx: a 4 digit number between parentheses.
 
     // Set the game date if it is in the gameTitle.
-    // *RAWG will append the date in parentheses to some games, mainly retro games.        
-    console.log(`title: ${title}`);
+    // *RAWG will append the date in parentheses to some games, mainly retro games.            
     const extractedDate = title.match(dateRegEx);
     if (extractedDate) {
         const dateWithParentheses = extractedDate[0];           // get the date (first element in array returned by match())

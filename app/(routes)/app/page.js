@@ -31,6 +31,7 @@ export default function App() {
     const [posts, setPosts] = useState([]);                                     // The array of formatted post objects to be rendered
     const [isLoadingPosts, setIsLoadingPosts] = useState(false);                // Used for conditionally rendering the posts or "Loading..." if fetching posts    
     const [selectedGame, setSelectedGame] = useState({});                       // An object returned by RAWG API representing the selected game
+    const [isLoadingPlatforms, setIsLoadingPlatforms] = useState(false);        // Used for conditionally rendering the platforms <select> element
 
     /*
      The useRef Hook allows you to persist values between renders.
@@ -110,7 +111,7 @@ export default function App() {
     }, [loggedIn]);
 
     // Updates the searchBarInput state on every change to the input field
-    async function handleSearchBarInput(event) {
+    async function handleSearchBarInput(event) {        
         // Set the state variable        
         setSearchBarInput(event.target.value);        
     }
@@ -120,8 +121,8 @@ export default function App() {
     // 2. Populates the Platforms drop down list
     // Debouncing function:
     // This useEffect instance RUNS every time there is a change to searchBarInput,
-    // including when a game is selected from the drop-down list (which counts as a change to searchBarInput)
-    // However, fetchData is only EXECUTED once every 250ms to prevent calling RAWG API for every char entered in input
+    // including when a game is selected from the drop-down list (which counts as a change to searchBarInput and a call to RAWG API)
+    // However, "fetchData" is only EXECUTED once every 300ms to prevent calling RAWG API for every char entered in input.
     useEffect(() => {
         // Clear the platform options
         setPlatformOptions([]);
@@ -131,48 +132,40 @@ export default function App() {
 
         // Debouncing function:
         const fetchData = setTimeout(async () => {
-            
             // Check for input in the search bar
             if (searchBarInput) {
-                console.log(`inside useeffect...searchBarInput`);
                 // Do a search for games matching user input:
+                setIsLoadingPlatforms(true);
                 let gameTitleSearchResults = await checkGameTitle(searchBarInput);
-                                                
-                // If a game has been selected from the list:
-                if (gameTitles.includes(searchBarInput)) {                    
-                    
-                    console.log(`!!! game titled selected !!!`);
-                    
+
+                // Populate the games menu
+                const matchingGameTitles = [];
+                if (gameTitleSearchResults) {
+                    gameTitleSearchResults.forEach(result => {
+                        matchingGameTitles.push(result.name);
+                    });
+                    // Set the state variable
+                    setGameTitles(matchingGameTitles);
+                }
+
+                // If the search bar input matches a game in the results:
+                if (matchingGameTitles.includes(searchBarInput)) {                    
                     // Display platforms
                     gameTitleSearchResults.forEach(result => {
-                        if (result.name === searchBarInput) {                            
+                        if (result.name === searchBarInput) {
                             // Set the platforms
                             setPlatformOptions(result.platforms);
                             // Set the selected game
-                            setSelectedGame(result);                                                    
+                            setSelectedGame(result);
                         }
-                    });                    
+                    });
+                    setIsLoadingPlatforms(false);
                 }
-                else {                    
-                    // Populate the game titles drop-down
-                    
-                    console.log(`!!! populating game titles drop down !!!`);
-
-                    const matchingGameTitles = [];
-                    if (gameTitleSearchResults) {
-                        gameTitleSearchResults.forEach(result => {
-                            matchingGameTitles.push(result.name);
-                        });
-
-                        console.log(`setGameTitles() to matchingGameTitles: ${matchingGameTitles}`);
-                        setGameTitles(matchingGameTitles);                        
-                    }                    
-                }                                 
             }
             else {
                 // If search bar is empty, clear the drop down menu of game titles
                 setGameTitles([]);
-            }            
+            }
         }, 300)
 
         // Destroy instance of the useEffect Hook using return
@@ -199,10 +192,7 @@ export default function App() {
     }
 
     // Sets the game info
-    function setGameInfo(game) {
-        console.log(`setting game info!! game:`);
-        console.log(game);
-        
+    function setGameInfo(game) {        
         // Toggle state boolean
         setDisplayGameInfo(true);
 
@@ -223,7 +213,7 @@ export default function App() {
     async function handleSearchSubmit(event) {
         // Prevents the page from reloading on submit
         event.preventDefault();
-
+                                
         // Set loading to true when fetching data
         setIsLoadingPosts(true);
 
@@ -242,7 +232,7 @@ export default function App() {
 
     return (
         <>
-            <SearchForm handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} searchButtonDisabled={searchButtonDisabled} platformOptions={platformOptions} selectedPlatform={selectedPlatform} handleSelectPlatform={handleSelectPlatform} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} matchTitleExactly={matchTitleExactly} />
+            <SearchForm isLoadingPlatforms={isLoadingPlatforms} handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} searchButtonDisabled={searchButtonDisabled} platformOptions={platformOptions} selectedPlatform={selectedPlatform} handleSelectPlatform={handleSelectPlatform} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} matchTitleExactly={matchTitleExactly} />
             <br />
             {displayGameInfo ?
                 <>

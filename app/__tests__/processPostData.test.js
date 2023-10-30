@@ -1,7 +1,6 @@
 // postProcessData.test.js - This file tests the functions in the processPostData.js file
-
 import "@testing-library/jest-dom";
-import { processPosts, formatGameTitle, validatePost, determineTitleWeights } from "../processPostData";
+import { processPosts, formatGameTitle, validatePost } from "../processPostData";
 import { getRedditPosts, getAllTopComments } from "../api/reddit"; // Import the actual function from the module we want mocked
 
 // Tell Jest to mock the implementation of this module

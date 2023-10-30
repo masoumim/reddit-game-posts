@@ -1,5 +1,4 @@
 // app.test.js - This file tests the App() component
-
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -8,6 +7,7 @@ import userEvent from '@testing-library/user-event';
 import { ctx } from "@/app/components/providers";
 
 // Mocking the <SearchForm> component which is the child component of <App>
+// *Note: Mocking the searchForm component isn't the only way to run this test, but is used here for example and for future reference of how to mock components.
 jest.mock('../components/SearchForm.js', () => ({ searchBarInput, handleSelectPlatform, searchButtonDisabled, platformOptions, handleSearchBarInput, handleSearchSubmit, gameTitles, handleMatchExactlyCheckbox }) => {
     // Set the prop to have mocked data
     platformOptions = [{ platform: { name: "platform1" } }, { platform: { name: "platform2" } }];

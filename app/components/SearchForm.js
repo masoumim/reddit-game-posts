@@ -2,7 +2,7 @@
 // The datalist is populated with matching games for each character the user enters
 // The submit button is disabled unless the input matches an <option>
 
-export default function SearchForm({ searchBarInput, handleSelectPlatform, searchButtonDisabled, platformOptions, handleSearchBarInput, handleSearchSubmit, gameTitles, handleMatchExactlyCheckbox }) {
+export default function SearchForm({ isLoadingPlatforms, searchBarInput, handleSelectPlatform, searchButtonDisabled, platformOptions, handleSearchBarInput, handleSearchSubmit, gameTitles, handleMatchExactlyCheckbox }) {
     return (
         <>
             <form onSubmit={handleSearchSubmit}>
@@ -13,15 +13,21 @@ export default function SearchForm({ searchBarInput, handleSelectPlatform, searc
                         return (<option key={index} value={title}>{title}</option>);
                     })}
                 </datalist>
-                {/* PLATFORMS */}                
+                {/* PLATFORMS */}
                 <select required aria-label="selectPlatform" onChange={handleSelectPlatform}>
-                    <option value={""}>{"Select a platform"}</option>
-                    {platformOptions.map((e, index) => {
-                        return (<option key={index} value={e.platform.name}>{e.platform.name}</option>);
-                    })}
+                    {isLoadingPlatforms ?
+                        <option value={""}>{"Loading platforms..."}</option>
+                        :
+                        <>
+                            <option value={""}>{"Select a platform"}</option>
+                            {platformOptions.map((e, index) => {
+                                return (<option key={index} value={e.platform.name}>{e.platform.name}</option>);
+                            })}
+                        </>
+                    }
                 </select>
                 {/* Disable search button unless search bar input matches a title in the drop-down menu */}
-                <input type="submit" disabled={searchButtonDisabled} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-slate-400 disabled:text-slate-500" />
+                <input type="submit" value="Search" disabled={searchButtonDisabled} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-slate-400 disabled:text-slate-500" />
                 <input type="checkbox" onClick={handleMatchExactlyCheckbox} id="check-match-exactly" name="check-match-exactly" />
                 <label htmlFor="check-match-exactly">match title exactly</label>
             </form>

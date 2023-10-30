@@ -1,5 +1,4 @@
 // reddit.test.js - This file tests the functions in the reddit.js file
-
 import { authorizeAppOnly, getUserAuthAccessToken, getUserInfo, getRedditPosts } from "../api/reddit";
 import axios from "axios";
 

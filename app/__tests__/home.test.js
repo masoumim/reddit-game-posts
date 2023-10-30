@@ -1,5 +1,4 @@
 // Home.test.js - This file tests the Home component (app/page.js)
-
 import React from "react";
 import {render, screen} from "@testing-library/react";
 import "@testing-library/jest-dom";
