@@ -86,7 +86,7 @@ export default function App() {
                     // Set the access token state variable
                     setAccessToken(token);
                     // Set the navbar content to a Login button
-                    setNavContent(<button onClick={userAuthorizeApp}>Log in to Reddit</button>);
+                    setNavContent(<button onClick={userAuthorizeApp} className="text-emerald-50 transition ease-in-out bg-emerald-800 hover:bg-emerald-900 duration-300 font-bold py-2 px-4 rounded">Log in to Reddit</button>);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -102,7 +102,7 @@ export default function App() {
             getUserInfo(accessToken)
                 .then(res => {
                     // Set the navbar content to the Reddit username which links to their Reddit profile
-                    setNavContent(<Link href={`https://www.reddit.com/user/${res}`}>{res}</Link>);
+                    setNavContent(<Link href={`https://www.reddit.com/user/${res}`} className="text-emerald-500 transition ease-in-out hover:text-emerald-200 duration-300 font-bold text-xl">u/{res}</Link>);
                 })
                 .catch((err) => {
                     console.log(err);
