@@ -140,7 +140,7 @@ export default function App() {
 
                 // Populate the games menu
                 const matchingGameTitles = [];
-                if (gameTitleSearchResults) {
+                if (gameTitleSearchResults && !gameTitles.includes(searchBarInput)) {
                     gameTitleSearchResults.forEach(result => {
                         matchingGameTitles.push(result.name);
                     });
@@ -149,7 +149,7 @@ export default function App() {
                 }
 
                 // If the search bar input matches a game in the results:
-                if (matchingGameTitles.includes(searchBarInput)) {                    
+                if (matchingGameTitles.includes(searchBarInput) || gameTitles.includes(searchBarInput)) {                                        
                     // Display platforms
                     gameTitleSearchResults.forEach(result => {
                         if (result.name === searchBarInput) {
@@ -165,6 +165,7 @@ export default function App() {
             else {
                 // If search bar is empty, clear the drop down menu of game titles
                 setGameTitles([]);
+                setIsLoadingPlatforms(false);
             }
         }, 300)
 

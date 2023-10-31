@@ -114,7 +114,7 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
     if (!hasSubredditScore && (postSubreddit.toLowerCase() === formattedGameTitle)) {
         validityScore++;
         hasSubredditScore = true;
-        console.log(`validatePost() - subreddit === ${formattedGameTitle}!`);
+        // console.log(`validatePost() - subreddit === ${formattedGameTitle}!`);
     }
 
     // Check for game title word(s)  
@@ -124,7 +124,7 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
             if (postSubreddit.toLowerCase().includes(word)) {
                 validityScore++;
                 hasSubredditScore = true;
-                console.log(`validatePost() - subreddit: ${postSubreddit} contains game title word: ${word}`);
+                // console.log(`validatePost() - subreddit: ${postSubreddit} contains game title word: ${word}`);
                 return;
             }
         });
