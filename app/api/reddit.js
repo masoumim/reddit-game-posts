@@ -130,7 +130,6 @@ export async function getUserInfo(accessToken) {
 
 // Calls Reddit API to search for posts about game title
 export async function getRedditPosts(accessToken, gameTitle, gamePlatform, matchTitleExactly) {
-
     // If matching title exactly, wrap title in quotes
     const title = matchTitleExactly ? `"${gameTitle}"` : `${gameTitle}`;
 
@@ -147,7 +146,7 @@ export async function getRedditPosts(accessToken, gameTitle, gamePlatform, match
     };
 
     try {
-        const response = await axios.request(options);
+        const response = await axios.request(options);        
         return response.data.data.children;
     }
     catch (err) {

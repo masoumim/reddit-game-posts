@@ -9,31 +9,18 @@ import timeago from 'epoch-timeago'; // Converts Unix Timestamp to formatted str
 // Roman numerals (from 1 to 20)
 const romanNumerals = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii", "xiii", "xiv", "xv", "xvi", "xvii", "xviii", "xix", "xx"];
 
-export async function processPosts(accessToken, gameTitle, gamePlatform, matchTitleExactly) {
-    let gameDate = "";
-    let title = gameTitle;
-    let dateRegEx = /\(\d{4}\)/; // RegEx: a 4 digit number between parentheses.
-
-    // Set the game date if it is in the gameTitle.
-    // *RAWG will append the date in parentheses to some games, mainly retro games.            
-    const extractedDate = title.match(dateRegEx);
-    if (extractedDate) {
-        const dateWithParentheses = extractedDate[0];           // get the date (first element in array returned by match())
-        gameDate = dateWithParentheses.replace(/\(|\)/g, "");   // extract the date by removing parentheses        
-    }
-
-    // remove date from the title (if it exists)
-    // title = title.replace(dateRegEx, "").toLowerCase().trim();
-    title = title.toLowerCase();
+export async function processPosts(accessToken, gameTitle, gamePlatform, matchTitleExactly) {    
+    // Set the title 
+    let title = gameTitle.toLowerCase();
 
     // Get the formattedGameTitle
     const formattedGameTitle = formatGameTitle(title);
 
     // Search Reddit for this game. Returns an array of posts                 
-    const redditSearchResults = await getRedditPosts(accessToken, title, gamePlatform, matchTitleExactly);
+    const redditSearchResults = await getRedditPosts(accessToken, gameTitle, gamePlatform, matchTitleExactly);
 
     // Filter / remove posts with Subredit names in a removePosts array    
-    const removePosts = ["gamecollecting", "gameswap", "3dsqrcodes", "indiegameswap", "steamgameswap", "gametrade", "gamesale", "steam_giveaway", "gamedeals", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals", "ama", "digitalcodesell", "uvtrade", "romhacking", "roms", "videogamedealscanada", "videogamedealsus", "gamepreorderscanada", "gamepreordersus", "warehouseconsoledeals"];
+    const removePosts = ["gamecollecting", "gameswap", "3dsqrcodes", "indiegameswap", "steamgameswap", "gametrade", "gamesale", "steam_giveaway", "gamedeals", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals", "ama", "digitalcodesell", "uvtrade", "romhacking", "roms", "videogamedealscanada", "videogamedealsus", "gamepreorderscanada", "gamepreordersus", "warehouseconsoledeals", "freegamefindings"];
     const filteredPosts = redditSearchResults.filter(post => !removePosts.includes(post.data.subreddit.toLowerCase()));
 
     // For each post in filteredPosts, determine if the post is related to the game title.
