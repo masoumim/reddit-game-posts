@@ -20,7 +20,7 @@ export async function processPosts(accessToken, gameTitle, gamePlatform, matchTi
     const redditSearchResults = await getRedditPosts(accessToken, gameTitle, gamePlatform, matchTitleExactly);
 
     // Filter / remove posts with Subredit names in a removePosts array    
-    const removePosts = ["gamecollecting", "gameswap", "3dsqrcodes", "indiegameswap", "steamgameswap", "gametrade", "gamesale", "steam_giveaway", "gamedeals", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals", "ama", "digitalcodesell", "uvtrade", "romhacking", "roms", "videogamedealscanada", "videogamedealsus", "gamepreorderscanada", "gamepreordersus", "warehouseconsoledeals", "freegamefindings"];
+    const removePosts = ["gamecollecting", "gameswap", "3dsqrcodes", "indiegameswap", "steamgameswap", "gametrade", "gamesale", "steam_giveaway", "gamedeals", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals", "ama", "digitalcodesell", "uvtrade", "romhacking", "roms", "videogamedealscanada", "videogamedealsus", "gamepreorderscanada", "gamepreordersus", "warehouseconsoledeals", "freegamefindings", "randomactsofgaming", "giftofgames", "freegamesonsteam"];
     const filteredPosts = redditSearchResults.filter(post => !removePosts.includes(post.data.subreddit.toLowerCase()));
 
     // For each post in filteredPosts, determine if the post is related to the game title.
@@ -114,17 +114,17 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
     if (!hasSubredditScore && (postSubreddit.toLowerCase() === formattedGameTitle)) {
         validityScore++;
         hasSubredditScore = true;
-        // console.log(`validatePost() - subreddit === ${formattedGameTitle}!`);
+        console.log(`validatePost() - subreddit === ${formattedGameTitle}!`);
     }
 
-    // Check for game title word      
+    // Check for game title word(s)  
     if (!hasSubredditScore) {
         const gameTitleWords = titleWordsToArray(gameTitle);
         gameTitleWords.forEach(word => {
-            if (word.includes(postSubreddit.toLowerCase())) {
+            if (postSubreddit.toLowerCase().includes(word)) {
                 validityScore++;
                 hasSubredditScore = true;
-                // console.log(`validatePost() - subreddit contains game title word!`);
+                console.log(`validatePost() - subreddit: ${postSubreddit} contains game title word: ${word}`);
                 return;
             }
         });
