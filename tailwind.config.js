@@ -8,7 +8,12 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx,mdx}'    
   ],
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage:{
+        'atari-flashback-classics':"url('/platforms/afc-logo.png')",
+        'nes':"url('/platforms/NES_logo.svg')"
+      }
+    },
   },
   plugins: [require("daisyui")],
 }
