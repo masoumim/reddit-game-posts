@@ -29,9 +29,40 @@ export default function Home() {
       </div>
 
       {/* Game Platform Logos - image sources are added to tailwind.config.js */}
-      <div className="flex flex-col items-center mt-5 gap-5">        
-        <div className="bg-gray-700 bg-nes bg-cover bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
-        <div className="bg-gray-700 bg-atari-flashback-classics bg-cover bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-11"></div>
+      <div className="flex flex-col items-center my-5 gap-5">        
+        <div className="bg-gray-700 bg-nes bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-snes bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
+        <div className="bg-gray-700 bg-n64 bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-28"></div>
+        <div className="bg-gray-700 bg-gamecube bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
+        <div className="bg-gray-700 bg-wii bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
+        <div className="bg-gray-700 bg-wiiu bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
+        <div className="bg-gray-700 bg-nintendoswitch bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-28"></div>
+        <div className="bg-gray-700 bg-gameboy bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
+        <div className="bg-gray-700 bg-gameboycolor bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-gameboyadvance bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
+        <div className="bg-gray-700 bg-nintendods bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
+        <div className="bg-gray-700 bg-nintendo3ds bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
+        <div className="bg-gray-700 bg-segamastersystem bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-segagenesis bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-segacd bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
+        <div className="bg-gray-700 bg-sega32x bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-segasaturn bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-28"></div>
+        <div className="bg-gray-700 bg-segadreamcast bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-28"></div>
+        <div className="bg-gray-700 bg-segagamegear bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-28"></div>
+        <div className="bg-gray-700 bg-playstation bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-32"></div>
+        <div className="bg-gray-700 bg-playstation2 bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-playstation3 bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-playstation4 bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-playstation5 bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-playstationportable bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-playstationvita bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-xbox bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-xbox360 bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
+        <div className="bg-gray-700 bg-xboxone bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
+        <div className="bg-gray-700 bg-xboxseriesxs bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-amiga bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-atari2600 bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-atari-flashback-classics bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
       </div>
     </>
   )
