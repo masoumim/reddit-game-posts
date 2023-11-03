@@ -19,8 +19,7 @@ export default function App() {
     const [loggedIn, setLoggedIn] = useState(false);                            // Status representing if user is logged in to Reddit or not        
     const [searchBarInput, setSearchBarInput] = useState("");                   // The text entered into the search bar
     const [gameTitles, setGameTitles] = useState([]);                           // Array of results returned by RAWG API
-    const [matchTitleExactly, setMatchTitleExactly] = useState(false);          // Toggled by the 'match title exactly' checkbox
-    const [displayGameInfo, setDisplayGameInfo] = useState(false);              // Toggled when search for title is performed and result is received
+    const [matchTitleExactly, setMatchTitleExactly] = useState(false);          // Toggled by the 'match title exactly' checkbox    
     const [gameTitle, setGameTitle] = useState("");                             // Title of game being searched for
     const [gameYear, setGameYear] = useState("");                               // Release year of game being searched for
     const [gamePlatform, setGamePlatform] = useState([]);                       // Platform of the game being searched for
@@ -111,9 +110,9 @@ export default function App() {
     }, [loggedIn]);
 
     // Updates the searchBarInput state on every change to the input field
-    async function handleSearchBarInput(event) {        
+    async function handleSearchBarInput(event) {
         // Set the state variable        
-        setSearchBarInput(event.target.value);        
+        setSearchBarInput(event.target.value);
     }
 
     // This useEffect instance:
@@ -149,7 +148,7 @@ export default function App() {
                 }
 
                 // If the search bar input matches a game in the results:
-                if (matchingGameTitles.includes(searchBarInput) || gameTitles.includes(searchBarInput)) {                                        
+                if (matchingGameTitles.includes(searchBarInput) || gameTitles.includes(searchBarInput)) {
                     // Display platforms
                     gameTitleSearchResults.forEach(result => {
                         if (result.name === searchBarInput) {
@@ -194,9 +193,6 @@ export default function App() {
 
     // Sets the game info
     function setGameInfo(game) {        
-        // Toggle state boolean
-        setDisplayGameInfo(true);
-
         // Set the values for the game
         setGameTitle(game.name);
         if (game.released) {
@@ -206,7 +202,6 @@ export default function App() {
             setGameYear("N/A");
         }
         setGamePlatform(selectedPlatform);
-
         setGameMetacritic(game.metacritic);
     }
 
@@ -214,7 +209,7 @@ export default function App() {
     async function handleSearchSubmit(event) {
         // Prevents the page from reloading on submit
         event.preventDefault();
-                                
+
         // Set loading to true when fetching data
         setIsLoadingPosts(true);
 
@@ -226,26 +221,24 @@ export default function App() {
 
         // Set the state variable
         setPosts(formattedPostsArray);
-        
+
         // Set loading to false after fetching data
         setIsLoadingPosts(false);
     }
 
     return (
         <>
-            <SearchForm isLoadingPlatforms={isLoadingPlatforms} handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} searchButtonDisabled={searchButtonDisabled} platformOptions={platformOptions} selectedPlatform={selectedPlatform} handleSelectPlatform={handleSelectPlatform} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} matchTitleExactly={matchTitleExactly} />
-            <br />
-            {displayGameInfo ?
-                <>
-                    {isLoadingPosts ? <p><b>Results: </b>Loading...</p> : <p><b>Results: </b>{posts.length}</p>}
+            <SearchForm isLoadingPlatforms={isLoadingPlatforms} handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} searchButtonDisabled={searchButtonDisabled} platformOptions={platformOptions} selectedPlatform={selectedPlatform} handleSelectPlatform={handleSelectPlatform} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} matchTitleExactly={matchTitleExactly} />            
+            <div className="bg-gray-500 rounded-xl text-white mx-auto my-5 w-64 py-4 text-center">
+                <div>
+                    {isLoadingPosts ? <p><b className="text-emerald-100">Search Results: </b>Loading...</p> : <p><b className="text-emerald-100">Search Results: </b>{posts.length}</p>}
                     <br />
-                    <p><b>Title: </b>{gameTitle}</p>
-                    <p><b>Release Year: </b>{gameYear}</p>
-                    <p><b>Platform: </b>{gamePlatform}</p>
-                    <p><b>Metacritic score: </b>{gameMetacritic ? gameMetacritic : "N/A"}</p>
-                    <br />
-                </>
-                : ""}
+                    <p><b className=" text-emerald-100">Title: </b>{gameTitle}</p>
+                    <p><b className=" text-emerald-100">Release Year: </b>{gameYear}</p>
+                    <p><b className=" text-emerald-100">Platform: </b>{gamePlatform}</p>
+                    <p><b className=" text-emerald-100">Metacritic score: </b>{gameMetacritic ? gameMetacritic : ""}</p>                    
+                </div>
+            </div>
             {isLoadingPosts ? <p>Loading posts...</p> : posts.map((post, index) => { return <Tile key={index} post={post} loggedIn={loggedIn} userAuthorizeApp={userAuthorizeApp} accessToken={accessToken} /> })}
         </>
     )

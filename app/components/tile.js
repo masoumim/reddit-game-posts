@@ -50,19 +50,21 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
 
         switch (post.mediaType) {
             case "image":
-                embeddedMedia = <Image src={post.mediaURL} width={500} height={500} alt="" />;
+                // Nextjs method for making images responsive: https://nextjs.org/docs/app/api-reference/components/image#responsive-image-with-aspect-ratio
+                embeddedMedia = <Image src={post.mediaURL} sizes="100vw" style={{ width: '100%', height: 'auto' }} width={500} height={300} alt="" />;
                 break;
             case "video":
                 embeddedMedia = <video autoPlay width={320} height={240} controls src={post.mediaURL} type="video/mp4" />;
                 break;
             case "youtube":
-                embeddedMedia = <ReactPlayer url={post.mediaURL} />
+                // Hack for making Youtube videos responsive: https://github.com/CookPete/react-player#responsive-player
+                embeddedMedia = <div style={{ position: 'relative', paddingTop: '56.25%' }}><ReactPlayer style={{ position: 'absolute', top: 0, left: 0 }} width={"100%"} height={"100%"} url={post.mediaURL} /></div>
                 break;
             case "twitter":
                 embeddedMedia = <TwitterTweetEmbed tweetId={post.mediaURL} />
                 break;
-            case "link":
-                embeddedMedia = <Link href={post.mediaURL}>{post.mediaURL}</Link>
+            case "link":                
+                embeddedMedia = <><Link href={post.mediaURL}>{post.mediaURL}</Link><br/></>
                 break;
         }
         return embeddedMedia;
@@ -70,42 +72,40 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
 
     return (
         <>
-            <div>
-                <div className="collapse bg-base-200">
-                    <input type="checkbox" />
-                    <div className="collapse-title text-xl font-medium">
-                        <p>{post.title}</p>
-                        <p>{post.subreddit}</p>
-                        <p>{post.author}</p>
-                        <p>{post.date}</p>
-                        <p>{post.upvotes}</p>
-                        {post.topCommentText}
-                        <p>{post.topCommentAuthor}</p>
-                        <p>{post.commentDate}</p>
-                        <p>{post.topCommentUpVotes}</p>
-                    </div>
-                    <div className="collapse-content">
-                        {post.text}
-                        {embedPostMedia(post)}
-                        <br />
-                        {loggedIn ?
-                            !post.archived ?
-                                <>
-                                    <div>
+            <div className="collapse bg-gray-600 w-64 mx-auto mb-5 p-3">
+                <input type="checkbox" />
+                <div className="collapse-title p-0">
+                    <p className="text-white font-bold text-center">{post.title}</p>
+                    <p className="">{post.subreddit}</p>
+                    <p>{post.author}</p>
+                    <p>{post.date}</p>
+                    <p>{post.upvotes}</p>
+                    {post.topCommentText}
+                    <p>{post.topCommentAuthor}</p>
+                    <p>{post.commentDate}</p>
+                    <p>{post.topCommentUpVotes}</p>
+                </div>
+                <div className="collapse-content break-all p-0">
+                    {post.text}
+                    {embedPostMedia(post)}
+                    <br />
+                    {loggedIn ?
+                        !post.archived ?
+                            <>
+                                <div>
+                                    {/* Submit comment button */}
+                                    <form onSubmit={handleCommentSubmit}>
+                                        {/* Input text field (comment) */}
+                                        <input required autoComplete="off" onChange={(e) => setCommentInput(e.currentTarget.value)} value={commentInput} placeholder="enter a comment" name="comment" className="comment" minLength={1} maxLength={40000} />
                                         {/* Submit comment button */}
-                                        <form onSubmit={handleCommentSubmit}>
-                                            {/* Input text field (comment) */}
-                                            <input required autoComplete="off" onChange={(e) => setCommentInput(e.currentTarget.value)} value={commentInput} placeholder="enter a comment" name="comment" className="comment" minLength={1} maxLength={40000} />
-                                            {/* Submit comment button */}
-                                            <input type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-slate-400 disabled:text-slate-500" />
-                                            {/* Comment Submission status message */}
-                                            {submitStatusMsg}
-                                        </form>
-                                    </div>
-                                </>
-                                : <b>Sorry, thread is archived. New comments cannot be posted.</b>
-                            : <><button onClick={userAuthorizeApp}>Log in to Reddit</button> to submit comments</>}
-                    </div>
+                                        <input type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-slate-400 disabled:text-slate-500" />
+                                        {/* Comment Submission status message */}
+                                        {submitStatusMsg}
+                                    </form>
+                                </div>
+                            </>
+                            : <b>Sorry, thread is archived. New comments cannot be posted.</b>
+                        : <><p className="text-sm text-white"><button onClick={userAuthorizeApp} className="font-bold text-emerald-100">Log in to Reddit</button> to post comments</p></>}
                 </div>
             </div>
         </>
