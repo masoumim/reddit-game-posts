@@ -62,7 +62,25 @@ export default function Home() {
         <div className="bg-gray-700 bg-xboxseriesxs bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
         <div className="bg-gray-700 bg-amiga bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
         <div className="bg-gray-700 bg-atari2600 bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-atari5200 bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-atari7800 bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
+        <div className="bg-gray-700 bg-atarist bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>        
+        <div className="bg-gray-700 bg-atari400 bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
+        <div className="bg-gray-700 bg-atari800 bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
+        <div className="bg-gray-700 bg-atarixegs bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-atarijaguar bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-atarilynx bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
         <div className="bg-gray-700 bg-atari-flashback-classics bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-14"></div>
+        <div className="bg-gray-700 bg-3do bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-32"></div>
+        <div className="bg-gray-700 bg-neogeo bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-16"></div>
+        <div className="bg-gray-700 bg-windowspc bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-16"></div>
+        <div className="bg-gray-700 bg-macos bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-16"></div>
+        <div className="bg-gray-700 bg-classicmacintosh bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-28"></div>
+        <div className="bg-gray-700 bg-appleII bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-linux bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-28"></div>
+        <div className="bg-gray-700 bg-android bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-16"></div>
+        <div className="bg-gray-700 bg-ios bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>
+        <div className="bg-gray-700 bg-web bg-contain bg-center bg-no-repeat bg-blend-luminosity hover:bg-blend-normal w-60 h-24"></div>        
       </div>
     </>
   )
