@@ -72,20 +72,28 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
 
     return (
         <>
-            <div className="collapse bg-gray-600 w-64 mx-auto mb-5 p-3">
+            <div className="collapse bg-gray-600 w-64 mx-auto mb-5 p-3 hover:outline outline-2 outline-emerald-500">
                 <input type="checkbox" />
                 <div className="collapse-title p-0">
-                    <p className="text-white font-bold text-center">{post.title}</p>
-                    <p className="">{post.subreddit}</p>
-                    <p>{post.author}</p>
-                    <p>{post.date}</p>
-                    <p>{post.upvotes}</p>
-                    {post.topCommentText}
-                    <p>{post.topCommentAuthor}</p>
-                    <p>{post.commentDate}</p>
-                    <p>{post.topCommentUpVotes}</p>
+                    <p className="text-white font-bold text-center text-md mb-2">{post.title}</p>                    
+                    <p className="text-yellow-300 font-bold text-sm">r/{post.subreddit}</p>
+                    <p className="text-emerald-500 font-bold text-sm">u/{post.author}</p>
+                    <div className="flex flex-row gap-2">
+                    <p className="text-lime-500 font-bold text-sm">{post.date}</p>
+                    <p className="text-lime-400 font-bold text-sm">{post.upvotes} upvotes</p>
+                    </div>
+                    <br/>
+                    <div className="text-white italic text-center mb-2">{post.topCommentText}</div>
+                    <div className="flex flex-row gap-1">
+                    <div className="bg-comment bg-contain bg-center bg-no-repeat w-5 h-5 pt-6"/>
+                    <p className="text-emerald-100 font-bold text-sm">u/{post.topCommentAuthor}</p>
+                    </div>
+                    <div className="flex flex-row gap-2">
+                    <p className="text-lime-500 font-bold text-sm">{post.commentDate}</p>
+                    <p className="text-lime-400 font-bold text-sm">{post.topCommentUpVotes} upvotes</p>
+                    </div>
                 </div>
-                <div className="collapse-content break-all p-0">
+                <div className="collapse-content break-all p-0 mt-5">
                     {post.text}
                     {embedPostMedia(post)}
                     <br />

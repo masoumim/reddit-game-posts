@@ -60,7 +60,8 @@ module.exports = {
         'linux':"url('/platforms/Linux_Logo.svg')",
         'android':"url('/platforms/Android_logo.svg')",
         'ios':"url('/platforms/ios_logo.svg')",
-        'web':"url('/platforms/web_logo.svg')"
+        'web':"url('/platforms/web_logo.svg')",
+        'comment':"url('/comment.svg')"        
       }
     },
   },
