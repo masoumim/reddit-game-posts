@@ -239,7 +239,7 @@ export default function App() {
                     <p><b className=" text-emerald-100">Metacritic score: </b>{gameMetacritic ? gameMetacritic : ""}</p>                    
                 </div>
             </div>
-            {isLoadingPosts ? <p>Loading posts...</p> : posts.map((post, index) => { return <Tile key={index} post={post} loggedIn={loggedIn} userAuthorizeApp={userAuthorizeApp} accessToken={accessToken} /> })}
+            {isLoadingPosts ? <p className="text-white font-bold text-center">Loading posts...</p> : posts.map((post, index) => { return <Tile key={index} post={post} loggedIn={loggedIn} userAuthorizeApp={userAuthorizeApp} accessToken={accessToken} /> })}
         </>
     )
 }

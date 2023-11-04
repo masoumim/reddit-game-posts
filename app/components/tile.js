@@ -64,7 +64,7 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
                 embeddedMedia = <TwitterTweetEmbed tweetId={post.mediaURL} />
                 break;
             case "link":                
-                embeddedMedia = <><Link href={post.mediaURL}>{post.mediaURL}</Link><br/></>
+                embeddedMedia = <><Link className="break-all text-emerald-200 hover:text-emerald-50 font-bold text-center" href={post.mediaURL}>{post.mediaURL}</Link><br/></>
                 break;
         }
         return embeddedMedia;
@@ -75,26 +75,34 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
             <div className="collapse bg-gray-600 w-64 mx-auto mb-5 p-3 hover:outline outline-2 outline-emerald-500">
                 <input type="checkbox" />
                 <div className="collapse-title p-0">
+                    {/* Post Title */}
                     <p className="text-white font-bold text-center text-md mb-2">{post.title}</p>                    
+                    {/* Subreddit */}
                     <p className="text-yellow-300 font-bold text-sm">r/{post.subreddit}</p>
+                    {/* Username */}
                     <p className="text-emerald-500 font-bold text-sm">u/{post.author}</p>
+                    {/* Comment time posted and upvotes */}
                     <div className="flex flex-row gap-2">
                     <p className="text-lime-500 font-bold text-sm">{post.date}</p>
                     <p className="text-lime-400 font-bold text-sm">{post.upvotes} upvotes</p>
                     </div>
                     <br/>
-                    <div className="text-white italic text-center mb-2">{post.topCommentText}</div>
+                    {/* User Comment */}
+                    <div className="user-comment text-white italic text-center" style={{overflowWrap: "anywhere"}}>{post.topCommentText}</div>
+                    {/* Comment icon and Comment username  */}
                     <div className="flex flex-row gap-1">
                     <div className="bg-comment bg-contain bg-center bg-no-repeat w-5 h-5 pt-6"/>
                     <p className="text-emerald-100 font-bold text-sm">u/{post.topCommentAuthor}</p>
                     </div>
+                    {/* Comment time posted and upvotes */}
                     <div className="flex flex-row gap-2">
                     <p className="text-lime-500 font-bold text-sm">{post.commentDate}</p>
                     <p className="text-lime-400 font-bold text-sm">{post.topCommentUpVotes} upvotes</p>
                     </div>
                 </div>
-                <div className="collapse-content break-all p-0 mt-5">
-                    {post.text}
+                <div className="collapse-content p-0 mt-5">
+                    {/* Post content */}
+                    <div className="post-text text-white" style={{overflowWrap: "anywhere"}}>{post.text}</div>
                     {embedPostMedia(post)}
                     <br />
                     {loggedIn ?
@@ -104,16 +112,16 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
                                     {/* Submit comment button */}
                                     <form onSubmit={handleCommentSubmit}>
                                         {/* Input text field (comment) */}
-                                        <input required autoComplete="off" onChange={(e) => setCommentInput(e.currentTarget.value)} value={commentInput} placeholder="enter a comment" name="comment" className="comment" minLength={1} maxLength={40000} />
+                                        <input required autoComplete="off" onChange={(e) => setCommentInput(e.currentTarget.value)} value={commentInput} placeholder="enter a comment" name="comment" className="outline-none text-center h-10 w-full px-5 mb-3" minLength={1} maxLength={40000} />
                                         {/* Submit comment button */}
-                                        <input type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-slate-400 disabled:text-slate-500" />
+                                        <input type="submit" className="bg-emerald-700 transition ease-in-out hover:bg-emerald-600 duration-300 text-white font-bold py-2 px-4 rounded h-10 w-full" />
                                         {/* Comment Submission status message */}
-                                        {submitStatusMsg}
+                                        <div className="text-white text-sm text-center">{submitStatusMsg}</div>
                                     </form>
                                 </div>
                             </>
-                            : <b>Sorry, thread is archived. New comments cannot be posted.</b>
-                        : <><p className="text-sm text-white"><button onClick={userAuthorizeApp} className="font-bold text-emerald-100">Log in to Reddit</button> to post comments</p></>}
+                            : <b className="text-white italic text-sm break-normal">Sorry, thread is archived. New comments cannot be posted.</b>
+                        : <><p className="text-sm text-white"><button onClick={userAuthorizeApp} className="font-bold text-emerald-300 hover:text-emerald-50">Log in to Reddit</button> to post comments</p></>}
                 </div>
             </div>
         </>

@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Add white space after each <p> element in the user-comment div */
+div[class^="user-comment"] .md p {
+    padding-bottom: 10px;
+}
+
+/* Add white space after each <p> element in the post text div */
+div[class^="post-text"] .md p {
+    padding-bottom: 10px;
+}
+
+/* Post text URL's */
+div[class^="post-text"] .md a {
+    color: #34d399;
+    font-weight: bold;
+}
+
+/* Post text URL's hover color */
+div[class^="post-text"] .md a:hover {
+    color: #dcfce7;
+    font-weight: bold;
+}

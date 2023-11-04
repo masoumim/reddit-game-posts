@@ -17,7 +17,7 @@ export default function SearchForm({ isLoadingPlatforms, searchBarInput, handleS
                     {/* PLATFORMS */}
                     <select required aria-label="selectPlatform" onChange={handleSelectPlatform} className="outline-none text-center h-10 w-60">
                         {isLoadingPlatforms ?
-                            <option value={""}>{"Loading platforms..."}</option>
+                            <option value={""}>{"Loading..."}</option>
                             :
                             <>
                                 <option value={""}>{"Select a platform"}</option>
