@@ -14,9 +14,9 @@ export default function Navbar() {
     // Conditionally render the navContent state variable
     return (
         <>
-            <div className="navbar flex flex-col items-center bg-emerald-700 w-full">
+            <div className="navbar flex flex-col items-center bg-emerald-700 w-full sm:flex-row">
                 <div className="flex-1">
-                    <Link href={"/"} className="text-emerald-50 transition ease-in-out hover:text-emerald-300 duration-300 font-bold text-lg py-1">Reddit Game Posts</Link>
+                    <Link href={"/"} className="text-emerald-50 transition ease-in-out hover:text-emerald-300 duration-300 font-bold text-lg py-1 sm:ml-5">Reddit Game Posts</Link>
                 </div>
                 {navContent}
             </div>

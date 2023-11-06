@@ -7,15 +7,15 @@ export default function SearchForm({ isLoadingPlatforms, searchBarInput, handleS
         <>
             <form onSubmit={handleSearchSubmit}>
                 {/* GAME TITLES */}
-                <div className="flex flex-col items-center gap-3 mt-3">
-                    <input required autoComplete="off" placeholder="enter a game title" list="game-titles" name="searchBar" input={searchBarInput} onInput={handleSearchBarInput} className="outline-none text-center h-10 w-60 px-5" />
+                <div className="flex flex-col items-center gap-3 mt-3 sm:mx-32 sm:text-lg">
+                    <input required autoComplete="off" placeholder="enter a game title" list="game-titles" name="searchBar" input={searchBarInput} onInput={handleSearchBarInput} className="outline-none text-center h-10 w-72 max-w-md px-5 sm:w-full" />
                     <datalist id="game-titles">
                         {gameTitles.map((title, index) => {
                             return (<option key={index} value={title}>{title}</option>);
                         })}
                     </datalist>
                     {/* PLATFORMS */}
-                    <select required aria-label="selectPlatform" onChange={handleSelectPlatform} className="outline-none text-center h-10 w-60">
+                    <select required aria-label="selectPlatform" onChange={handleSelectPlatform} className="outline-none text-center h-10 w-72 max-w-md sm:w-full">
                         {isLoadingPlatforms ?
                             <option value={""}>{"Loading..."}</option>
                             :
@@ -28,11 +28,11 @@ export default function SearchForm({ isLoadingPlatforms, searchBarInput, handleS
                         }
                     </select>
                     {/* Disable search button unless search bar input matches a title in the drop-down menu */}
-                    <input type="submit" value="Search" disabled={searchButtonDisabled} className="bg-emerald-700 transition ease-in-out hover:bg-emerald-600 duration-300 text-white font-bold py-2 px-4 rounded disabled:bg-slate-400 disabled:text-slate-500 h-10 w-60" />
+                    <input type="submit" value="Search" disabled={searchButtonDisabled} className="bg-emerald-700 transition ease-in-out hover:bg-emerald-600 duration-300 text-white font-bold py-2 px-4 rounded disabled:bg-slate-400 disabled:text-slate-500 h-10 w-72" />
                 </div>
                 <div className="flex justify-center">
                 <input type="checkbox" onClick={handleMatchExactlyCheckbox} id="check-match-exactly" name="check-match-exactly" />
-                <label htmlFor="check-match-exactly" className="text-md text-emerald-50 font-bold">match title exactly</label>
+                <label htmlFor="check-match-exactly" className="text-md text-emerald-50 font-bold sm:text-lg">match title exactly</label>
                 </div>
             </form>
         </>

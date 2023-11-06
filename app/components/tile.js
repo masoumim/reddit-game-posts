@@ -61,9 +61,10 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
                 embeddedMedia = <div className="p-3"><div style={{ position: 'relative', paddingTop: '56.25%' }}><ReactPlayer style={{ position: 'absolute', top: 0, left: 0 }} width={"100%"} height={"100%"} url={post.mediaURL} /></div></div>
                 break;
             case "twitter":
-                embeddedMedia = <TwitterTweetEmbed tweetId={post.mediaURL} />
+                // *The max size of an embedded tweet is 550px
+                embeddedMedia = <div className="px-7 sm:w-[550px] sm:p-0 sm:mx-auto"><TwitterTweetEmbed tweetId={post.mediaURL} /></div>
                 break;
-            case "link":                
+            case "link":
                 embeddedMedia = <div className="px-3"><Link className="break-all text-emerald-200 hover:text-emerald-50 font-bold text-center" href={post.mediaURL}>{post.mediaURL}</Link><br /></div>
                 break;
         }
@@ -72,55 +73,59 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
 
     return (
         <>
-            <div className="collapse bg-gray-600 w-64 mx-auto mb-5 hover:outline outline-2 outline-emerald-500">
+            <div className="collapse bg-gray-600 w-auto mx-3 mb-5 hover:outline outline-2 outline-emerald-500 lg:w-[1000px] lg:mx-auto">
                 <input type="checkbox" />
                 <div className="collapse-title p-0">
                     {/* Post Title */}
-                    <p className="text-white font-bold text-center text-md mb-2 p-3">{post.title}</p>                    
-                    {/* Subreddit */}
-                    <p className="text-yellow-300 font-bold text-sm pl-3">r/{post.subreddit}</p>
-                    {/* Username */}
-                    <p className="text-emerald-500 font-bold text-sm pl-3">u/{post.author}</p>
-                    {/* Comment time posted and upvotes */}
-                    <div className="flex flex-row gap-2 pl-3">
-                    <p className="text-lime-500 font-bold text-sm">{post.date}</p>
-                    <p className="text-lime-400 font-bold text-sm">{post.upvotes} upvotes</p>
+                    <p className="text-white font-bold text-center text-md mb-2 p-3 sm:text-lg sm:text-left">{post.title}</p>
+                    <div className="sm:flex flex-row">
+                        {/* Subreddit */}
+                        <p className="text-yellow-300 font-bold text-sm pl-3">r/{post.subreddit}</p>
+                        {/* Username */}
+                        <p className="text-emerald-500 font-bold text-sm pl-3">u/{post.author}</p>
+                        {/* Comment time posted and upvotes */}
+                        <div className="flex flex-row gap-2 pl-3">
+                            <p className="text-lime-500 font-bold text-sm">{post.date}</p>
+                            <p className="text-lime-400 font-bold text-sm">{post.upvotes} upvotes</p>
+                        </div>
                     </div>
-                    <br/>
+                    <br />
                     {/* User Comment */}
-                    <div className="user-comment text-white italic text-center p-3" style={{overflowWrap: "anywhere"}}>{post.topCommentText}</div>
+                    <div className="user-comment text-white italic text-center p-3 sm:text-lg" style={{ overflowWrap: "anywhere" }}>{post.topCommentText}</div>
                     {/* Comment icon and Comment username  */}
-                    <div className="flex flex-row gap-1 pl-3">
-                    <div className="bg-comment bg-contain bg-center bg-no-repeat w-5 h-5 pt-6"/>
-                    <p className="text-emerald-100 font-bold text-sm">u/{post.topCommentAuthor}</p>
-                    </div>
-                    {/* Comment time posted and upvotes */}
-                    <div className="flex flex-row gap-2 pl-3">
-                    <p className="text-lime-500 font-bold text-sm">{post.commentDate}</p>
-                    <p className="text-lime-400 font-bold text-sm">{post.topCommentUpVotes} upvotes</p>
+                    <div className="sm:flex flex-row">
+                        <div className="flex flex-row gap-1 pl-3 sm:flex-1">
+                            <div className="bg-comment bg-contain bg-center bg-no-repeat w-5 h-5 pt-6" />
+                            <p className="text-emerald-100 font-bold text-sm">u/{post.topCommentAuthor}</p>
+                        </div>
+                        {/* Comment time posted and upvotes */}
+                        <div className="flex flex-row gap-2 pl-3 sm:mr-3">
+                            <p className="text-lime-500 font-bold text-sm">{post.commentDate}</p>
+                            <p className="text-lime-400 font-bold text-sm">{post.topCommentUpVotes} upvotes</p>
+                        </div>
                     </div>
                 </div>
                 <div className="collapse-content p-0 mt-5">
                     {/* Post content */}
-                    <div className="post-text text-white px-3" style={{overflowWrap: "anywhere"}}>{post.text}</div>
+                    <div className="post-text text-white px-3" style={{ overflowWrap: "anywhere" }}>{post.text}</div>
                     {embedPostMedia(post)}
                     <br />
                     {loggedIn ?
                         !post.archived ?
                             <>
-                                <div className="px-3">
-                                    {/* Submit comment button */}
-                                    <form onSubmit={handleCommentSubmit}>
+                                {/* Comment Form*/}
+                                <form onSubmit={handleCommentSubmit}>
+                                    <div className="px-3 sm:flex flex-row gap-5 justify-center">
                                         {/* Input text field (comment) */}
-                                        <input required autoComplete="off" onChange={(e) => setCommentInput(e.currentTarget.value)} value={commentInput} placeholder="enter a comment" name="comment" className="outline-none text-center h-10 w-full px-5 mb-3" minLength={1} maxLength={40000} />
+                                        <input required autoComplete="off" onChange={(e) => setCommentInput(e.currentTarget.value)} value={commentInput} placeholder="enter a comment" name="comment" minLength={1} maxLength={40000} className="outline-none text-center h-10 w-full max-w-2xl px-5 mb-3 sm:flex-1" />
                                         {/* Submit comment button */}
-                                        <input type="submit" className="bg-emerald-700 transition ease-in-out hover:bg-emerald-600 duration-300 text-white font-bold py-2 px-4 rounded h-10 w-full" />
-                                        {/* Comment Submission status message */}
-                                        <div className="text-white text-sm text-center">{submitStatusMsg}</div>
-                                    </form>
-                                </div>
+                                        <input type="submit" className="bg-emerald-700 transition ease-in-out hover:bg-emerald-600 duration-300 text-white font-bold py-2 px-4 rounded h-10 w-full sm:w-40" />
+                                    </div>
+                                    {/* Comment Submission status message */}
+                                    <div className="text-white text-sm text-center font-bold">{submitStatusMsg}</div>
+                                </form>
                             </>
-                            : <div className="pl-3"><b className="text-white italic text-sm">Sorry, thread is archived. New comments cannot be posted.</b></div>
+                            : <div className="text-center px-3"><b className="text-white italic text-sm">Sorry, thread is archived. New comments cannot be posted.</b></div>
                         : <><p className="text-sm text-white pl-3"><button onClick={userAuthorizeApp} className="font-bold text-emerald-300 hover:text-emerald-50">Log in to Reddit</button> to post comments</p></>}
                 </div>
             </div>

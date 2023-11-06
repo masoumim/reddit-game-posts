@@ -85,7 +85,7 @@ export default function App() {
                     // Set the access token state variable
                     setAccessToken(token);
                     // Set the navbar content to a Login button
-                    setNavContent(<button onClick={userAuthorizeApp} className="text-emerald-50 transition ease-in-out bg-emerald-800 hover:bg-emerald-900 duration-300 font-bold text-sm p-2 rounded">Log in to Reddit</button>);
+                    setNavContent(<button onClick={userAuthorizeApp} className="text-emerald-50 transition ease-in-out bg-emerald-800 hover:bg-emerald-900 duration-300 font-bold text-sm p-2 rounded sm:text-lg sm:mr-5">Log in to Reddit</button>);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -101,7 +101,7 @@ export default function App() {
             getUserInfo(accessToken)
                 .then(res => {
                     // Set the navbar content to the Reddit username which links to their Reddit profile
-                    setNavContent(<Link href={`https://www.reddit.com/user/${res}`} className="text-emerald-500 transition ease-in-out hover:text-emerald-200 duration-300 font-bold text-xs">u/{res}</Link>);
+                    setNavContent(<Link href={`https://www.reddit.com/user/${res}`} className="text-emerald-500 transition ease-in-out hover:text-emerald-200 duration-300 font-bold text-sm sm:text-lg sm:mr-5">u/{res}</Link>);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -229,7 +229,7 @@ export default function App() {
     return (
         <>
             <SearchForm isLoadingPlatforms={isLoadingPlatforms} handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} searchButtonDisabled={searchButtonDisabled} platformOptions={platformOptions} selectedPlatform={selectedPlatform} handleSelectPlatform={handleSelectPlatform} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} matchTitleExactly={matchTitleExactly} />            
-            <div className="bg-gray-500 rounded-xl text-white mx-auto my-5 w-64 py-4 text-center">
+            <div className="bg-gray-500 rounded-xl text-white my-5 mx-3 py-4 text-center sm:text-lg lg:w-[1000px] lg:mx-auto">
                 <div>
                     {isLoadingPosts ? <p><b className="text-emerald-100">Search Results: </b>Loading...</p> : <p><b className="text-emerald-100">Search Results: </b>{posts.length}</p>}
                     <br />
