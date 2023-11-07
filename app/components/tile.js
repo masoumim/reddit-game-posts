@@ -77,7 +77,7 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
                 <input type="checkbox" />
                 <div className="collapse-title p-0">
                     {/* Post Title */}
-                    <p className="text-white font-bold text-center text-md mb-2 p-3 sm:text-lg sm:text-left lg:text-xl">{post.title}</p>
+                    <p className="font-cairo text-white font-bold text-center text-md mb-2 p-3 sm:text-lg sm:text-left lg:text-xl">{post.title}</p>
                     <div className="sm:flex flex-row">
                         {/* Subreddit */}
                         <p className="text-yellow-300 font-bold text-sm pl-3">r/{post.subreddit}</p>

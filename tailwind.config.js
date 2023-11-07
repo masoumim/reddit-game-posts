@@ -62,6 +62,9 @@ module.exports = {
         'ios':"url('/platforms/ios_logo.svg')",
         'web':"url('/platforms/web_logo.svg')",
         'comment':"url('/comment.svg')"        
+      },
+      fontFamily:{
+        cairo: ['var(--font-cairo)']
       }
     },
   },

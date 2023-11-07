@@ -21,7 +21,7 @@ export default function Home() {
   return (
     <>
       <div className="flex flex-col items-center text-emerald-50 bg-gray-600 mt-10 w-auto p-5 mx-4 rounded-lg lg:w-[1000px] lg:mx-auto">
-        <p className="text-sm font-bold text-center sm:text-lg">Find and browse Reddit posts about any game at a glance using an improved search function</p>
+        <p className="font-cairo text-sm font-bold text-center sm:text-lg">Find and browse Reddit posts about any game at a glance using an improved search function</p>
         <br />
         <button onClick={userAuthorizeApp} className="bg-emerald-700 transition ease-in-out hover:bg-emerald-600 duration-300 text-white text-center text-sm font-bold py-2 px-4 w-52 rounded sm:w-96 sm:text-lg">Connect your Reddit Account</button>
         <br />
