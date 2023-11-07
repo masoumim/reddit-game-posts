@@ -53,8 +53,8 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
                 // Nextjs method for making images responsive: https://nextjs.org/docs/app/api-reference/components/image#responsive-image-with-aspect-ratio
                 embeddedMedia = <Image className="p-3" src={post.mediaURL} sizes="100vw" style={{ width: '100%', height: 'auto' }} width={500} height={300} alt="" />;
                 break;
-            case "video":
-                embeddedMedia = <video autoPlay width={320} height={240} controls src={post.mediaURL} type="video/mp4" />;
+            case "video":                
+                embeddedMedia = <video className="p-3" autoPlay width={"100%"} height={"100%"} controls src={post.mediaURL} type="video/mp4" />;
                 break;
             case "youtube":
                 // Hack for making Youtube videos responsive: https://github.com/CookPete/react-player#responsive-player
@@ -77,7 +77,7 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
                 <input type="checkbox" />
                 <div className="collapse-title p-0">
                     {/* Post Title */}
-                    <p className="text-white font-bold text-center text-md mb-2 p-3 sm:text-lg sm:text-left">{post.title}</p>
+                    <p className="text-white font-bold text-center text-md mb-2 p-3 sm:text-lg sm:text-left lg:text-xl">{post.title}</p>
                     <div className="sm:flex flex-row">
                         {/* Subreddit */}
                         <p className="text-yellow-300 font-bold text-sm pl-3">r/{post.subreddit}</p>
