@@ -1,4 +1,4 @@
-// app.test.js - This file tests the App() component
+// app.test.js - This file tests the <App> component
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";

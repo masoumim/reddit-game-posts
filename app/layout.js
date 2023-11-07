@@ -4,7 +4,7 @@
 import './globals.css';
 import { Inter, Cairo } from 'next/font/google';
 
-// The Navbar component's content is conditionally rendered using the React Content 'Providers" component
+// The Navbar component's content is conditionally rendered using the React Context 'Providers" component
 import Navbar from './components/Navbar';
 import Providers from './components/providers';
 

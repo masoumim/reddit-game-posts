@@ -228,7 +228,9 @@ export default function App() {
 
     return (
         <>
+            {/* Game search form */}
             <SearchForm isLoadingPlatforms={isLoadingPlatforms} handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} searchButtonDisabled={searchButtonDisabled} platformOptions={platformOptions} selectedPlatform={selectedPlatform} handleSelectPlatform={handleSelectPlatform} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} matchTitleExactly={matchTitleExactly} />            
+            {/* Game Info */}
             <div className="bg-gray-500 rounded-xl text-white my-5 mx-3 py-4 text-center sm:text-lg lg:w-[1000px] lg:mx-auto">
                 <div>
                     {isLoadingPosts ? <p><b className="text-emerald-100">Search Results: </b>Loading...</p> : <p><b className="text-emerald-100">Search Results: </b>{posts.length}</p>}
@@ -239,6 +241,7 @@ export default function App() {
                     <p><b className=" text-emerald-100">Metacritic score: </b>{gameMetacritic ? gameMetacritic : ""}</p>                    
                 </div>
             </div>
+            {/* Tiles / Reddit Posts */}
             {isLoadingPosts ? <p className="text-white font-bold text-center">Loading posts...</p> : posts.map((post, index) => { return <Tile key={index} post={post} loggedIn={loggedIn} userAuthorizeApp={userAuthorizeApp} accessToken={accessToken} /> })}
         </>
     )
