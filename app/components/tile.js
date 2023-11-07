@@ -74,7 +74,7 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
     return (
         <>
             <div className="collapse bg-gray-600 w-auto mx-3 mb-5 hover:outline outline-2 outline-emerald-500 lg:w-[1000px] lg:mx-auto">
-                <input type="checkbox" />
+                <input type="checkbox" name="checkbox"/>
                 <div className="collapse-title p-0">
                     {/* Post Title */}
                     <p className="font-cairo text-white font-bold text-center text-md mb-2 p-3 sm:text-lg sm:text-left lg:text-xl">{post.title}</p>
@@ -119,7 +119,7 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
                                         {/* Input text field (comment) */}
                                         <input required autoComplete="off" onChange={(e) => setCommentInput(e.currentTarget.value)} value={commentInput} placeholder="enter a comment" name="comment" minLength={1} maxLength={40000} className="outline-none text-center h-10 w-full max-w-2xl px-5 mb-3 sm:flex-1" />
                                         {/* Submit comment button */}
-                                        <input type="submit" className="bg-emerald-700 transition ease-in-out hover:bg-emerald-600 duration-300 text-white font-bold py-2 px-4 rounded h-10 w-full sm:w-40" />
+                                        <input type="submit" name="submit" className="bg-emerald-700 transition ease-in-out hover:bg-emerald-600 duration-300 text-white font-bold py-2 px-4 rounded h-10 w-full sm:w-40" />
                                     </div>
                                     {/* Comment Submission status message */}
                                     <div className="text-white text-sm text-center font-bold">{submitStatusMsg}</div>

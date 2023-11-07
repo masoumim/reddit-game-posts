@@ -109,7 +109,6 @@ export async function postComment(postID, commentInput, accessToken) {
     }
 }
 
-
 // Calls Reddit API to get Reddit username
 export async function getUserInfo(accessToken) {        
     // Set the object to use in the GET request

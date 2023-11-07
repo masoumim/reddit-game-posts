@@ -85,6 +85,10 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
     // and given a validity score (we only want to score it once)    
     let hasSubredditScore = false;
 
+    // Toggles T/F depending on if the game title is present in either the post title, subreddit name or post body
+    // Used to filter out posts that do not contain the game title anywhere in the post.
+    let hasGameTitle = false;
+
     // 1. Analyze the Post Title:
     /////////////////////////////
 
@@ -92,6 +96,7 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
     if (containsGameTitle(gameTitle, postTitle.toLowerCase()) === true) {
         // console.log(`validatePost() - post title contains game title!`);
         validityScore++;
+        hasGameTitle = true;
     }
 
     // Check for platform
@@ -114,6 +119,7 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
     if (!hasSubredditScore && (postSubreddit.toLowerCase() === formattedGameTitle)) {
         validityScore++;
         hasSubredditScore = true;
+        hasGameTitle = true;
         // console.log(`validatePost() - subreddit === ${formattedGameTitle}!`);
     }
 
@@ -124,6 +130,7 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
             if (postSubreddit.toLowerCase().includes(word)) {
                 validityScore++;
                 hasSubredditScore = true;
+                hasGameTitle = true;
                 // console.log(`validatePost() - subreddit: ${postSubreddit} contains game title word: ${word}`);
                 return;
             }
@@ -144,6 +151,7 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
     if (postText && (containsGameTitle(gameTitle, postText.toLowerCase()) === true)) {
         // console.log(`validatePost() - post text contains game title!`);
         validityScore++;
+        hasGameTitle = true;
     }
 
     // Check for platform
@@ -153,6 +161,9 @@ export function validatePost(postTitle, postSubreddit, postText, gameTitle, form
     }
 
     // Return validity score
+    if(!hasGameTitle){
+        validityScore = 0;
+    }
     return validityScore;
 }
 
