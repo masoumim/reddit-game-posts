@@ -10,6 +10,8 @@ export default function Home() {
   const context = useContext(ctx);   // The React Context 'Provider' component    
   const setNavContent = context[1];  // Used to set the state of the navbar content
 
+  console.log(`NODE_ENV = ${process.env.NODE_ENV}`);
+  
   useEffect(() => {
     // Set the nav content to empty:
     setNavContent("");
