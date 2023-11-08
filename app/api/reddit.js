@@ -9,8 +9,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Use NODE_ENV to set environment variables 
 const redirectURI = process.env.NODE_ENV === "development" ? "http://localhost:3000/app" : "https://reddit-game-posts.vercel.app/app";
-const redditClientID = process.env.NODE_ENV === "development" ? process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID : process.env.REDDIT_CLIENT_ID;
-const redditSecret = process.env.NODE_ENV === "development" ? process.env.NEXT_PUBLIC_REDDIT_SECRET : process.env.REDDIT_SECRET;
+// const redditClientID = process.env.NODE_ENV === "development" ? process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID : process.env.REDDIT_CLIENT_ID;
+// const redditSecret = process.env.NODE_ENV === "development" ? process.env.NEXT_PUBLIC_REDDIT_SECRET : process.env.REDDIT_SECRET;
+
+const redditClientID = process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID;
+const redditSecret = process.env.NEXT_PUBLIC_REDDIT_SECRET;
 
 
 // Base URL for Reddit API
