@@ -2,7 +2,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import App from "../(routes)/app/page";
+import App from "../(routes)/search/page";
 import userEvent from '@testing-library/user-event';
 import { ctx } from "@/app/components/providers";
 

@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Use NODE_ENV to set "redirect_uri" depending on environment
 // TODO: Set the production URI after deploying to VERCEL 
-const redirectURI = process.env.NODE_ENV === "development" ? "http://localhost:3000/app" : "[productionURL]/app";
+const redirectURI = process.env.NODE_ENV === "development" ? "http://localhost:3000/search" : "[productionURL]/search";
 
 // Base URL for Reddit API
 const base_url = 'https://oauth.reddit.com';
