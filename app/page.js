@@ -22,7 +22,7 @@ export default function Home() {
         <br />
         <button onClick={userAuthorizeApp} className="bg-emerald-700 transition ease-in-out hover:bg-emerald-600 duration-300 text-white text-center text-sm font-bold py-2 px-4 w-52 rounded sm:w-96 sm:text-lg">Connect your Reddit Account</button>
         <br />
-        <Link href={'/search'} className="bg-emerald-700 transition ease-in-out hover:bg-emerald-600 duration-300 text-white text-center font-bold text-sm py-2 px-4 w-52 rounded sm:w-96 sm:text-lg">Continue without connecting account</Link>
+        <Link href={'/app'} className="bg-emerald-700 transition ease-in-out hover:bg-emerald-600 duration-300 text-white text-center font-bold text-sm py-2 px-4 w-52 rounded sm:w-96 sm:text-lg">Continue without connecting account</Link>
       </div>
 
       {/* Game Platform Logos - image sources are added to tailwind.config.js */}
