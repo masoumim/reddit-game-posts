@@ -7,9 +7,11 @@
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
 
-// Use NODE_ENV to set "redirect_uri" depending on environment
-// TODO: Set the production URI after deploying to VERCEL 
+// Use NODE_ENV to set environment variables 
 const redirectURI = process.env.NODE_ENV === "development" ? "http://localhost:3000/app" : "https://reddit-game-posts.vercel.app/app";
+const redditClientID = process.env.NODE_ENV === "development" ? process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID : process.env.REDDIT_CLIENT_ID;
+const redditSecret = process.env.NODE_ENV === "development" ? process.env.NEXT_PUBLIC_REDDIT_SECRET : process.env.REDDIT_SECRET;
+
 
 // Base URL for Reddit API
 const base_url = 'https://oauth.reddit.com';
@@ -26,7 +28,7 @@ export function userAuthorizeApp() {
 
     // Set url parameters
     const params = new URLSearchParams();
-    params.append("client_id", process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID);
+    params.append("client_id", redditClientID);
     params.append("response_type", "code");
     params.append("state", stateString);
     params.append("redirect_uri", redirectURI);
@@ -44,7 +46,7 @@ export async function getUserAuthAccessToken(code) {
         method: 'POST',
         url: 'https://www.reddit.com/api/v1/access_token',
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        auth: { username: process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID, password: process.env.NEXT_PUBLIC_REDDIT_SECRET },
+        auth: { username: redditClientID, password: redditSecret },
         data: {
             grant_type: 'authorization_code',
             code: code,
@@ -72,7 +74,7 @@ export async function authorizeAppOnly() {
         method: 'POST',
         url: 'https://www.reddit.com/api/v1/access_token',
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        auth: { username: process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID, password: process.env.NEXT_PUBLIC_REDDIT_SECRET },
+        auth: { username: redditClientID, password: redditSecret },
         data: {
             grant_type: 'client_credentials',
             scope: 'read',
