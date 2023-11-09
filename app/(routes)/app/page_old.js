@@ -3,7 +3,7 @@
 // This page will render all of the content for the app.
 
 import { useState, useEffect, useRef, useContext } from "react";
-import { userAuthorizeApp, authorizeAppOnly, getUserInfo } from "@/app/api/reddit.js";
+import { userAuthorizeApp, authorizeAppOnly, getUserAuthAccessToken, getUserInfo } from "@/app/api/reddit.js";
 import { checkGameTitle } from "@/app/api/vgdb";
 import { processPosts } from "@/app/processPostData";
 import SearchForm from "@/app/components/SearchForm";
@@ -63,15 +63,17 @@ export default function App() {
             // Check if the state string in the URL matches the initially generated string
             if (stateString === state) {
                 // Get the Access Token using code                
-                fetch('/api/authuser', { method: 'POST', body: JSON.stringify(code) })
-                    .then(Response => Response.json())
-                    .then(data => setAccessToken(data.data.access_token))
+                getUserAuthAccessToken(code)
+                    .then(token => {
+                        // Set the access token state variable
+                        setAccessToken(token);
+
+                        // Set bool to indicate User is logged in to their Reddit account
+                        setLoggedIn(true);
+                    })
                     .catch((err) => {
                         console.log(err);
-                    })
-                setLoggedIn(true);
-                // Delete the state string in sessionStore
-                window.sessionStorage.clear();
+                    });
             }
             else {
                 return "State strings do not match!";
@@ -190,7 +192,7 @@ export default function App() {
     }
 
     // Sets the game info
-    function setGameInfo(game) {
+    function setGameInfo(game) {        
         // Set the values for the game
         setGameTitle(game.name);
         if (game.released) {
@@ -227,7 +229,7 @@ export default function App() {
     return (
         <>
             {/* Game search form */}
-            <SearchForm isLoadingPlatforms={isLoadingPlatforms} handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} searchButtonDisabled={searchButtonDisabled} platformOptions={platformOptions} selectedPlatform={selectedPlatform} handleSelectPlatform={handleSelectPlatform} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} matchTitleExactly={matchTitleExactly} />
+            <SearchForm isLoadingPlatforms={isLoadingPlatforms} handleSearchSubmit={handleSearchSubmit} searchBarInput={searchBarInput} searchButtonDisabled={searchButtonDisabled} platformOptions={platformOptions} selectedPlatform={selectedPlatform} handleSelectPlatform={handleSelectPlatform} handleSearchBarInput={handleSearchBarInput} gameTitles={gameTitles} handleMatchExactlyCheckbox={handleMatchExactlyCheckbox} matchTitleExactly={matchTitleExactly} />            
             {/* Game Info */}
             <div className="bg-gray-500 rounded-xl text-white my-5 mx-3 py-4 text-center sm:text-lg lg:w-[1000px] lg:mx-auto">
                 <div>
@@ -236,7 +238,7 @@ export default function App() {
                     <p><b className=" text-emerald-100">Title: </b>{gameTitle}</p>
                     <p><b className=" text-emerald-100">Release Year: </b>{gameYear}</p>
                     <p><b className=" text-emerald-100">Platform: </b>{gamePlatform}</p>
-                    <p><b className=" text-emerald-100">Metacritic score: </b>{gameMetacritic ? gameMetacritic : ""}</p>
+                    <p><b className=" text-emerald-100">Metacritic score: </b>{gameMetacritic ? gameMetacritic : ""}</p>                    
                 </div>
             </div>
             {/* Tiles / Reddit Posts */}

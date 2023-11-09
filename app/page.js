@@ -1,6 +1,6 @@
 "use client";
 // page.js - This file is the main / root 'home page' for the app.
-import { userAuthorizeApp } from "./api/reddit.js";
+import userAuthorizeApp from "./api/userAuthorizeApp";
 import Link from "next/link.js";
 import { ctx } from "@/app/components/providers";
 import { useContext, useEffect } from "react";
@@ -10,15 +10,13 @@ export default function Home() {
   const context = useContext(ctx);   // The React Context 'Provider' component    
   const setNavContent = context[1];  // Used to set the state of the navbar content
 
-  console.log(`NODE_ENV = ${process.env.NODE_ENV}`);
-  
   useEffect(() => {
     // Set the nav content to empty:
     setNavContent("");
   })
 
   return (
-    <>
+    <>            
       <div className="flex flex-col items-center text-emerald-50 bg-gray-600 mt-10 w-auto p-5 mx-4 rounded-lg lg:w-[1000px] lg:mx-auto">
         <p className="font-cairo text-sm font-bold text-center sm:text-lg">Find and browse Reddit posts about any game at a glance using an improved search function</p>
         <br />

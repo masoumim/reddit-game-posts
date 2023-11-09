@@ -12,10 +12,6 @@ const redirectURI = process.env.NODE_ENV === "development" ? "http://localhost:3
 const redditClientID = process.env.NODE_ENV === "development" ? process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID : process.env.REDDIT_CLIENT_ID;
 const redditSecret = process.env.NODE_ENV === "development" ? process.env.NEXT_PUBLIC_REDDIT_SECRET : process.env.REDDIT_SECRET;
 
-// const redditClientID = process.env.NEXT_PUBLIC_REDDIT_CLIENT_ID;
-// const redditSecret = process.env.NEXT_PUBLIC_REDDIT_SECRET;
-
-
 // Base URL for Reddit API
 const base_url = 'https://oauth.reddit.com';
 
