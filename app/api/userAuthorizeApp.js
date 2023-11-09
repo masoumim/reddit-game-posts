@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 
-// *User grants this client app permission to access their Reddit account.
+// This function is called when User decides to authorize / grant this client app permission to access their Reddit account.
+// The user is redirected to Reddit so they can confirm their choice and then redirected back to this client app.
+// https://github.com/reddit-archive/reddit/wiki/OAuth2#authorization
 export default function userAuthorizeApp() {
     const redirectURI = process.env.NODE_ENV === "development" ? "http://localhost:3000/app" : "https://reddit-game-posts.vercel.app/app";
     

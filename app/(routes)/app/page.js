@@ -3,8 +3,7 @@
 // This page will render all of the content for the app.
 
 import { useState, useEffect, useRef, useContext } from "react";
-import { userAuthorizeApp, authorizeAppOnly, getUserInfo } from "@/app/api/reddit.js";
-import { checkGameTitle } from "@/app/api/vgdb";
+import userAuthorizeApp from "@/app/api/userAuthorizeApp";
 import { processPosts } from "@/app/processPostData";
 import SearchForm from "@/app/components/SearchForm";
 import Tile from "@/app/components/Tile.js";
@@ -43,68 +42,72 @@ export default function App() {
 
     // Get Access Token
     useEffect(() => {
-        // If we have already fetched the access token, return.
-        if (accessTokenRef.current) return;
+        async function fetchData() {
+            // If we have already fetched the access token, return.
+            if (accessTokenRef.current) return;
 
-        // Otherwise, set accessTokenRef to true and get access token
-        accessTokenRef.current = true;
+            // Otherwise, set accessTokenRef to true and get access token
+            accessTokenRef.current = true;
 
-        // We check to see if the URL has params named "state" and "code". 
-        // If it does, it signifies the User has authorized the app and has been redirected successfully.
-        // *window can only be accessed in the browser which we can access in useState.
-        const params = new URLSearchParams(window.location.search);
-        const state = params.get("state");
-        const code = params.get("code");
+            // We check to see if the URL has params named "state" and "code". 
+            // If it does, it signifies the User has authorized the app and has been redirected successfully.
+            // *window can only be accessed in the browser which we can access in useState.
+            const params = new URLSearchParams(window.location.search);
+            const state = params.get("state");
+            const code = params.get("code");
 
-        if (state && code) {
-            // Retrieve the initially generated state string
-            const stateString = window.sessionStorage.getItem("stateString");
+            if (state && code) {
+                // Retrieve the initially generated state string
+                const stateString = window.sessionStorage.getItem("stateString");
 
-            // Check if the state string in the URL matches the initially generated string
-            if (stateString === state) {
-                // Get the Access Token using code                
-                fetch('/api/authuser', { method: 'POST', body: JSON.stringify(code) })
-                    .then(Response => Response.json())
-                    .then(data => setAccessToken(data.data.access_token))
-                    .catch((err) => {
-                        console.log(err);
-                    })
-                setLoggedIn(true);
-                // Delete the state string in sessionStore
-                window.sessionStorage.clear();
+                // Check if the state string in the URL matches the initially generated string
+                if (stateString === state) {
+                    // Get the Access Token using code                                    
+                    const res = await fetch('/api/authuser', { method: 'POST', body: JSON.stringify(code) })
+                    const data = await res.json();
+
+                    // Set the accessToken and loggedIn states
+                    setAccessToken(data.data.access_token);
+                    setLoggedIn(true);
+
+                    // Delete the state string in sessionStore
+                    window.sessionStorage.clear();
+                }
+                else {
+                    return "State strings do not match!";
+                }
             }
             else {
-                return "State strings do not match!";
+                // Authorize App Only
+                const res = await fetch('/api/authapp', { method: 'POST' });
+                const data = await res.json();
+
+                // Set Access Token
+                setAccessToken(data.data.access_token);
+
+                // Set the navbar content to a Login button
+                setNavContent(<button onClick={userAuthorizeApp} className="text-emerald-50 transition ease-in-out bg-emerald-800 hover:bg-emerald-900 duration-300 font-bold text-sm p-2 rounded sm:text-lg sm:mr-5">Log in to Reddit</button>);
             }
         }
-        else {
-            authorizeAppOnly()
-                .then(token => {
-                    // Set the access token state variable
-                    setAccessToken(token);
-                    // Set the navbar content to a Login button
-                    setNavContent(<button onClick={userAuthorizeApp} className="text-emerald-50 transition ease-in-out bg-emerald-800 hover:bg-emerald-900 duration-300 font-bold text-sm p-2 rounded sm:text-lg sm:mr-5">Log in to Reddit</button>);
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        }
-    }, []);
+        fetchData();
+    }, [])
 
     // Get user's Reddit profile name
     useEffect(() => {
-        if (loggedIn) {
-            // Set navbar content to loading message while fetching username
-            setNavContent("Loading...");
-            getUserInfo(accessToken)
-                .then(res => {
-                    // Set the navbar content to the Reddit username which links to their Reddit profile
-                    setNavContent(<Link href={`https://www.reddit.com/user/${res}`} className="text-emerald-500 transition ease-in-out hover:text-emerald-200 duration-300 font-bold text-sm sm:text-lg sm:mr-5">u/{res}</Link>);
-                })
-                .catch((err) => {
-                    console.log(err);
-                })
+        async function fetchData(){
+            if(loggedIn){
+                // Set navbar content to loading message while fetching username
+                setNavContent("Loading...");
+
+                // Get the user's Reddit username
+                const res = await fetch(`/api/user?accesstoken=${accessToken}`, { method: 'GET' })
+                const data = await res.json();
+
+                // Set the navbar content to the Reddit username which links to their Reddit profile
+                setNavContent(<Link href={`https://www.reddit.com/user/${data.data.name}`} className="text-emerald-500 transition ease-in-out hover:text-emerald-200 duration-300 font-bold text-sm sm:text-lg sm:mr-5">u/{data.data.name}</Link>);
+            }
         }
+        fetchData();
     }, [loggedIn]);
 
     // Updates the searchBarInput state on every change to the input field
@@ -133,9 +136,13 @@ export default function App() {
             if (searchBarInput) {
                 // Do a search for games matching user input:
                 setIsLoadingPlatforms(true);
-                let gameTitleSearchResults = await checkGameTitle(searchBarInput);
+                const res = await fetch(`/api/rawg?searchBarInput=${searchBarInput}`, { method: 'GET'});
+                const data = await res.json();
 
-                // Populate the games menu
+                // Get the results from the API call
+                let gameTitleSearchResults = data.data.results;
+
+                // Populate the games menu if the API call returns games and none of the games are in the gameTitles array
                 const matchingGameTitles = [];
                 if (gameTitleSearchResults && !gameTitles.includes(searchBarInput)) {
                     gameTitleSearchResults.forEach(result => {
