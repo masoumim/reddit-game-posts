@@ -2,7 +2,6 @@ import 'server-only'
 
 // Route Handler for route: /api/user
 // Here we make a call to the Reddit API to retrieve and return the user's Reddit username
-
 export async function GET(request){
             
     // Get the access token from the url parameter        
