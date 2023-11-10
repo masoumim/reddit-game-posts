@@ -3,8 +3,8 @@
 // This page will render all of the content for the app.
 
 import { useState, useEffect, useRef, useContext } from "react";
-import { userAuthorizeApp, authorizeAppOnly, getUserAuthAccessToken, getUserInfo } from "@/app/api/reddit.js";
-import { checkGameTitle } from "@/app/api/vgdb";
+import { userAuthorizeApp, authorizeAppOnly, getUserAuthAccessToken, getUserInfo } from "@/old code/apis/reddit.js";
+import { checkGameTitle } from "@/old code/apis/vgdb";
 import { processPosts } from "@/app/processPostData";
 import SearchForm from "@/app/components/SearchForm";
 import Tile from "@/app/components/Tile.js";

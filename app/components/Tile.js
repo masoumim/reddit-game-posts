@@ -11,7 +11,6 @@ import Image from "next/image";
 import Link from "next/link";
 import ReactPlayer from 'react-player/youtube';
 import { TwitterTweetEmbed } from 'react-twitter-embed';
-import { postComment } from "../api/reddit";
 
 export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) {
 
@@ -23,8 +22,14 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
         event.preventDefault();
 
         try {
-            // POST the comment using the Reddit API
-            await postComment(post.id, commentInput, accessToken);
+            // POST the comment using the Reddit API            
+            const res = await fetch(`/api/comments?postid=${post.id}&comment=${commentInput}&accesstoken=${accessToken}`, { method: 'POST' });
+            const data = await res.json();
+
+            // Throw error if user tries to make more than one comment within 2 min limit
+            if (!data.data.success) {
+                throw "Wait a couple minutes before posting again."
+            }
 
             // Clear the input field
             setCommentInput("");
@@ -33,7 +38,7 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
             setSubmitStatusMsg("Comment submitted successfully!");
         }
         catch (err) {
-            setSubmitStatusMsg(`There was an error submitting your comment: ${err}`);
+            setSubmitStatusMsg(err);
         }
     }
 
@@ -53,7 +58,7 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
                 // Nextjs method for making images responsive: https://nextjs.org/docs/app/api-reference/components/image#responsive-image-with-aspect-ratio
                 embeddedMedia = <Image className="p-3" src={post.mediaURL} sizes="100vw" style={{ width: '100%', height: 'auto' }} width={500} height={300} alt="" />;
                 break;
-            case "video":                
+            case "video":
                 embeddedMedia = <video className="p-3" autoPlay width={"100%"} height={"100%"} controls src={post.mediaURL} type="video/mp4" />;
                 break;
             case "youtube":
@@ -74,7 +79,7 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
     return (
         <>
             <div className="collapse bg-gray-600 w-auto mx-3 mb-5 hover:outline outline-2 outline-emerald-500 lg:w-[1000px] lg:mx-auto">
-                <input type="checkbox" name="checkbox"/>
+                <input type="checkbox" name="checkbox" />
                 <div className="collapse-title p-0">
                     {/* Post Title */}
                     <p className="font-cairo text-white font-bold text-center text-md mb-2 p-3 sm:text-lg sm:text-left lg:text-xl">{post.title}</p>

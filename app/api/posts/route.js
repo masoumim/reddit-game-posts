@@ -2,6 +2,7 @@ import 'server-only'
 
 // Route Handler for route: /api/posts
 // Here we make a call to the Reddit API to retrieve and return Reddit posts about a game title
+// Docs: https://www.reddit.com/dev/api#GET_search
 export async function GET(request){
             
     // Get the url parameters to be used in the API call
@@ -15,7 +16,7 @@ export async function GET(request){
     const title = matchTitleExactly === 'true' ? `"${gameTitle}"` : `${gameTitle}`;
                                 
     // Send the GET request
-    const res = await fetch(`https://oauth.reddit.com/search?q=${title}+${gamePlatform}&limit=10&restrict_sr=false`, {
+    const res = await fetch(`https://oauth.reddit.com/search?q=${title}+${gamePlatform}&limit=10restrict_sr=false`, {
         method: 'GET',
         headers: { 'Authorization': `bearer ${accessToken}` },        
     });

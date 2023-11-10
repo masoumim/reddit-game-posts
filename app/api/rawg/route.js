@@ -2,6 +2,7 @@ import 'server-only';
 
 // Route Handler for route: /api/rawg
 // This route is for handling calls to the RAWG API
+// Docs: https://api.rawg.io/docs/#operation/games_list
 
 // Make a GET request using the user input (game title) and return the results
 export async function GET(request){
