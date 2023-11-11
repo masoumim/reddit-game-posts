@@ -1,3 +1,4 @@
+import 'client-only';
 // SearchForm.js - This file renders a search bar (datalist) along with a submit button
 // The datalist is populated with matching games for each character the user enters
 // The submit button is disabled unless the input matches an <option>

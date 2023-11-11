@@ -1,4 +1,4 @@
-"use client";
+'use client';
 // page.js - This file is the main / root 'home page' for the app.
 import userAuthorizeApp from "./api/userAuthorizeApp";
 import Link from "next/link.js";

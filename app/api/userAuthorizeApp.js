@@ -1,3 +1,4 @@
+import 'client-only';
 import { v4 as uuidv4 } from 'uuid';
 
 // This function is called when User decides to authorize / grant this client app permission to access their Reddit account.

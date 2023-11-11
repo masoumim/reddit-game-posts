@@ -1,3 +1,4 @@
+import 'server-only';
 // layout.js - This is the root layout file for the whole app.
 // Any styling included in this file will apply to ALL app components.
 

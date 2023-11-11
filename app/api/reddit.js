@@ -1,3 +1,4 @@
+import 'client-only';
 // reddit.js - This file contains client-side methods which perform server-side API calls to the Reddit API
 // These methods are called on the client-side, make a server-side API call and then return that fetched data.
 

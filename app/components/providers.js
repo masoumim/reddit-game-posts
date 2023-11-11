@@ -1,3 +1,4 @@
+'use client';
 /*
 Providers.js - This file sets up the React 'Context' feature which enables sharing state data 
 between components without having to pass them down manually as props.
@@ -12,8 +13,6 @@ The content being set conditionally rendered to be either:
 The Providers component below accepts a 'children' prop from the RootLayout component located in app/layout.js
 This children prop represents every component in the component tree, hence the ability to share a state variable in a global way.
 */
-
-"use client";
 
 import { createContext, useState } from 'react';
 

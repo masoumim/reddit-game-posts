@@ -1,3 +1,4 @@
+import 'client-only';
 // tile.js - This file displays a posts's data formatted within a tile object.
 // A single tile is a container for a single post. When clicked, a tile will expand to display:
 // - the post's body (text, image, embedded video / YouTube video, Tweet etc.)

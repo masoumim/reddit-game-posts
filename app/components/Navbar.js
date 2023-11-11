@@ -1,5 +1,5 @@
+'use client';
 // Navbar.js - This file renders the Navbar component
-"use client";
 
 import { useContext } from "react";
 import Link from "next/link";

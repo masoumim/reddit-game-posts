@@ -1,3 +1,4 @@
+import 'client-only';
 // rawg.js - This file contains a client-side method which performs a server-side API call to the RAWG API
 // This method is called on the client-side, makes a server-side API call and then returns that fetched data.
 
