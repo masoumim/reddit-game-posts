@@ -2,8 +2,6 @@
 // A single tile is a container for a single post. When clicked, a tile will expand to display:
 // - the post's body (text, image, embedded video / YouTube video, Tweet etc.)
 // - A text input element for inputting a comment along with submission button
-// - Buttons for Upvoting and Downvoting the post
-
 // Collapse component: https://daisyui.com/components/collapse/
 
 import { useState, useEffect } from "react";

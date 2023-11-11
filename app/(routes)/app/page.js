@@ -56,7 +56,7 @@ export default function App() {
             const state = params.get("state");
             const code = params.get("code");
 
-            if (state && code) {
+            if (state && code) {                                
                 // Retrieve the initially generated state string
                 const stateString = window.sessionStorage.getItem("stateString");
 
@@ -77,11 +77,11 @@ export default function App() {
                     return "State strings do not match!";
                 }
             }
-            else {
+            else {                                
                 // Authorize App Only
                 const res = await fetch('/api/authapp', { method: 'POST' });
                 const data = await res.json();
-
+                                
                 // Set Access Token
                 setAccessToken(data.data.access_token);
 
