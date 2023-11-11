@@ -16,7 +16,7 @@ export async function GET(request){
     const title = matchTitleExactly === 'true' ? `"${gameTitle}"` : `${gameTitle}`;
                                 
     // Send the GET request
-    const res = await fetch(`https://oauth.reddit.com/search?q=${title}+${gamePlatform}&limit=10restrict_sr=false`, {
+    const res = await fetch(`https://oauth.reddit.com/search?q=${title}+${gamePlatform}&limit=100restrict_sr=false`, {
         method: 'GET',
         headers: { 'Authorization': `bearer ${accessToken}` },        
     });
