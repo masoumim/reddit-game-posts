@@ -1,13 +1,14 @@
 // app.test.js - This file tests the <App> component
 import React from "react";
-import { act, render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import App from "../(routes)/app/page";
 import userEvent from '@testing-library/user-event';
 import { ctx } from "@/app/components/providers";
 
-// Mock the response of fetch to set a value for access_token in the <App> component
-fetch.mockResponse(JSON.stringify({ data: { data: { access_token: "123" } } }));
+// Tell Jest to mock the implementation of this module
+// *This will use the mocked version of the module in the __mocks__ folder.
+jest.mock("../api/reddit");
 
 // Mocking the <SearchForm> component which is the child component of <App>
 // *Note: Mocking the searchForm component isn't the only way to run this test, but is used here for example and for future reference of how to mock components.
@@ -47,9 +48,9 @@ it("Confirms presence of text input field, disabled 'submit' button and unchecke
     const navContent = jest.fn();       // Mock the first Context object
     const setNavContent = jest.fn();    // Mock the second Context object
 
-    // 1. We wrap render in await act(...)
+    // 1. We wrap render in await waitFor which waits for all component updates to finish
     // 2. When we render <App>, wrap it in the imported Context (ctx) <Provider> component    
-    await act(() => {
+   await waitFor(()=>{
         render(
             <ctx.Provider value={[navContent, setNavContent]}>
                 <App />

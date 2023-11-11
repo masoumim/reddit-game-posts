@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import ReactPlayer from 'react-player/youtube';
 import { TwitterTweetEmbed } from 'react-twitter-embed';
+import { postComment } from "../api/reddit";
 
 export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) {
 
@@ -21,11 +22,10 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
 
         try {
             // POST the comment using the Reddit API            
-            const res = await fetch(`/api/comments?postid=${post.id}&comment=${commentInput}&accesstoken=${accessToken}`, { method: 'POST' });
-            const data = await res.json();
+            const res = await postComment(`/api/comments?postid=${post.id}&comment=${commentInput}&accesstoken=${accessToken}`, { method: 'POST' })
 
             // Throw error if user tries to make more than one comment within 2 min limit
-            if (!data.data.success) {
+            if (!res.data.success) {
                 throw "Wait a couple minutes before posting again."
             }
 

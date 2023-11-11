@@ -9,6 +9,8 @@ import SearchForm from "@/app/components/SearchForm";
 import Tile from "@/app/components/Tile.js";
 import Link from "next/link";
 import { ctx } from "@/app/components/providers";
+import { getAccessToken, getUsername } from "@/app/api/reddit";
+import { getGameResults } from "@/app/api/rawg";
 
 export default function App() {
 
@@ -62,12 +64,11 @@ export default function App() {
 
                 // Check if the state string in the URL matches the initially generated string
                 if (stateString === state) {
-                    // Get the Access Token using code                                    
-                    const res = await fetch('/api/authuser', { method: 'POST', body: JSON.stringify(code) })
-                    const data = await res.json();
+                    // Get the Access Token using code                                                        
+                    const accessToken = await getAccessToken('/api/authuser', { method: 'POST', body: JSON.stringify(code) })
 
-                    // Set the accessToken and loggedIn states
-                    setAccessToken(data.data.access_token);
+                    // Set the accessToken and loggedIn states                    
+                    setAccessToken(accessToken);
                     setLoggedIn(true);
 
                     // Delete the state string in sessionStore
@@ -79,11 +80,10 @@ export default function App() {
             }
             else {                                
                 // Authorize App Only
-                const res = await fetch('/api/authapp', { method: 'POST' });
-                const data = await res.json();
+                const accessToken = await getAccessToken('/api/authapp', { method: 'POST' });
                                 
-                // Set Access Token
-                setAccessToken(data.data.access_token);
+                // Set Access Token                
+                setAccessToken(accessToken);
 
                 // Set the navbar content to a Login button
                 setNavContent(<button onClick={userAuthorizeApp} className="text-emerald-50 transition ease-in-out bg-emerald-800 hover:bg-emerald-900 duration-300 font-bold text-sm p-2 rounded sm:text-lg sm:mr-5">Log in to Reddit</button>);
@@ -99,12 +99,11 @@ export default function App() {
                 // Set navbar content to loading message while fetching username
                 setNavContent("Loading...");
 
-                // Get the user's Reddit username
-                const res = await fetch(`/api/user?accesstoken=${accessToken}`, { method: 'GET' })
-                const data = await res.json();
+                // Get the user's Reddit username                
+                const username = await getUsername(`/api/user?accesstoken=${accessToken}`, { method: 'GET' });
 
                 // Set the navbar content to the Reddit username which links to their Reddit profile
-                setNavContent(<Link href={`https://www.reddit.com/user/${data.data.name}`} className="text-emerald-500 transition ease-in-out hover:text-emerald-200 duration-300 font-bold text-sm sm:text-lg sm:mr-5">u/{data.data.name}</Link>);
+                setNavContent(<Link href={`https://www.reddit.com/user/${username}`} className="text-emerald-500 transition ease-in-out hover:text-emerald-200 duration-300 font-bold text-sm sm:text-lg sm:mr-5">u/{username}</Link>);
             }
         }
         fetchData();
@@ -136,11 +135,9 @@ export default function App() {
             if (searchBarInput) {
                 // Do a search for games matching user input:
                 setIsLoadingPlatforms(true);
-                const res = await fetch(`/api/rawg?searchBarInput=${searchBarInput}`, { method: 'GET'});
-                const data = await res.json();
-
-                // Get the results from the API call
-                let gameTitleSearchResults = data.data.results;
+                
+                // Get the results from the API call                
+                let gameTitleSearchResults = await getGameResults(`/api/rawg?searchBarInput=${searchBarInput}`, { method: 'GET'});
 
                 // Populate the games menu if the API call returns games and none of the games are in the gameTitles array
                 const matchingGameTitles = [];

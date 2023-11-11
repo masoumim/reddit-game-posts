@@ -4,6 +4,7 @@
 
 import parse from 'html-react-parser'; // html-react-parser Converts an HTML string to one or more React elements.
 import timeago from 'epoch-timeago'; // Converts Unix Timestamp to formatted string of the 'amount of time that has past'
+import { getRedditPosts, getRedditPostComments } from './api/reddit';
 
 // Roman numerals (from 1 to 20)
 const romanNumerals = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii", "xiii", "xiv", "xv", "xvi", "xvii", "xviii", "xix", "xx"];
@@ -16,13 +17,11 @@ export async function processPosts(accessToken, gameTitle, gamePlatform, matchTi
     const formattedGameTitle = formatGameTitle(title);
 
     // Search Reddit for this game. Returns an array of posts                 
-    const redditSearchResponse = await fetch(`/api/posts?accesstoken=${accessToken}&gametitle=${gameTitle}&gameplatform=${gamePlatform}&matchtitleexactly=${matchTitleExactly}`, {method: 'GET'});    
-    const searchResponseData = await redditSearchResponse.json();        
-    const redditSearchResults = searchResponseData.data.data.children;
-
+    const redditSearchResults = await getRedditPosts(`/api/posts?accesstoken=${accessToken}&gametitle=${gameTitle}&gameplatform=${gamePlatform}&matchtitleexactly=${matchTitleExactly}`, { method: 'GET' });
+    
     // Filter / remove posts with Subredit names in a removePosts array    
     const removePosts = ["gamecollecting", "gameswap", "3dsqrcodes", "indiegameswap", "steamgameswap", "gametrade", "gamesale", "steam_giveaway", "gamedeals", "emulation", "vitahacks", "vitapiracy", "greatxboxdeals", "ama", "digitalcodesell", "uvtrade", "romhacking", "roms", "videogamedealscanada", "videogamedealsus", "gamepreorderscanada", "gamepreordersus", "warehouseconsoledeals", "freegamefindings", "randomactsofgaming", "giftofgames", "freegamesonsteam"];
-    const filteredPosts = redditSearchResults.filter(post => !removePosts.includes(post.data.subreddit.toLowerCase()));
+    const filteredPosts = redditSearchResults ? redditSearchResults.filter(post => !removePosts.includes(post.data.subreddit.toLowerCase())) : [];
 
     // For each post in filteredPosts, determine if the post is related to the game title.
     // If so, add the post to the validatedPosts array. Otherwise, skip the post.
@@ -35,15 +34,7 @@ export async function processPosts(accessToken, gameTitle, gamePlatform, matchTi
     });
 
     // Get the top comment for each post        
-    const promisesArray = [];
-    for (const post in validatedPosts) {                        
-        // Create and send api request for each reddit post
-        // Store each returned promise in promisesArray
-        promisesArray.push(fetch(`/api/comments?postid=${validatedPosts[post].post.data.id}&subreddit=${validatedPosts[post].post.data.subreddit}&accesstoken=${accessToken}`, { method: 'GET' }));
-    }
-
-    // Resolve all promises at once
-    const topCommentsArray = await Promise.all(promisesArray).then((responses) => { return Promise.all(responses.map((response) => { return response.json() })) });
+    const topCommentsArray = await getRedditPostComments(validatedPosts, accessToken);
     
     // Create a final array of formatted post objects to be returned.
     let formattedPostsArray = [];

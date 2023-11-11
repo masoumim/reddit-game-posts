@@ -3,7 +3,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { ctx } from "@/app/components/providers";
-import Home from "../../app/page";
+import Home from "../page";
 
 it("Confirms presence of 'Connect your Reddit account' button' and 'Continue without connecting Reddit Account' Link", () => {
     // Arrange
@@ -27,4 +27,3 @@ it("Confirms presence of 'Connect your Reddit account' button' and 'Continue wit
     expect(button).toBeInTheDocument();
     expect(link).toBeInTheDocument();
 });
-

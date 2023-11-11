@@ -6,7 +6,7 @@ import 'server-only';
 
 // Make a GET request using the user input (game title) and return the results
 export async function GET(request){
-            
+    
     // Get the user input (game title)        
     const { searchParams } = new URL(request.url);
     const userInput = searchParams.get('searchBarInput');
