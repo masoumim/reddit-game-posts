@@ -245,6 +245,7 @@ export default function App() {
             </div>
             {/* Tiles / Reddit Posts */}
             {isLoadingPosts ? <p className="text-white font-bold text-center">Loading posts...</p> : posts.map((post, index) => { return <Tile key={index} post={post} loggedIn={loggedIn} userAuthorizeApp={userAuthorizeApp} accessToken={accessToken} /> })}
+            <br/>
         </>
     )
 }
