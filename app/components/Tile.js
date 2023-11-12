@@ -97,17 +97,18 @@ export default function Tile({ post, loggedIn, userAuthorizeApp, accessToken }) 
                     {/* User Comment */}
                     <div className="user-comment text-white italic text-center p-3 sm:text-lg" style={{ overflowWrap: "anywhere" }}>{post.topCommentText}</div>
                     {/* Comment icon and Comment username  */}
-                    <div className="sm:flex flex-row">
-                        <div className="flex flex-row gap-1 pl-3 sm:flex-1">
-                            <div className="bg-comment bg-contain bg-center bg-no-repeat w-5 h-5 pt-6" />
-                            <p className="text-emerald-100 font-bold text-sm">u/{post.topCommentAuthor}</p>
-                        </div>
-                        {/* Comment time posted and upvotes */}
-                        <div className="flex flex-row gap-2 pl-3 sm:mr-3">
-                            <p className="text-lime-500 font-bold text-sm">{post.commentDate}</p>
-                            <p className="text-lime-400 font-bold text-sm">{post.topCommentUpVotes} upvotes</p>
-                        </div>
-                    </div>
+                    {post.topCommentText !== "No comments" ?
+                        <div className="sm:flex flex-row">
+                            <div className="flex flex-row gap-1 pl-3 sm:flex-1">
+                                <div className="bg-comment bg-contain bg-center bg-no-repeat w-5 h-5 pt-6" />
+                                <p className="text-emerald-100 font-bold text-sm">u/{post.topCommentAuthor}</p>
+                            </div>
+                            {/* Comment time posted and upvotes */}
+                            <div className="flex flex-row gap-2 pl-3 sm:mr-3">
+                                <p className="text-lime-500 font-bold text-sm">{post.commentDate}</p>
+                                <p className="text-lime-400 font-bold text-sm">{post.topCommentUpVotes} upvotes</p>
+                            </div>
+                        </div> : <></>}
                 </div>
                 <div className="collapse-content p-0 mt-5">
                     {/* Post content */}
