@@ -31,7 +31,10 @@ Posts are given a validity score based on the above criteria and then assigned a
 
 
 # React Server Components:
-Next.js 13 App Router introduces a new type of component called a [Server Component](https://nextjs.org/docs/app/building-your-application/rendering/server-components). By default, all components created using App Router as React Server Components (RSC). RSC's render on the server and there are [numerous benefits](https://nextjs.org/docs/app/building-your-application/rendering/server-components#benefits-of-server-rendering) to doing so. Of the stated benefits, this project specifically uses RSC's for **data fetching** and **security**. In general, it is recommended that API calls be made on the server and not the client. As stated in the documentation: *This can improve performance by reducing time it takes to fetch data needed for rendering, and the amount of requests the client needs to make*. As for the security benefit, this project uses two different external API's and each provide sensitive data in order to access them. The Reddit API uses a "secret" that is used to obtain an access token and RAWG provides an API key which is private and used to call the API. This sensitive data is kept in an env.local file which can only be accessed using by an RSC. Therefore, by moving my API calls to the server by containing them in RSC's, I gain both the benefit of more efficient data fetching and increased security by not exposing sensitive data.
+Next.js 13 App Router introduces a new type of component called a [Server Component](https://nextjs.org/docs/app/building-your-application/rendering/server-components). By default, all components created using App Router as React Server Components (RSC). RSC's render on the server and there are [numerous benefits](https://nextjs.org/docs/app/building-your-application/rendering/server-components#benefits-of-server-rendering) to doing so. Of the stated benefits, this project specifically uses RSC's for **data fetching** and **security**. In general, it is recommended that API calls be made on the server and not the client. 
+
+As stated in the documentation: *This can improve performance by reducing time it takes to fetch data needed for rendering, and the amount of requests the client needs to make*. As for the security benefit, this project uses two different external API's and each provide sensitive data in order to access them. The Reddit API uses a "secret" that is used to obtain an access token and RAWG provides an API key which is private and used to call the API. This sensitive data is kept in an env.local file which can only be accessed using by an RSC. Therefore, by moving my API calls to the server by containing them in RSC's, I gain both the benefit of more efficient data fetching and increased security by not exposing sensitive data.
+
 
 # Keeping Server-only Code out of the Client Environment
 The tricky thing about RSC's is that they can *become* a Client Component inadvertently. For example, if I have a file foo.js which contains a function bar(), this bar() will run on the server by default. However, if I have another file, baz.js which is a Client Component and I import into it the bar() function from foo.js, then by this one action foo.js has now become a Client component. In fact, if foo.js had multiple functions, states and components, then ALL of them would now be run on the client and not the server. This can happen inadvertently because such an action would produce no warning, error and notification that a RSC has just become a Client Component. As the Next.js docs state: *by defining a "use client" in a file, all other modules imported into it, including child components, are considered part of the client bundle.*
@@ -62,7 +65,7 @@ With that all set up I am now ready to make an API call like so:
 
 1. In [app/(routes)/app/page.js](https://github.com/masoumim/reddit-game-posts/blob/main/app/(routes)/app/page.js) I import and call the getGameResults() function located in [app/api/rawg.js](https://github.com/masoumim/reddit-game-posts/blob/main/app/api/rawg.js): 
 
-let gameTitleSearchResults = await getGameResults(`/api/rawg?searchBarInput=${searchBarInput}`, { method: 'GET'});
+let gameTitleSearchResults = await getGameResults(/api/rawg?searchBarInput=${searchBarInput}, { method: 'GET'});
 
 2. The getGameResults() function located in [app/api/rawg.js](https://github.com/masoumim/reddit-game-posts/blob/main/app/api/rawg.js) is called:
 
@@ -76,10 +79,8 @@ export async function getGameResults(url, options) {
 
 export async function GET(request){              
     const { searchParams } = new URL(request.url);
-    const userInput = searchParams.get('searchBarInput');
-                                
-    const res = await fetch(`https://api.rawg.io/api/games?key=${process.env.RAWG_API_KEY}&search=${userInput}`, { method: 'GET' });
-            
+    const userInput = searchParams.get('searchBarInput');                                
+    const res = await fetch(https://api.rawg.io/api/games?key=${process.env.RAWG_API_KEY}&search=${userInput}, { method: 'GET' });            
     const data = await res.json();
     return Response.json({ data });
 }
